@@ -31,4 +31,10 @@ void IOManager::input() {
         int resourcePosY, resourcePosX;
         cin >> resourcePosY >> resourcePosX;
     }
+    
+    string endStr;
+    cin >> endStr;
+    if (endStr != "END") {
+        cerr << "[IOManager] Error: end of input";
+    }
 }
