@@ -1,0 +1,232 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.security.SecureRandom;
+import java.util.*;
+import java.util.List;
+
+class Drawer extends JFrame {
+    public static final int EXTRA_WIDTH = 300;
+    public static final int EXTRA_HEIGHT = 100;
+
+    public World world;
+    public DrawerPanel panel;
+
+    public int cellSize, boardSize;
+    public int width, height;
+
+    public boolean pauseMode = false;
+
+/*    class DrawerKeyListener extends KeyAdapter {
+        public void keyPressed(KeyEvent e) {
+            synchronized (keyMutex) {
+                if (e.getKeyChar() == ' ') {
+                    pauseMode = !pauseMode;
+                }
+                keyPressed = true;
+                keyMutex.notifyAll();
+            }
+        }
+    }*/
+
+    class DrawerPanel extends JPanel {
+        public void paint(Graphics g) {
+        	  // field cells
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(15, 15, cellSize * boardSize + 1, cellSize * boardSize + 1);
+            g.setColor(Color.RED);
+            for (int i = 0; i <= boardSize; i++) {
+                g.drawLine(15 + i * cellSize, 15, 15 + i * cellSize, 15 + cellSize * boardSize);
+                g.drawLine(15, 15 + i * cellSize, 15 + cellSize * boardSize, 15 + i * cellSize);
+            }
+
+            // snow
+            g.setColor(Color.WHITE);
+            for (int i=0; i < boardSize; i++) {
+                for (int j=0; j < boardSize; j++) {
+                    if (world.haveSnow[i][j]) {
+                        g.fillRect(15 + j * cellSize + 1, 15 + i * cellSize + 1, cellSize - 2, cellSize - 2);
+                    }
+                }
+            }
+
+            // worker
+            g.setColor(Color.BLUE);
+            synchronized (world.workersLock) {
+                for (Cell worker : world.workers) {
+                    g.fillRect(15 + worker.c * cellSize + 1, 15 + worker.r * cellSize + 1, cellSize - 2, cellSize - 2);
+                }
+            }
+
+            // texts
+            g.setColor(Color.BLACK);
+            g.setFont(new Font("Arial", Font.BOLD, 12));
+            Graphics2D g2 = (Graphics2D)g;
+
+            int horPos = 40 + boardSize * cellSize;
+
+            g2.drawString("Board size = " + world.haveSnow.length, horPos, 30);
+            synchronized (world.workersLock) {
+                g2.drawString("Workers = " + world.workers.size(), horPos, 145);
+            }
+        }
+    }
+
+    class DrawerWindowListener extends WindowAdapter {
+        public void windowClosing(WindowEvent event) {
+            Sample.stopSolution();
+            System.exit(0);
+        }
+    }
+
+    final Object keyMutex = new Object();
+    boolean keyPressed;
+
+    public void processPause() {
+        synchronized (keyMutex) {
+            if (!pauseMode) {
+                return;
+            }
+            keyPressed = false;
+            while (!keyPressed) {
+                try {
+                    keyMutex.wait();
+                } catch (InterruptedException e) {
+                    // do nothing
+                }
+            }
+        }
+    }
+
+    public Drawer(World world, int cellSize) {
+        super();
+
+        panel = new DrawerPanel();
+        getContentPane().add(panel);
+
+        addWindowListener(new DrawerWindowListener());
+
+        this.world = world;
+
+        boardSize = world.haveSnow.length;
+        this.cellSize = cellSize;
+        width = cellSize * boardSize + EXTRA_WIDTH;
+        height = cellSize * boardSize + EXTRA_HEIGHT;
+
+//        addKeyListener(new DrawerKeyListener());
+
+        setSize(width, height);
+        setTitle("Visualizer tool for problem SnowCleaning");
+
+        setResizable(false);
+        setVisible(true);
+    }
+}
+
+class World {
+    final Object workersLock = new Object();
+
+    int snowCnt;
+    boolean[][] haveSnow;
+
+    List<Cell> workers = new ArrayList<Cell>();
+    Set<Integer> usedWorkers = new HashSet<Integer>();
+
+    int salary, fine;
+    int totSalary, totFine;
+    int curDay = -1;
+
+    public World(int boardSize) {
+        haveSnow = new boolean[boardSize][boardSize];
+    }
+
+/*
+    public void updateTotalSalary() {
+        synchronized (workersLock) {
+            totSalary += salary * workers.size();
+        }
+    }
+
+    public void updateTotalFine() {
+        totFine += snowCnt * fine;
+    }
+
+    public void addSnow(int r, int c) {
+        if (!haveSnow[r][c]) {
+            snowCnt++;
+            haveSnow[r][c] = true;
+        }
+    }
+
+    public void removeSnow(int r, int c) {
+        if (haveSnow[r][c]) {
+            snowCnt--;
+            haveSnow[r][c] = false;
+        }
+    }
+
+    public void startNewDay() {
+        curDay++;
+        usedWorkers.clear();
+    }
+
+    public String addWorker(int r, int c) {
+        synchronized (workersLock) {
+            if (workers.size() == Constants.MAX_WORKERS) {
+                return "You are allowed to have at most " + Constants.MAX_WORKERS + " workers.";
+            } else if (r < 0 || r >= haveSnow.length || c < 0 || c >= haveSnow.length) {
+                return "You are trying to hire a worker at a cell outside the board.";
+            } else {
+                workers.add(new Cell(r, c));
+                usedWorkers.add(workers.size() - 1);
+                removeSnow(r, c);
+                return "";
+            }
+        }
+    }
+
+    public String moveWorker(int id, int dir) {
+        synchronized (workersLock) {
+            if (id < 0 || id >= workers.size()) {
+                return "You are trying to move worker which does not exist.";
+            } else if (usedWorkers.contains(id)) {
+                return "You are trying to execute a command for some worker more than once during the same turn.";
+            } else {
+                Cell worker = workers.get(id);
+                worker.r += Constants.DR[dir];
+                worker.c += Constants.DC[dir];
+                if (worker.r < 0 || worker.c < 0 || worker.r >= haveSnow.length || worker.c >= haveSnow.length) {
+                    return "You are trying to move a worker outside the board.";
+                }
+                removeSnow(worker.r, worker.c);
+                usedWorkers.add(id);
+                return "";
+            }
+        }
+    }
+
+    public void cleanAllSnow() {
+        synchronized (workersLock) {
+            for (Cell worker : workers) {
+                removeSnow(worker.r, worker.c);
+            }
+        }
+    }*/
+}
+
+public class FieldSample {
+	public static void main(String args[]) {
+		System.out.println("hoge");
+
+		World world = new World(100);
+		Drawer drawer = new Drawer(world, 7);
+
+	}
+}
