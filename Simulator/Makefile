@@ -9,6 +9,6 @@ java_only: java_compile
 java_compile:
 	$(JAVAC) CodeVS40Simulator.java -Xlint:unchecked
 
-field_sample:
-	$(JAVAC) FieldSample.java -Xlint:unchecked
-	java FieldSample
+game:
+	$(JAVAC) CodeVS.java -Xlint:unchecked
+	java CodeVS
