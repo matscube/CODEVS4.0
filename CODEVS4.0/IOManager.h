@@ -9,16 +9,31 @@
 #ifndef __CODEVS4_0__IOManager__
 #define __CODEVS4_0__IOManager__
 
+#include "Field.h"
+#include "Game.h"
+#include "Player.h"
+#include "Library.h"
+#include "AI.h"
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
+
 class IOManager {
-    
-    
+    Game *game;
+    Field *field;
+    Player *player;
+    void finishInput();
 public:
+    IOManager(Game &game, Field &field, Player &player);
+    int nextInt();
+    void testInput();
     void input();
+    void firstOutput();
+    void output(vector<Command> commands);
+    void testOutput();
 };
 
 #endif /* defined(__CODEVS4_0__IOManager__) */

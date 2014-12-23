@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		213DC4381A492BFE00E5DC85 /* Library.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 213DC4361A492BFE00E5DC85 /* Library.cpp */; };
+		216121181A4890A100C7C139 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216121161A4890A100C7C139 /* Player.cpp */; };
+		2161211B1A4890AD00C7C139 /* Field.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216121191A4890AD00C7C139 /* Field.cpp */; };
+		2161211E1A4890BD00C7C139 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2161211C1A4890BD00C7C139 /* Game.cpp */; };
+		216121211A48925100C7C139 /* AI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2161211F1A48925100C7C139 /* AI.cpp */; };
 		219D56411A3F47BE00162FEA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 219D56401A3F47BE00162FEA /* main.cpp */; };
 		219D56491A3F497F00162FEA /* IOManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 219D56471A3F497F00162FEA /* IOManager.cpp */; };
 /* End PBXBuildFile section */
@@ -24,6 +29,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		213DC4361A492BFE00E5DC85 /* Library.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Library.cpp; sourceTree = "<group>"; };
+		213DC4371A492BFE00E5DC85 /* Library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Library.h; sourceTree = "<group>"; };
+		216121161A4890A100C7C139 /* Player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = "<group>"; };
+		216121171A4890A100C7C139 /* Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
+		216121191A4890AD00C7C139 /* Field.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Field.cpp; sourceTree = "<group>"; };
+		2161211A1A4890AD00C7C139 /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Field.h; sourceTree = "<group>"; };
+		2161211C1A4890BD00C7C139 /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Game.cpp; sourceTree = "<group>"; };
+		2161211D1A4890BD00C7C139 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
+		2161211F1A48925100C7C139 /* AI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AI.cpp; sourceTree = "<group>"; };
+		216121201A48925100C7C139 /* AI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AI.h; sourceTree = "<group>"; };
 		219D563D1A3F47BE00162FEA /* CODEVS4.0 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CODEVS4.0; sourceTree = BUILT_PRODUCTS_DIR; };
 		219D56401A3F47BE00162FEA /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		219D56471A3F497F00162FEA /* IOManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOManager.cpp; sourceTree = "<group>"; };
@@ -41,6 +56,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		213DC4351A49241800E5DC85 /* Libs */ = {
+			isa = PBXGroup;
+			children = (
+				219D56471A3F497F00162FEA /* IOManager.cpp */,
+				219D56481A3F497F00162FEA /* IOManager.h */,
+				216121161A4890A100C7C139 /* Player.cpp */,
+				216121171A4890A100C7C139 /* Player.h */,
+				216121191A4890AD00C7C139 /* Field.cpp */,
+				2161211A1A4890AD00C7C139 /* Field.h */,
+				2161211C1A4890BD00C7C139 /* Game.cpp */,
+				2161211D1A4890BD00C7C139 /* Game.h */,
+				213DC4361A492BFE00E5DC85 /* Library.cpp */,
+				213DC4371A492BFE00E5DC85 /* Library.h */,
+			);
+			name = Libs;
+			sourceTree = "<group>";
+		};
 		219D56341A3F47BE00162FEA = {
 			isa = PBXGroup;
 			children = (
@@ -60,9 +92,10 @@
 		219D563F1A3F47BE00162FEA /* CODEVS4.0 */ = {
 			isa = PBXGroup;
 			children = (
+				213DC4351A49241800E5DC85 /* Libs */,
 				219D56401A3F47BE00162FEA /* main.cpp */,
-				219D56471A3F497F00162FEA /* IOManager.cpp */,
-				219D56481A3F497F00162FEA /* IOManager.h */,
+				2161211F1A48925100C7C139 /* AI.cpp */,
+				216121201A48925100C7C139 /* AI.h */,
 			);
 			path = CODEVS4.0;
 			sourceTree = "<group>";
@@ -125,6 +158,11 @@
 			files = (
 				219D56411A3F47BE00162FEA /* main.cpp in Sources */,
 				219D56491A3F497F00162FEA /* IOManager.cpp in Sources */,
+				2161211B1A4890AD00C7C139 /* Field.cpp in Sources */,
+				213DC4381A492BFE00E5DC85 /* Library.cpp in Sources */,
+				216121181A4890A100C7C139 /* Player.cpp in Sources */,
+				2161211E1A4890BD00C7C139 /* Game.cpp in Sources */,
+				216121211A48925100C7C139 /* AI.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -238,6 +276,7 @@
 				219D56461A3F47BE00162FEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -21,3 +21,6 @@ Pods
 
 # Simulator
 *.class
+
+codevs4.jnlp
+Data/CODEVS4sample/

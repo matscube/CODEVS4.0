@@ -10,38 +10,52 @@
 #include <vector>
 #include <fstream>
 #include "IOManager.h"
+#include "Field.h"
+#include "Player.h"
+#include "Game.h"
+#include "AI.h"
+#include "Library.h"
 
 using namespace std;
 
-
-
 int main(int argc, const char * argv[]) {
-    ifstream arq(getenv("MYARQ"));
-    cin.rdbuf(arq.rdbuf());
+    cout << "matscube" << endl;
     
-    int n;
-    cin >> n;
-    cout << n;
-    cin >> n;
-    cout << n;
-    cin >> n;
-    cout << n;
+    Game game = Game();
+    Field field = Field();
+    Player player = Player();
+    AI ai = AI(game, field, player);
     
-    // insert code here...
-//    cout << "Hello, World!\n";
     
-    IOManager iOManager;
-    iOManager.input();
+    IOManager iOManager = IOManager(game, field, player);
 
-    
-/*    for (int i = 0; i < 10; i++) {
-        cout << i << endl;
+    for (int i = 0; i < 1000; i++) {
+
+        iOManager.input();
+        // debug output
+        ai.debug();
+        
+        // AI
+        ai.resetWithTurn();
+        ai.fixWorkerOnResource();
+        if (i < 200) {
+            ai.addCommands(ai.createWorkerCommand());
+        }
+        
+
+        if (i < 500) {
+            ai.addCommands(ai.randomWalkCommand());
+        } else {
+            ai.addCommands(ai.getResourceCommand());
+        }
+        
+        
+        iOManager.output(ai.getCommands());
+//        iOManager.testInput();
+//        iOManager.testOutput();
     }
-    
-    int n;
-    cout << "put n:";
-    cin >> n;
-    cout << n << endl;*/
+
+
     
     return 0;
 }
