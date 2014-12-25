@@ -15,6 +15,7 @@
 #include "Library.h"
 #include <stdio.h>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -25,6 +26,8 @@ class AI {
     Field *field;
     Player *player;
     vector<Command> commands;
+    ofstream ofs;
+    ofstream fieldOfs;
 public:
     AI(Game &game, Field &field, Player &player);
     void resetWithTurn();

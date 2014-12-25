@@ -78,6 +78,7 @@ void IOManager::input() {
         PlayerUnit unit = PlayerUnit(unitID, unitPosX, unitPosY, PlayerUnitType(unitType));
         unit.setHitPoint(unitHP);
         field->updateStatusWithAllyUnit(unit);
+        field->updateVisited(&unit);
         player->units[unit.ID] = unit;
     }
     

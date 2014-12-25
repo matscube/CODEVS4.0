@@ -23,6 +23,8 @@ using namespace std;
 
 typedef pair<int, int> Position;
 
+bool isValidIndex(int x, int y);
+
 enum class FieldUnitType {
     Resource,
 };
@@ -44,11 +46,14 @@ enum class FieldStatus {
     AllyCastle,
     EnemyCastle,
 };
+string FieldStatusName(FieldStatus s);
 
 class Field {
 public:
     Field();
     FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     Position allyCastle;
     Position EnemyCastle;
 
@@ -58,10 +63,10 @@ public:
 
     
 //    vector<FieldUnit> units;
-    void initStatus();
     void resetStatusWithTurn();
     void updateStatusWithAllyUnit(PlayerUnit playerUnit);
     void updateStatusWithFieldUnit(FieldUnit fieldUnit);
+    void updateVisited(PlayerUnit *playerUnit);
     
 };
 

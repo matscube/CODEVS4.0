@@ -13,6 +13,8 @@ AI::AI(Game &game, Field &field, Player &player) {
     AI::game = &game;
     AI::field = &field;
     AI::player = &player;
+    ofs = ofstream("/Users/matscube/hoge.txt");
+    fieldOfs = ofstream("/Users/matscube/field.txt");
 }
 
 void AI::resetWithTurn() {
@@ -124,24 +126,52 @@ vector<Command> AI::randomWalkCommand() {
 
 vector<Command> AI::searchResourceCommand() {
     vector<Command> commands;
-    
+
     map<int, PlayerUnit>::iterator unitIte = player->units.begin();
     for (; unitIte != player->units.end(); unitIte++) {
         PlayerUnit *unit = &unitIte->second;
-        if (unit->type == PlayerUnitType::Castle) {
-            continue;
-        }
 
-        if (unit->status == PlayerUnitStatus::Idle) {
-            if (rand() % 2) {
-                Command com(unit->ID, PlayerUnitActionType::MoveDown);
-                commands.push_back(com);
-            } else {
-                Command com(unit->ID, PlayerUnitActionType::MoveRight);
-                commands.push_back(com);
-            }
+        if (!unit->isCommandable()) continue;
+        if (!unit->isMovable()) continue;
+
+        for (int d = 5; d < 100; d++) {
+            for (int dx = -d; dx <= d; dx++) {
+                int dy = (d - abs(dx));
+                int multi = (rand() % 2) ? 1 : -1;
+                dy *= multi;
                 
+                int x = unit->x + dx;
+                int y = unit->y + dy;
+                
+/*                if (isValidIndex(x, y)) {
+                    ofs << "d: " << d << " dx:" << dx << " x:" << x << " y:" << y << " isVisited:" << field->willBeVisited[x][y] << endl;
+                }*/
+                
+                if (isValidIndex(x, y) && !field->willBeVisited[x][y]) {
+                    Command com(unit->ID, unit->moveToTargetAction(x, y));
+                    commands.push_back(com);
+                    unit->setReserved();
+                    field->willBeVisited[x][y] = true;
+                    goto breakLoop;
+                }
+
+                y = unit->y - dy;
+                
+/*                if (isValidIndex(x, y)) {
+                    ofs << "d: " << d << " dx:" << dx << " x:" << x << " y:" << y << " isVisited:" << field->willBeVisited[x][y] << endl;
+                }*/
+
+                if (isValidIndex(x, y) && !field->willBeVisited[x][y]) {
+                    Command com(unit->ID, unit->moveToTargetAction(x, y));
+                    commands.push_back(com);
+                    unit->setReserved();
+                    field->willBeVisited[x][y] = true;
+                    goto breakLoop;
+                }
+            }
         }
+        breakLoop:
+        continue;
     }
     
     return commands;
@@ -166,6 +196,25 @@ void AI::debug() {
     map<int, FieldUnit> resources = field->resources;
     cerr << "Visible Resource count: " << resources.size() << endl;
     cerr << "-----end debug-----" << endl;
+#endif
+    
+    
+#if 0
+    int visitedCnt = 0;
+    for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
+        for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
+//            if (field->isVisited[x][y]) {
+            if (field->willBeVisited[x][y]) {
+                fieldOfs << "#";
+                visitedCnt++;
+            } else {
+                fieldOfs << ".";
+            }
+        }
+        fieldOfs << endl;
+    }
+//    cerr << visitedCnt << endl;
+
 #endif
 }
 

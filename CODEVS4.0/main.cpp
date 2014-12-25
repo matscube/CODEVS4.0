@@ -37,16 +37,18 @@ int main(int argc, const char * argv[]) {
         
         // AI
         ai.resetWithTurn();
-        ai.fixWorkerOnResource();
+//        ai.fixWorkerOnResource();
         if (i < 200) {
-            ai.addCommands(ai.createWorkerCommand());
+//            ai.addCommands(ai.createWorkerCommand());
         }
         
+        ai.addCommands(ai.searchResourceCommand());
 
         if (i < 500) {
-            ai.addCommands(ai.randomWalkCommand());
+//            ai.addCommands(ai.randomWalkCommand());
+//            ai.addCommands(ai.searchResourceCommand());
         } else {
-            ai.addCommands(ai.getResourceCommand());
+//            ai.addCommands(ai.getResourceCommand());
         }
         
         
