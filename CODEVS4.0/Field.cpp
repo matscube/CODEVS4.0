@@ -34,6 +34,7 @@ Field::Field() {
             willBeVisited[x][y] = false;
         }
     }
+    ofs = ofstream("/Users/matscube/field.txt");
 }
 
 FieldUnit::FieldUnit() {}
@@ -41,6 +42,7 @@ FieldUnit::FieldUnit(int x, int y, FieldUnitType type) {
     FieldUnit::x = x;
     FieldUnit::y = y;
     FieldUnit::type = type;
+    FieldUnit::occupancy = 0;
     FieldUnit::hashID = getHashID(x, y);
 }
 
@@ -49,6 +51,10 @@ void Field::resetStatusWithTurn() {
     memset(allyWorkers, 0, sizeof(allyWorkers));
     memset(reservedWorkers, 0, sizeof(reservedWorkers));
     memcpy(willBeVisited, isVisited, sizeof(isVisited));
+    map<int, FieldUnit>::iterator resIte = resources.begin();
+    for (; resIte != resources.end(); resIte++) {
+        resIte->second.occupancy = 0;
+    }
 }
 
 void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
@@ -63,9 +69,6 @@ void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
             if (dist(cx, cy, x, y) > viewRange) continue;
             if (status[x][y] != FieldStatus::Unknown) continue;
             
-            cerr << allyUnit.ID << " " << cx << " " << cy << " " << x << " " << y << " " << PlayerUnitTypeName(allyUnit.type) << endl;
-//            cerr << allyUnit.ID << endl;
-
             status[x][y] = FieldStatus::Visited;
         }
     }

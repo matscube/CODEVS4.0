@@ -122,16 +122,13 @@ void IOManager::output(vector<Command> commands) {
     
     cout << sz << endl; cout.flush();
     
-    vector<Command>::iterator ite = commands.begin();
-    while (ite != commands.end()) {
+    vector<Command>::iterator ite;
+    for (ite = commands.begin(); ite != commands.end(); ite++) {
         if (ite->second == PlayerUnitActionType::None) {
             cerr << "[IOManager::output] Error: 'None' action is called." << endl;
             continue;
-        } else {
-//            cerr << ite->first << " " << PlayerUnit::action(ite->second) << endl; cerr.flush();
         }
         cout << ite->first << " " << PlayerUnit::action(ite->second) << endl; cout.flush();
-        ite++;
     }
 }
 

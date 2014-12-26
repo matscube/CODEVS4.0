@@ -14,7 +14,7 @@ AI::AI(Game &game, Field &field, Player &player) {
     AI::field = &field;
     AI::player = &player;
     ofs = ofstream("/Users/matscube/hoge.txt");
-    fieldOfs = ofstream("/Users/matscube/field.txt");
+    fieldOfs = ofstream("/Users/matscube/AIfield.txt");
 }
 
 void AI::resetWithTurn() {
@@ -46,45 +46,41 @@ vector<Command> AI::createWorkerCommand() {
     return commands;
 }
 
-void AI::fixWorkerOnResource() {
-    map<int, PlayerUnit>::iterator pUnitIte = player->units.begin();
-    for (; pUnitIte != player->units.end(); pUnitIte++) {
-        PlayerUnit *pUnit = &pUnitIte->second;
-        
-        if (field->status[pUnit->x][pUnit->y] == FieldStatus::Resource
-            && field->reservedWorkers[pUnit->x][pUnit->y] < 5 ) {
-            
-            field->reservedWorkers[pUnit->x][pUnit->y]++;
-            pUnit->setReserved();
-        }
-    }
-}
-
 vector<Command> AI::getResourceCommand() {
     vector<Command> commands;
 
-    map<int, FieldUnit>::iterator resIte = field->resources.begin();
-    for (; resIte != field->resources.end(); resIte++) {
-        FieldUnit *fUnit = &resIte->second;
-
-        int rest = 5 - field->allyWorkers[fUnit->x][fUnit->y];
-        if (rest <= 0) continue;
-        
-        map<int, PlayerUnit>::iterator pUnitIte = player->units.begin();
-        for (; pUnitIte != player->units.end(); pUnitIte++) {
-            PlayerUnit *pUnit = &pUnitIte->second;
+    map<int, FieldUnit>::iterator resIte;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    vector<pair<int, pair<int, int> > > dists; // (dist, (resID, unitID))
+    for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
+        for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+            if (pUnitIte->second.type != PlayerUnitType::Worker) continue;
             
-            if (!pUnit->isMovable()) continue;
-            if (!pUnit->isCommandable()) continue;
-            
-            PlayerUnitActionType action = pUnit->moveToTargetAction(fUnit->x, fUnit->y);
-            if (action != PlayerUnitActionType::None) {
-                Command com(pUnit->ID, action);
-                commands.push_back(com);
-                pUnit->setReserved();
-            }
+            int d = dist(resIte->second.x, resIte->second.y, pUnitIte->second.x, pUnitIte->second.y);
+            dists.push_back(make_pair(d, make_pair(resIte->second.hashID, pUnitIte->second.ID)));
         }
     }
+
+    sort(dists.begin(), dists.end());
+    
+    for (int i = 0; i < dists.size(); i++) {
+        int unitID = dists[i].second.second;
+        int resID = dists[i].second.first;
+        PlayerUnit *pUnit = &player->units[unitID];
+        FieldUnit *res = &field->resources[resID];
+
+        if (res->occupancy >= MAX_GETTING_RESOURCE) continue;
+        if (!pUnit->isCommandable()) continue;
+        
+        int d = dists[i].first;
+        if (d != 0) {
+            Command com(pUnit->ID, pUnit->moveToTargetAction(res->x, res->y));
+            commands.push_back(com);
+        }
+        res->occupancy++;
+        pUnit->setReserved();
+    }
+
     return commands;
 }
 
@@ -177,6 +173,16 @@ vector<Command> AI::searchResourceCommand() {
     return commands;
 }
 
+
+bool AI::isSearchable() {
+    for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
+        for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
+            if (!field->isVisited[x][y]) return true;
+        }
+    }
+    return false;
+}
+
 void AI::debug() {
 #if 0
     // Player
@@ -215,6 +221,15 @@ void AI::debug() {
     }
 //    cerr << visitedCnt << endl;
 
+#endif
+    
+#if 0
+    fieldOfs << "Field********" << endl;
+    map<int, FieldUnit>::iterator fUIte = field->resources.begin();
+    for (; fUIte != field->resources.end(); fUIte++) {
+        fieldOfs << fUIte->first << " " << fUIte->second.hashID << " " << fUIte->second.x << " " << fUIte->second.y << endl;
+    }
+    
 #endif
 }
 

@@ -38,9 +38,11 @@ public:
 
     vector<Command> createWorkerCommand();
     vector<Command> randomWalkCommand();
-    void fixWorkerOnResource();
     vector<Command> getResourceCommand();
     vector<Command> searchResourceCommand();
+    
+    
+    bool isSearchable();
     
     void debug();
 };

@@ -103,10 +103,15 @@ Player::Player() {
 
 void Player::resetWithTurn() {
     units.clear();
-    map<int, PlayerUnit>::iterator iteUnit = units.begin();
-    for (; iteUnit != units.end(); iteUnit++) {
-        iteUnit->second.status = PlayerUnitStatus::Idle;
+}
+
+int Player::calcWorkerCount() {
+    int cnt = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
+        if (pUnitIte->second.type == PlayerUnitType::Worker) cnt++;
     }
+    return cnt;
 }
 
 PlayerUnit::PlayerUnit() {}

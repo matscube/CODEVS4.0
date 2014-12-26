@@ -13,9 +13,11 @@
 #include <stdio.h>
 #include <vector>
 #include <map>
+#include <fstream>
 
 #define MAX_FIELD_WIDTH 100
 #define MAX_FIELD_HEIGHT 100
+#define MAX_GETTING_RESOURCE 5
 
 
 using namespace std;
@@ -34,6 +36,7 @@ class FieldUnit {
 public:
     int x, y;
     int hashID;
+    int occupancy;
     FieldUnitType type;
     FieldUnit();
     FieldUnit(int x, int y, FieldUnitType type);
@@ -49,6 +52,7 @@ enum class FieldStatus {
 string FieldStatusName(FieldStatus s);
 
 class Field {
+    ofstream ofs;
 public:
     Field();
     FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];

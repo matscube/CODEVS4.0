@@ -83,6 +83,7 @@ public:
     int resourceCount;
     map<int, PlayerUnit> units;
     
+    int calcWorkerCount();
     void resetWithTurn();
 };
 
