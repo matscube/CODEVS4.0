@@ -43,10 +43,10 @@ int main(int argc, const char * argv[]) {
         }
         
         if (ai.isSearchable()) {
-            ai.addCommands(ai.searchResourceCommand());
-        } else {
-            ai.addCommands(ai.getResourceCommand());
+            ai.addCommands(ai.searchResourceCommand(10));
         }
+        
+        ai.addCommands(ai.getResourceCommand(INF));
         
         
         iOManager.output(ai.getCommands());

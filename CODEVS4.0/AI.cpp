@@ -46,7 +46,7 @@ vector<Command> AI::createWorkerCommand() {
     return commands;
 }
 
-vector<Command> AI::getResourceCommand() {
+vector<Command> AI::getResourceCommand(int assign) {
     vector<Command> commands;
 
     map<int, FieldUnit>::iterator resIte;
@@ -63,6 +63,7 @@ vector<Command> AI::getResourceCommand() {
 
     sort(dists.begin(), dists.end());
     
+    int curAssign = 0;
     for (int i = 0; i < dists.size(); i++) {
         int unitID = dists[i].second.second;
         int resID = dists[i].second.first;
@@ -79,6 +80,9 @@ vector<Command> AI::getResourceCommand() {
         }
         res->occupancy++;
         pUnit->setReserved();
+
+        curAssign++;
+        if (curAssign >= assign) break;
     }
 
     return commands;
@@ -120,9 +124,10 @@ vector<Command> AI::randomWalkCommand() {
     return commands;
 }
 
-vector<Command> AI::searchResourceCommand() {
+vector<Command> AI::searchResourceCommand(int assign) {
     vector<Command> commands;
 
+    int curAssign = 0;
     map<int, PlayerUnit>::iterator unitIte = player->units.begin();
     for (; unitIte != player->units.end(); unitIte++) {
         PlayerUnit *unit = &unitIte->second;
@@ -148,6 +153,10 @@ vector<Command> AI::searchResourceCommand() {
                     commands.push_back(com);
                     unit->setReserved();
                     field->willBeVisited[x][y] = true;
+
+                    curAssign++;
+                    if (curAssign >= assign) goto finishAssign;
+
                     goto breakLoop;
                 }
 
@@ -162,6 +171,10 @@ vector<Command> AI::searchResourceCommand() {
                     commands.push_back(com);
                     unit->setReserved();
                     field->willBeVisited[x][y] = true;
+                    
+                    curAssign++;
+                    if (curAssign >= assign) goto finishAssign;
+
                     goto breakLoop;
                 }
             }
@@ -169,6 +182,7 @@ vector<Command> AI::searchResourceCommand() {
         breakLoop:
         continue;
     }
+    finishAssign:
     
     return commands;
 }
