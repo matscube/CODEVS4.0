@@ -29,18 +29,80 @@ void AI::addCommands(vector<Command> newCommands) {
     commands.insert(commands.begin(), newCommands.begin(), newCommands.end());
 }
 
-vector<Command> AI::createWorkerCommand() {
+vector<Command> AI::createWorkerCommand(int assign) {
     vector<Command> commands;
-    // TODO : find castleID
-    int castleID = 0;
-    PlayerUnit *castleUnit = &player->units[castleID];
 
-    if (castleUnit->isCommandable()) {
-        // TODO : make isCreatable func
-        if (player->resourceCount >= PlayerUnit::cost(PlayerUnitType::Worker)) {
-            Command com(castleID, PlayerUnitActionType::CreateWorker);
-            commands.push_back(com);
-        }
+    int curAssign = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (!pUnitIte->second.isCreatableWorker()) continue;
+        if (!player->hasResource(PlayerUnitType::Worker)) continue;
+        
+        Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateWorker);
+        commands.push_back(com);
+        pUnitIte->second.fix();
+        
+        curAssign++;
+        if (curAssign >= assign) break;
+    }
+    
+    return commands;
+}
+vector<Command> AI::createVillageCommand(int assign) {
+    vector<Command> commands;
+    
+    int curAssign = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (!pUnitIte->second.isCreatableVillage()) continue;
+        if (!player->hasResource(PlayerUnitType::Village)) continue;
+        
+        Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateVillage);
+        commands.push_back(com);
+        pUnitIte->second.fix();
+        
+        curAssign++;
+        if (curAssign >= assign) break;
+    }
+    
+    return commands;
+}
+vector<Command> AI::createBaseCommand(int assign) {
+    vector<Command> commands;
+    
+    int curAssign = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (!pUnitIte->second.isCreatableBase()) continue;
+        if (!player->hasResource(PlayerUnitType::Base)) continue;
+        
+        Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateBase);
+        commands.push_back(com);
+        pUnitIte->second.fix();
+        
+        curAssign++;
+        if (curAssign >= assign) break;
+    }
+    
+    return commands;
+}
+
+// Create only assasin
+vector<Command> AI::createAttakerCommand(int assign) {
+    vector<Command> commands;
+    
+    int curAssign = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (!pUnitIte->second.isCreatableAttacker()) continue;
+        if (!player->hasResource(PlayerUnitType::Assassin)) continue;
+        
+        Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateAssassin);
+        commands.push_back(com);
+        pUnitIte->second.fix();
+        
+        curAssign++;
+        if (curAssign >= assign) break;
     }
     
     return commands;
@@ -71,15 +133,17 @@ vector<Command> AI::getResourceCommand(int assign) {
         FieldUnit *res = &field->resources[resID];
 
         if (res->occupancy >= MAX_GETTING_RESOURCE) continue;
-        if (!pUnit->isCommandable()) continue;
+        if (!pUnit->isMovable()) continue;
         
         int d = dists[i].first;
         if (d != 0) {
             Command com(pUnit->ID, pUnit->moveToTargetAction(res->x, res->y));
             commands.push_back(com);
+            pUnit->fix();
+        } else {
+            pUnit->fixOnlyPosition();
         }
         res->occupancy++;
-        pUnit->setReserved();
 
         curAssign++;
         if (curAssign >= assign) break;
@@ -97,7 +161,6 @@ vector<Command> AI::randomWalkCommand() {
     for (; unitIte != player->units.end(); unitIte++) {
         PlayerUnit *unit = &unitIte->second;
         if (!unit->isMovable()) continue;
-        if (!unit->isCommandable()) continue;
         
         vector<int> prob;
         for (int i = 0; i < 35; i++) prob.push_back(0);
@@ -119,7 +182,7 @@ vector<Command> AI::randomWalkCommand() {
             Command com(unit->ID, PlayerUnitActionType::MoveLeft);
             commands.push_back(com);
         }
-        unit->setReserved();
+        unit->fix();
     }
     return commands;
 }
@@ -132,7 +195,6 @@ vector<Command> AI::searchResourceCommand(int assign) {
     for (; unitIte != player->units.end(); unitIte++) {
         PlayerUnit *unit = &unitIte->second;
 
-        if (!unit->isCommandable()) continue;
         if (!unit->isMovable()) continue;
 
         for (int d = 5; d < 100; d++) {
@@ -151,7 +213,7 @@ vector<Command> AI::searchResourceCommand(int assign) {
                 if (isValidIndex(x, y) && !field->willBeVisited[x][y]) {
                     Command com(unit->ID, unit->moveToTargetAction(x, y));
                     commands.push_back(com);
-                    unit->setReserved();
+                    unit->fix();
                     field->willBeVisited[x][y] = true;
 
                     curAssign++;
@@ -169,7 +231,7 @@ vector<Command> AI::searchResourceCommand(int assign) {
                 if (isValidIndex(x, y) && !field->willBeVisited[x][y]) {
                     Command com(unit->ID, unit->moveToTargetAction(x, y));
                     commands.push_back(com);
-                    unit->setReserved();
+                    unit->fix();
                     field->willBeVisited[x][y] = true;
                     
                     curAssign++;
@@ -187,6 +249,24 @@ vector<Command> AI::searchResourceCommand(int assign) {
     return commands;
 }
 
+vector<Command> AI::attackCastleCommand(int assign) {
+    vector<Command> commands;
+    
+    int curAssign = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.isMovable()) {
+            Command com(pUnitIte->second.ID, pUnitIte->second.moveToTargetAction(field->castlePosition.first, field->castlePosition.second));
+            commands.push_back(com);
+            pUnitIte->second.fix();
+            
+            curAssign++;
+            if (curAssign >= assign) break;
+        }
+    }
+    
+    return commands;
+}
 
 bool AI::isSearchable() {
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {

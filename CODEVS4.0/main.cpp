@@ -38,15 +38,26 @@ int main(int argc, const char * argv[]) {
         // AI
         ai.resetWithTurn();
 
-        if (player.calcWorkerCount() < 100) {
-            ai.addCommands(ai.createWorkerCommand());
-        }
+        if (player.calcWorkerCount() < 110)
+            ai.addCommands(ai.createWorkerCommand(5));
         
-        if (ai.isSearchable()) {
-            ai.addCommands(ai.searchResourceCommand(10));
-        }
+        if (isValidIndex(field.castlePosition.first, field.castlePosition.second))
+            ai.addCommands(ai.attackCastleCommand(INF));
         
+        if (ai.isSearchable())
+            ai.addCommands(ai.searchResourceCommand(20));
+
+//        ai.addCommands(ai.getResourceCommand(10));
+
+        if (player.calcVillageCount() < 5)
+            ai.addCommands(ai.createVillageCommand(INF));
+        if (player.calcBaseCount() < 5)
+            ai.addCommands(ai.createBaseCommand(10));
+        
+        ai.addCommands(ai.createAttakerCommand(INF));
+
         ai.addCommands(ai.getResourceCommand(INF));
+        
         
         
         iOManager.output(ai.getCommands());

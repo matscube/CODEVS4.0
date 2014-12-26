@@ -9,20 +9,7 @@
 #include "Player.h"
 #include "Library.h"
 
-int PlayerUnit::cost(PlayerUnitType type) {
-    switch (type) {
-        case PlayerUnitType::Worker: return 40;
-        case PlayerUnitType::Knight: return 20;
-        case PlayerUnitType::Fighter: return 40;
-        case PlayerUnitType::Assassin: return 60;
-        case PlayerUnitType::Castle: return INF;
-        case PlayerUnitType::Village: return 100;
-        case PlayerUnitType::Base: return 500;
-        default:
-            cerr << "[PlayerUnit::cost] Error: Unknonwn PlayerUnitType is called, PlayerUnitType: " << &type << endl;
-            return 0;
-    }
-}
+
 
 string PlayerUnitTypeName(PlayerUnitType t) {
     switch (t) {
@@ -45,6 +32,21 @@ string PlayerUnitStatusName(PlayerUnitStatus s) {
     return "Unkwon Type";
 }
 
+/*------------------------------------------------*/
+int PlayerUnit::cost(PlayerUnitType type) {
+    switch (type) {
+        case PlayerUnitType::Worker: return 40;
+        case PlayerUnitType::Knight: return 20;
+        case PlayerUnitType::Fighter: return 40;
+        case PlayerUnitType::Assassin: return 60;
+        case PlayerUnitType::Castle: return INF;
+        case PlayerUnitType::Village: return 100;
+        case PlayerUnitType::Base: return 500;
+        default:
+            cerr << "[PlayerUnit::cost] Error: Unknonwn PlayerUnitType is called, PlayerUnitType: " << &type << endl;
+            return 0;
+    }
+}
 string PlayerUnit::action(PlayerUnitActionType type) {
     switch (type) {
         // Move Action
@@ -97,22 +99,7 @@ int PlayerUnit::attackRange(PlayerUnitType type) {
     }
 }
 
-Player::Player() {
-    
-}
 
-void Player::resetWithTurn() {
-    units.clear();
-}
-
-int Player::calcWorkerCount() {
-    int cnt = 0;
-    map<int, PlayerUnit>::iterator pUnitIte;
-    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
-        if (pUnitIte->second.type == PlayerUnitType::Worker) cnt++;
-    }
-    return cnt;
-}
 
 PlayerUnit::PlayerUnit() {}
 PlayerUnit::PlayerUnit(int ID, int x, int y, PlayerUnitType type) {
@@ -145,6 +132,8 @@ void PlayerUnit::setHitPoint(int hitPoint) {
 }
 
 bool PlayerUnit::isMovable() {
+    if (status != PlayerUnitStatus::Idle) return false;
+    
     switch (type) {
         case PlayerUnitType::Worker: return true;
         case PlayerUnitType::Knight: return true;
@@ -157,12 +146,120 @@ bool PlayerUnit::isMovable() {
     cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
     return false;
 }
+bool PlayerUnit::isCreatableWorker() {
+    if (status == PlayerUnitStatus::Reserved) return false;
+    
+    switch (type) {
+        case PlayerUnitType::Worker: return false;
+        case PlayerUnitType::Knight: return false;
+        case PlayerUnitType::Fighter: return false;
+        case PlayerUnitType::Assassin: return false;
+        case PlayerUnitType::Castle: return true;
+        case PlayerUnitType::Village: return true;
+        case PlayerUnitType::Base: return false;
+    }
+    cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
+    return false;
+}
+bool PlayerUnit::isCreatableVillage() {
+    if (status == PlayerUnitStatus::Reserved) return false;
 
-bool PlayerUnit::isCommandable() {
-    if (status == PlayerUnitStatus::Idle) return true;
-    else return false;
+    switch (type) {
+        case PlayerUnitType::Worker: return true;
+        case PlayerUnitType::Knight: return false;
+        case PlayerUnitType::Fighter: return false;
+        case PlayerUnitType::Assassin: return false;
+        case PlayerUnitType::Castle: return false;
+        case PlayerUnitType::Village: return false;
+        case PlayerUnitType::Base: return false;
+    }
+    cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
+    return false;
+}
+bool PlayerUnit::isCreatableAttacker() {
+    if (status == PlayerUnitStatus::Reserved) return false;
+
+    switch (type) {
+        case PlayerUnitType::Worker: return false;
+        case PlayerUnitType::Knight: return false;
+        case PlayerUnitType::Fighter: return false;
+        case PlayerUnitType::Assassin: return false;
+        case PlayerUnitType::Castle: return false;
+        case PlayerUnitType::Village: return false;
+        case PlayerUnitType::Base: return true;
+    }
+    cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
+    return false;
+}
+bool PlayerUnit::isCreatableBase() {
+    if (status == PlayerUnitStatus::Reserved) return false;
+
+    switch (type) {
+        case PlayerUnitType::Worker: return true;
+        case PlayerUnitType::Knight: return false;
+        case PlayerUnitType::Fighter: return false;
+        case PlayerUnitType::Assassin: return false;
+        case PlayerUnitType::Castle: return false;
+        case PlayerUnitType::Village: return false;
+        case PlayerUnitType::Base: return false;
+    }
+    cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
+    return false;
 }
 
-void PlayerUnit::setReserved() {
+void PlayerUnit::fix() {
     status = PlayerUnitStatus::Reserved;
+}
+void PlayerUnit::fixOnlyPosition() {
+    status = PlayerUnitStatus::FixPosition;
+}
+
+/*------------------------------------------------------------*/
+
+Player::Player() {
+    
+}
+
+void Player::resetWithTurn() {
+    units.clear();
+}
+
+int Player::calcWorkerCount() {
+    int cnt = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
+        if (pUnitIte->second.type == PlayerUnitType::Worker) cnt++;
+    }
+    return cnt;
+}
+
+int Player::calcVillageCount() {
+    int cnt = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
+        if (pUnitIte->second.type == PlayerUnitType::Village) cnt++;
+    }
+    return cnt;
+}
+
+int Player::calcBaseCount() {
+    int cnt = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
+        if (pUnitIte->second.type == PlayerUnitType::Base) cnt++;
+    }
+    return cnt;
+}
+int Player::calcAssassinCount() {
+    int cnt = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
+        if (pUnitIte->second.type == PlayerUnitType::Assassin) cnt++;
+    }
+    return cnt;
+}
+
+bool Player::hasResource(PlayerUnitType t) {
+    if (resourceCount >= PlayerUnit::cost(t)) return true;
+    else return false;
 }

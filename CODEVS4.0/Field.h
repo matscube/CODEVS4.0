@@ -54,6 +54,8 @@ string FieldStatusName(FieldStatus s);
 class Field {
     ofstream ofs;
 public:
+    Position castlePosition;
+
     Field();
     FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];

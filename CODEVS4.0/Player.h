@@ -48,6 +48,7 @@ enum class PlayerUnitActionType {
 
 enum class PlayerUnitStatus {
     Idle,
+    FixPosition,
     Reserved,
 };
 
@@ -70,9 +71,15 @@ public:
     static string action(PlayerUnitActionType type);
     static int viewRange(PlayerUnitType type);
     static int attackRange(PlayerUnitType type);
+    // TODO : including calcing cost
     bool isMovable();
-    bool isCommandable();
-    void setReserved();
+    bool isCreatableWorker();
+    bool isCreatableAttacker();
+    bool isCreatableVillage();
+    bool isCreatableBase();
+
+    void fix();
+    void fixOnlyPosition();
 };
 
 
@@ -84,6 +91,10 @@ public:
     map<int, PlayerUnit> units;
     
     int calcWorkerCount();
+    int calcVillageCount();
+    int calcBaseCount();
+    int calcAssassinCount();
+    bool hasResource(PlayerUnitType t);
     void resetWithTurn();
 };
 

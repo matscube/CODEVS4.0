@@ -36,11 +36,18 @@ public:
     
     void addCommands(vector<Command> newCommands);
 
-    vector<Command> createWorkerCommand();
+    vector<Command> createWorkerCommand(int assign);
+    vector<Command> createVillageCommand(int assign);
+    vector<Command> createBaseCommand(int assign);
+
+    vector<Command> createAttakerCommand(int assign);
+
     vector<Command> randomWalkCommand();
     vector<Command> getResourceCommand(int assign);
     vector<Command> searchResourceCommand(int assign);
-    
+
+    vector<Command> attackCastleCommand(int assign);
+
     
     bool isSearchable();
     

@@ -35,6 +35,7 @@ Field::Field() {
         }
     }
     ofs = ofstream("/Users/matscube/field.txt");
+    castlePosition = Position(-1, -1);
 }
 
 FieldUnit::FieldUnit() {}

@@ -90,6 +90,10 @@ void IOManager::input() {
         int unitPosX = nextInt();
         int unitHP = nextInt();
         int unitType = nextInt();
+        
+        if (PlayerUnitType(unitType) == PlayerUnitType::Castle) {
+            field->castlePosition = Position(unitPosX, unitPosY);
+        }
     }
     
     // Input FieldUnit Information
@@ -118,12 +122,25 @@ void IOManager::firstOutput() {
 }
 
 void IOManager::output(vector<Command> commands) {
-    int sz = (int)commands.size();
-    
-    cout << sz << endl; cout.flush();
+    vector<Command> resCommands;
     
     vector<Command>::iterator ite;
     for (ite = commands.begin(); ite != commands.end(); ite++) {
+        if (ite->second == PlayerUnitActionType::None) {
+            cerr << "[IOManager::output] Error: 'None' action is called." << endl;
+            continue;
+        } else {
+            resCommands.push_back(*ite);
+        }
+    }
+    
+    
+    
+    int sz = (int)resCommands.size();
+    
+    cout << sz << endl; cout.flush();
+    
+    for (ite = resCommands.begin(); ite != resCommands.end(); ite++) {
         if (ite->second == PlayerUnitActionType::None) {
             cerr << "[IOManager::output] Error: 'None' action is called." << endl;
             continue;
