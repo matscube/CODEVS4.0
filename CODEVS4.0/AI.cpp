@@ -36,11 +36,11 @@ vector<Command> AI::createWorkerCommand(int assign) {
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (!pUnitIte->second.isCreatableWorker()) continue;
-        if (!player->hasResource(PlayerUnitType::Worker)) continue;
         
-        Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateWorker);
+        PlayerUnitActionType at = PlayerUnitActionType::CreateWorker;
+        Command com(pUnitIte->second.ID, at);
         commands.push_back(com);
-        pUnitIte->second.fix();
+        pUnitIte->second.fix(at);
         
         curAssign++;
         if (curAssign >= assign) break;
@@ -55,11 +55,11 @@ vector<Command> AI::createVillageCommand(int assign) {
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (!pUnitIte->second.isCreatableVillage()) continue;
-        if (!player->hasResource(PlayerUnitType::Village)) continue;
         
-        Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateVillage);
+        PlayerUnitActionType at = PlayerUnitActionType::CreateVillage;
+        Command com(pUnitIte->second.ID, at);
         commands.push_back(com);
-        pUnitIte->second.fix();
+        pUnitIte->second.fix(at);
         
         curAssign++;
         if (curAssign >= assign) break;
@@ -74,11 +74,11 @@ vector<Command> AI::createBaseCommand(int assign) {
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (!pUnitIte->second.isCreatableBase()) continue;
-        if (!player->hasResource(PlayerUnitType::Base)) continue;
         
-        Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateBase);
+        PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+        Command com(pUnitIte->second.ID, at);
         commands.push_back(com);
-        pUnitIte->second.fix();
+        pUnitIte->second.fix(at);
         
         curAssign++;
         if (curAssign >= assign) break;
@@ -94,12 +94,13 @@ vector<Command> AI::createAttakerCommand(int assign) {
     int curAssign = 0;
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
-        if (!pUnitIte->second.isCreatableAttacker()) continue;
-        if (!player->hasResource(PlayerUnitType::Assassin)) continue;
+
+        if (!pUnitIte->second.isCreatableAttacker(PlayerUnitType::Assassin)) continue;
         
-        Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateAssassin);
+        PlayerUnitActionType at = PlayerUnitActionType::CreateAssassin;
+        Command com(pUnitIte->second.ID, at);
         commands.push_back(com);
-        pUnitIte->second.fix();
+        pUnitIte->second.fix(at);
         
         curAssign++;
         if (curAssign >= assign) break;
@@ -137,9 +138,10 @@ vector<Command> AI::getResourceCommand(int assign) {
         
         int d = dists[i].first;
         if (d != 0) {
-            Command com(pUnit->ID, pUnit->moveToTargetAction(res->x, res->y));
+            PlayerUnitActionType at = pUnit->moveToTargetAction(res->x, res->y);
+            Command com(pUnit->ID, at);
             commands.push_back(com);
-            pUnit->fix();
+            pUnit->fix(at);
         } else {
             pUnit->fixOnlyPosition();
         }
@@ -181,9 +183,10 @@ vector<Command> AI::getMinimumResourceCommand(int assign) {
         
         int d = dists[i].first;
         if (d != 0) {
-            Command com(pUnit->ID, pUnit->moveToTargetAction(res->x, res->y));
+            PlayerUnitActionType at = pUnit->moveToTargetAction(res->x, res->y);
+            Command com(pUnit->ID, at);
             commands.push_back(com);
-            pUnit->fix();
+            pUnit->fix(at);
         } else {
             // create village
             pUnit->fixOnlyPosition();
@@ -219,9 +222,10 @@ vector<Command> AI::createVillageOnResource(int assign) {
         if (field->resources.find(hashID) != field->resources.end()) {
             if (!pUnitIte->second.isCreatableVillage()) continue;
             if (villageCount.find(hashID) == villageCount.end()) {
-                Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateVillage);
+                PlayerUnitActionType at = PlayerUnitActionType::CreateVillage;
+                Command com(pUnitIte->second.ID, at);
                 commands.push_back(com);
-                pUnitIte->second.fix();
+                pUnitIte->second.fix(at);
                 
                 curAssign++;
                 if (curAssign >= assign) break;
@@ -258,9 +262,10 @@ vector<Command> AI::createWorkerOnResource(int assign) {
             else if (workerCount[hashID] < MAX_GETTING_RESOURCE) flg = true;
 
             if (flg) {
-                Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateWorker);
+                PlayerUnitActionType at = PlayerUnitActionType::CreateWorker;
+                Command com(pUnitIte->second.ID, at);
                 commands.push_back(com);
-                pUnitIte->second.fix();
+                pUnitIte->second.fix(at);
 
                 curAssign++;
                 if (curAssign >= assign) break;
@@ -285,20 +290,25 @@ vector<Command> AI::randomWalkCommand() {
         for (int i = 0; i < 15; i++) prob.push_back(3);
         
         int p = prob[rand() % 100];
+        PlayerUnitActionType at;
         if (p == 0) {
-            Command com(unit->ID, PlayerUnitActionType::MoveDown);
+            at = PlayerUnitActionType::MoveDown;
+            Command com(unit->ID, at);
             commands.push_back(com);
         } else if (p == 1) {
-            Command com(unit->ID, PlayerUnitActionType::MoveRight);
+            at = PlayerUnitActionType::MoveRight;
+            Command com(unit->ID, at);
             commands.push_back(com);
         } else if (p == 2) {
-            Command com(unit->ID, PlayerUnitActionType::MoveUp);
+            at = PlayerUnitActionType::MoveUp;
+            Command com(unit->ID, at);
             commands.push_back(com);
         } else {
-            Command com(unit->ID, PlayerUnitActionType::MoveLeft);
+            at = PlayerUnitActionType::MoveLeft;
+            Command com(unit->ID, at);
             commands.push_back(com);
         }
-        unit->fix();
+        unit->fix(at);
     }
     return commands;
 }
@@ -327,9 +337,10 @@ vector<Command> AI::searchResourceCommand(int assign) {
                 }*/
                 
                 if (isValidIndex(x, y) && !field->willBeVisited[x][y]) {
-                    Command com(unit->ID, unit->moveToTargetAction(x, y));
+                    PlayerUnitActionType at = unit->moveToTargetAction(x, y);
+                    Command com(unit->ID, at);
                     commands.push_back(com);
-                    unit->fix();
+                    unit->fix(at);
                     field->willBeVisited[x][y] = true;
 
                     curAssign++;
@@ -345,9 +356,10 @@ vector<Command> AI::searchResourceCommand(int assign) {
                 }*/
 
                 if (isValidIndex(x, y) && !field->willBeVisited[x][y]) {
-                    Command com(unit->ID, unit->moveToTargetAction(x, y));
+                    PlayerUnitActionType at = unit->moveToTargetAction(x, y);
+                    Command com(unit->ID, at);
                     commands.push_back(com);
-                    unit->fix();
+                    unit->fix(at);
                     field->willBeVisited[x][y] = true;
                     
                     curAssign++;
@@ -372,9 +384,10 @@ vector<Command> AI::attackCastleCommand(int assign) {
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (pUnitIte->second.isMovable()) {
-            Command com(pUnitIte->second.ID, pUnitIte->second.moveToTargetAction(field->castlePosition.first, field->castlePosition.second));
+            PlayerUnitActionType at = pUnitIte->second.moveToTargetAction(field->castlePosition.first, field->castlePosition.second);
+            Command com(pUnitIte->second.ID, at);
             commands.push_back(com);
-            pUnitIte->second.fix();
+            pUnitIte->second.fix(at);
             
             curAssign++;
             if (curAssign >= assign) break;

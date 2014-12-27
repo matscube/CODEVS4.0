@@ -28,6 +28,7 @@ enum class PlayerUnitType {
     Castle,
     Village,
     Base,
+    Unknown,
 };
 
 string PlayerUnitTypeName(PlayerUnitType t);
@@ -46,6 +47,10 @@ enum class PlayerUnitActionType {
     None,
 };
 
+PlayerUnitType UnitTypeCreated(PlayerUnitActionType at);
+
+PlayerUnitActionType CreateAttackerAction(PlayerUnitType t);
+
 enum class PlayerUnitStatus {
     Idle,
     FixPosition,
@@ -54,6 +59,7 @@ enum class PlayerUnitStatus {
 
 string PlayerUnitStatusName(PlayerUnitStatus s);
 
+class Player;
 class PlayerUnit {
 public:
     int ID;
@@ -61,24 +67,25 @@ public:
     int hitPoint;
     PlayerUnitType type;
     PlayerUnitStatus status;
+    Player *player;
 
     PlayerUnit();
-    PlayerUnit(int ID, int x, int y, PlayerUnitType type);
+    PlayerUnit(int ID, int x, int y, PlayerUnitType type, Player *player);
     void setHitPoint(int hitPoint);
     PlayerUnitActionType moveToTargetAction(int targetX, int targetY);
     
-    static int cost(PlayerUnitType type);
+    static int cost(PlayerUnitActionType at);
     static string action(PlayerUnitActionType type);
     static int viewRange(PlayerUnitType type);
     static int attackRange(PlayerUnitType type);
     // TODO : including calcing cost
     bool isMovable();
     bool isCreatableWorker();
-    bool isCreatableAttacker();
+    bool isCreatableAttacker(PlayerUnitType t);
     bool isCreatableVillage();
     bool isCreatableBase();
 
-    void fix();
+    void fix(PlayerUnitActionType at);
     void fixOnlyPosition();
 };
 
@@ -97,7 +104,6 @@ public:
     int calcVillageCount();
     int calcBaseCount();
     int calcAssassinCount();
-    bool hasResource(PlayerUnitType t);
     void resetWithTurn();
 };
 

@@ -36,10 +36,8 @@ public:
     
     void addCommands(vector<Command> newCommands);
     
-    // Set conditions
-    
+    // TODO: cost limit system
 
-    // TODO : cost limit system
     vector<Command> createWorkerCommand(int assign);
     vector<Command> createVillageCommand(int assign);
     vector<Command> createBaseCommand(int assign);

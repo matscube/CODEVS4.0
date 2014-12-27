@@ -32,30 +32,59 @@ string PlayerUnitStatusName(PlayerUnitStatus s) {
     return "Unkwon Type";
 }
 
+PlayerUnitType UnitTypeCreated(PlayerUnitActionType at) {
+    switch (at) {
+        case PlayerUnitActionType::CreateWorker: return PlayerUnitType::Worker;
+        case PlayerUnitActionType::CreateKnight: return PlayerUnitType::Knight;
+        case PlayerUnitActionType::CreateFighter: return PlayerUnitType::Fighter;
+        case PlayerUnitActionType::CreateAssassin: return PlayerUnitType::Assassin;
+        case PlayerUnitActionType::CreateVillage: return PlayerUnitType::Village;
+        case PlayerUnitActionType::CreateBase: return PlayerUnitType::Base;
+    }
+    cerr << "[UnitTypeCreated] Error: Unknown PlayerUnitTypeAction is called" << endl;
+    return PlayerUnitType::Unknown;
+}
+
+PlayerUnitActionType CreateAttackerAction(PlayerUnitType t) {
+    switch (t) {
+        case PlayerUnitType::Knight: return PlayerUnitActionType::CreateKnight;
+        case PlayerUnitType::Fighter: return PlayerUnitActionType::CreateFighter;
+        case PlayerUnitType::Assassin: return PlayerUnitActionType::CreateAssassin;
+    }
+    cerr << "[PlayerUnitActionType] Error: Unknown Attacker Type is called" << endl;
+    return PlayerUnitActionType::None;
+}
+
 /*------------------------------------------------*/
-int PlayerUnit::cost(PlayerUnitType type) {
-    switch (type) {
-        case PlayerUnitType::Worker: return 40;
-        case PlayerUnitType::Knight: return 20;
-        case PlayerUnitType::Fighter: return 40;
-        case PlayerUnitType::Assassin: return 60;
-        case PlayerUnitType::Castle: return INF;
-        case PlayerUnitType::Village: return 100;
-        case PlayerUnitType::Base: return 500;
+int PlayerUnit::cost(PlayerUnitActionType at) {
+    switch (at) {
+        // Move Action
+        case PlayerUnitActionType::MoveUp: return 0;
+        case PlayerUnitActionType::MoveDown: return 0;
+        case PlayerUnitActionType::MoveLeft: return 0;
+        case PlayerUnitActionType::MoveRight: return 0;
+
+        // Create Action
+        case PlayerUnitActionType::CreateWorker: return 40;
+        case PlayerUnitActionType::CreateKnight: return 20;
+        case PlayerUnitActionType::CreateFighter: return 40;
+        case PlayerUnitActionType::CreateAssassin: return 60;
+        case PlayerUnitActionType::CreateVillage: return 100;
+        case PlayerUnitActionType::CreateBase: return 500;
         default:
-            cerr << "[PlayerUnit::cost] Error: Unknonwn PlayerUnitType is called, PlayerUnitType: " << &type << endl;
+            cerr << "[PlayerUnit::cost] Error: Unknonwn PlayerUnitActionType is called" << endl;
             return 0;
     }
 }
 string PlayerUnit::action(PlayerUnitActionType type) {
     switch (type) {
-        // Move Action
+            // Move Action
         case PlayerUnitActionType::MoveUp: return "U";
         case PlayerUnitActionType::MoveDown: return "D";
         case PlayerUnitActionType::MoveLeft: return "L";
         case PlayerUnitActionType::MoveRight: return "R";
 
-        // Create Action
+            // Create Action
         case PlayerUnitActionType::CreateWorker: return "0";
         case PlayerUnitActionType::CreateKnight: return "1";
         case PlayerUnitActionType::CreateFighter: return "2";
@@ -102,11 +131,12 @@ int PlayerUnit::attackRange(PlayerUnitType type) {
 
 
 PlayerUnit::PlayerUnit() {}
-PlayerUnit::PlayerUnit(int ID, int x, int y, PlayerUnitType type) {
+PlayerUnit::PlayerUnit(int ID, int x, int y, PlayerUnitType type, Player *player) {
     PlayerUnit::ID = ID;
     PlayerUnit::x = x;
     PlayerUnit::y = y;
     PlayerUnit::type = type;
+    PlayerUnit::player = player;
     status = PlayerUnitStatus::Idle;
 }
 
@@ -148,6 +178,7 @@ bool PlayerUnit::isMovable() {
 }
 bool PlayerUnit::isCreatableWorker() {
     if (status == PlayerUnitStatus::Reserved) return false;
+    if (player->resourceCount < PlayerUnit::cost(PlayerUnitActionType::CreateWorker)) return false;
     
     switch (type) {
         case PlayerUnitType::Worker: return false;
@@ -163,6 +194,7 @@ bool PlayerUnit::isCreatableWorker() {
 }
 bool PlayerUnit::isCreatableVillage() {
     if (status == PlayerUnitStatus::Reserved) return false;
+    if (player->resourceCount < PlayerUnit::cost(PlayerUnitActionType::CreateVillage)) return false;
 
     switch (type) {
         case PlayerUnitType::Worker: return true;
@@ -176,8 +208,9 @@ bool PlayerUnit::isCreatableVillage() {
     cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
     return false;
 }
-bool PlayerUnit::isCreatableAttacker() {
+bool PlayerUnit::isCreatableAttacker(PlayerUnitType t) {
     if (status == PlayerUnitStatus::Reserved) return false;
+    if (player->resourceCount < PlayerUnit::cost(CreateAttackerAction(t))) return false;
 
     switch (type) {
         case PlayerUnitType::Worker: return false;
@@ -207,7 +240,8 @@ bool PlayerUnit::isCreatableBase() {
     return false;
 }
 
-void PlayerUnit::fix() {
+void PlayerUnit::fix(PlayerUnitActionType at) {
+    player->resourceCount -= PlayerUnit::cost(at);
     status = PlayerUnitStatus::Reserved;
 }
 void PlayerUnit::fixOnlyPosition() {
@@ -257,9 +291,4 @@ int Player::calcAssassinCount() {
         if (pUnitIte->second.type == PlayerUnitType::Assassin) cnt++;
     }
     return cnt;
-}
-
-bool Player::hasResource(PlayerUnitType t) {
-    if (resourceCount >= PlayerUnit::cost(t)) return true;
-    else return false;
 }
