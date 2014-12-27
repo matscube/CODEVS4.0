@@ -152,7 +152,123 @@ vector<Command> AI::getResourceCommand(int assign) {
     return commands;
 }
 
+vector<Command> AI::getMinimumResourceCommand(int assign) {
+    vector<Command> commands;
+    
+    map<int, FieldUnit>::iterator resIte;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    vector<pair<int, pair<int, int> > > dists; // (dist, (resID, unitID))
+    for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
+        for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+            if (pUnitIte->second.type != PlayerUnitType::Worker) continue;
+            
+            int d = dist(resIte->second.x, resIte->second.y, pUnitIte->second.x, pUnitIte->second.y);
+            dists.push_back(make_pair(d, make_pair(resIte->second.hashID, pUnitIte->second.ID)));
+        }
+    }
+    
+    sort(dists.begin(), dists.end());
+    
+    int curAssign = 0;
+    for (int i = 0; i < dists.size(); i++) {
+        int unitID = dists[i].second.second;
+        int resID = dists[i].second.first;
+        PlayerUnit *pUnit = &player->units[unitID];
+        FieldUnit *res = &field->resources[resID];
+        
+        if (res->occupancy >= 1) continue;
+        if (!pUnit->isMovable()) continue;
+        
+        int d = dists[i].first;
+        if (d != 0) {
+            Command com(pUnit->ID, pUnit->moveToTargetAction(res->x, res->y));
+            commands.push_back(com);
+            pUnit->fix();
+        } else {
+            // create village
+            pUnit->fixOnlyPosition();
+        }
+        res->occupancy++;
+        
+        curAssign++;
+        if (curAssign >= assign) break;
+    }
+    
+    return commands;
+}
 
+vector<Command> AI::createVillageOnResource(int assign) {
+    vector<Command> commands;
+    
+    map<int, int> villageCount; // <hashID, count>
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.type == PlayerUnitType::Village) {
+            int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+            if (villageCount.find(hashID) != villageCount.end()) {
+                villageCount[hashID]++;
+            } else {
+                villageCount[hashID] = 0;
+            }
+        }
+    }
+    
+    int curAssign = 0;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+        if (field->resources.find(hashID) != field->resources.end()) {
+            if (!pUnitIte->second.isCreatableVillage()) continue;
+            if (villageCount.find(hashID) == villageCount.end()) {
+                Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateVillage);
+                commands.push_back(com);
+                pUnitIte->second.fix();
+                
+                curAssign++;
+                if (curAssign >= assign) break;
+            }
+        }
+    }
+    return commands;
+}
+
+vector<Command> AI::createWorkerOnResource(int assign) {
+    vector<Command> commands;
+    
+    map<int, int> workerCount; // <hashID, count>
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.type == PlayerUnitType::Worker) {
+            int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+            if (workerCount.find(hashID) != workerCount.end()) {
+                workerCount[hashID]++;
+            } else {
+                workerCount[hashID] = 1;
+            }
+        }
+    }
+
+    int curAssign = 0;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+        if (field->resources.find(hashID) != field->resources.end()) {
+            if (!pUnitIte->second.isCreatableWorker()) continue;
+            
+            bool flg = false;
+            if (workerCount.find(hashID) == workerCount.end()) flg = true;
+            else if (workerCount[hashID] < MAX_GETTING_RESOURCE) flg = true;
+
+            if (flg) {
+                Command com(pUnitIte->second.ID, PlayerUnitActionType::CreateWorker);
+                commands.push_back(com);
+                pUnitIte->second.fix();
+
+                curAssign++;
+                if (curAssign >= assign) break;
+            }
+        }
+    }
+    return commands;
+}
 
 vector<Command> AI::randomWalkCommand() {
     vector<Command> commands;

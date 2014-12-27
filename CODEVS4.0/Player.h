@@ -88,6 +88,9 @@ class Player {
 public:
     Player();
     int resourceCount;
+  
+    // TODO : units by type
+//    map<int, PlayerUnit> villageUnits;
     map<int, PlayerUnit> units;
     
     int calcWorkerCount();

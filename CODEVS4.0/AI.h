@@ -35,19 +35,29 @@ public:
     vector<Command> getCommands();
     
     void addCommands(vector<Command> newCommands);
+    
+    // Set conditions
+    
 
+    // TODO : cost limit system
     vector<Command> createWorkerCommand(int assign);
     vector<Command> createVillageCommand(int assign);
     vector<Command> createBaseCommand(int assign);
 
     vector<Command> createAttakerCommand(int assign);
 
-    vector<Command> randomWalkCommand();
+    // get resource fastly
+    vector<Command> getMinimumResourceCommand(int assign);
+    vector<Command> createVillageOnResource(int assign);
+    vector<Command> createWorkerOnResource(int assign);
+
     vector<Command> getResourceCommand(int assign);
     vector<Command> searchResourceCommand(int assign);
 
     vector<Command> attackCastleCommand(int assign);
 
+    // utility
+    vector<Command> randomWalkCommand();
     
     bool isSearchable();
     

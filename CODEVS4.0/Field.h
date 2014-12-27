@@ -32,7 +32,6 @@ enum class FieldUnitType {
 };
 
 class FieldUnit {
-    static int getHashID(int x, int y);
 public:
     int x, y;
     int hashID;
@@ -40,6 +39,7 @@ public:
     FieldUnitType type;
     FieldUnit();
     FieldUnit(int x, int y, FieldUnitType type);
+    static int getHashID(int x, int y);
 };
 
 enum class FieldStatus {
