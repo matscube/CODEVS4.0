@@ -29,6 +29,14 @@ void AI::addCommands(vector<Command> newCommands) {
     commands.insert(commands.begin(), newCommands.begin(), newCommands.end());
 }
 
+void AI::setResourceLimit(int n) {
+    player->necessaryResourceCount = n;
+}
+
+void AI::releaseResourceLimit() {
+    player->necessaryResourceCount = 0;
+}
+
 vector<Command> AI::createWorkerCommand(int assign) {
     vector<Command> commands;
 
@@ -272,6 +280,33 @@ vector<Command> AI::createWorkerOnResource(int assign) {
             }
         }
     }
+    return commands;
+}
+
+vector<Command> AI::createBaseOnNearestEnemy(int assign) {
+    vector<Command> commands;
+    
+    Position target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
+    if (isValidIndex(field->EnemyCastle.first, field->EnemyCastle.second)) {
+        target = field->EnemyCastle;
+    }
+    
+    int curAssign = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+        if (field->resources.find(hashID) != field->resources.end()) {
+            if (!pUnitIte->second.isCreatableBase()) continue;
+            PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+            Command com(pUnitIte->second.ID, at);
+            commands.push_back(com);
+            pUnitIte->second.fix(at);
+            
+            curAssign++;
+            if (curAssign >= assign) break;
+        }
+    }
+    
     return commands;
 }
 

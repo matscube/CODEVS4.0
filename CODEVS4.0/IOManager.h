@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -26,6 +27,7 @@ class IOManager {
     Field *field;
     Player *player;
     void finishInput();
+    ofstream ofs;
 public:
     IOManager(Game &game, Field &field, Player &player);
     int nextInt();

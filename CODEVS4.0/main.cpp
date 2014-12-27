@@ -38,19 +38,30 @@ int main(int argc, const char * argv[]) {
         // AI
         ai.resetWithTurn();
 
+        // ready to create base
+        if (player.calcVillageCount() > 5) {
+            ai.setResourceLimit(PlayerUnit::cost(PlayerUnitActionType::CreateBase));
+        }
         
         // attack castle
         if (isValidIndex(field.castlePosition.first, field.castlePosition.second))
             ai.addCommands(ai.attackCastleCommand(INF));
         
-        
         // get resource fastly
         ai.addCommands(ai.getMinimumResourceCommand(INF));
         ai.addCommands(ai.createVillageOnResource(INF));
         ai.addCommands(ai.createWorkerOnResource(INF));
+
+        
         if (ai.isSearchable())
             ai.addCommands(ai.searchResourceCommand(10));
 
+        // create base
+        ai.releaseResourceLimit();
+        if (player.calcVillageCount() > 5 && player.calcBaseCount() < 5) {
+            ai.addCommands(ai.createBaseOnNearestEnemy(INF));
+        }
+        
         // create worker
 //        if (player.calcWorkerCount() < 110)
 //            ai.addCommands(ai.createWorkerCommand(5));

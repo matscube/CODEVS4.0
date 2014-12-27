@@ -37,6 +37,9 @@ public:
     void addCommands(vector<Command> newCommands);
     
     // TODO: cost limit system
+    void setResourceLimit(int n);
+    void releaseResourceLimit();
+    
 
     vector<Command> createWorkerCommand(int assign);
     vector<Command> createVillageCommand(int assign);
@@ -49,9 +52,14 @@ public:
     vector<Command> createVillageOnResource(int assign);
     vector<Command> createWorkerOnResource(int assign);
 
+    // get resource utility
     vector<Command> getResourceCommand(int assign);
     vector<Command> searchResourceCommand(int assign);
+    
+    // create base
+    vector<Command> createBaseOnNearestEnemy(int assign);
 
+    // attack castle
     vector<Command> attackCastleCommand(int assign);
 
     // utility

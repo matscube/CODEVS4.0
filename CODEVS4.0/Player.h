@@ -95,6 +95,7 @@ class Player {
 public:
     Player();
     int resourceCount;
+    int necessaryResourceCount;
   
     // TODO : units by type
 //    map<int, PlayerUnit> villageUnits;

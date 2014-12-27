@@ -178,7 +178,8 @@ bool PlayerUnit::isMovable() {
 }
 bool PlayerUnit::isCreatableWorker() {
     if (status == PlayerUnitStatus::Reserved) return false;
-    if (player->resourceCount < PlayerUnit::cost(PlayerUnitActionType::CreateWorker)) return false;
+    if (player->resourceCount - PlayerUnit::cost(PlayerUnitActionType::CreateWorker) < player->necessaryResourceCount) return false;
+    
     
     switch (type) {
         case PlayerUnitType::Worker: return false;
@@ -194,7 +195,7 @@ bool PlayerUnit::isCreatableWorker() {
 }
 bool PlayerUnit::isCreatableVillage() {
     if (status == PlayerUnitStatus::Reserved) return false;
-    if (player->resourceCount < PlayerUnit::cost(PlayerUnitActionType::CreateVillage)) return false;
+    if (player->resourceCount - PlayerUnit::cost(PlayerUnitActionType::CreateVillage) < player->necessaryResourceCount) return false;
 
     switch (type) {
         case PlayerUnitType::Worker: return true;
@@ -210,7 +211,7 @@ bool PlayerUnit::isCreatableVillage() {
 }
 bool PlayerUnit::isCreatableAttacker(PlayerUnitType t) {
     if (status == PlayerUnitStatus::Reserved) return false;
-    if (player->resourceCount < PlayerUnit::cost(CreateAttackerAction(t))) return false;
+    if (player->resourceCount - PlayerUnit::cost(CreateAttackerAction(t)) < player->necessaryResourceCount) return false;
 
     switch (type) {
         case PlayerUnitType::Worker: return false;
@@ -226,6 +227,7 @@ bool PlayerUnit::isCreatableAttacker(PlayerUnitType t) {
 }
 bool PlayerUnit::isCreatableBase() {
     if (status == PlayerUnitStatus::Reserved) return false;
+    if (player->resourceCount - PlayerUnit::cost(PlayerUnitActionType::CreateBase) < player->necessaryResourceCount) return false;
 
     switch (type) {
         case PlayerUnitType::Worker: return true;
@@ -256,6 +258,7 @@ Player::Player() {
 
 void Player::resetWithTurn() {
     units.clear();
+    necessaryResourceCount = 0;
 }
 
 int Player::calcWorkerCount() {
