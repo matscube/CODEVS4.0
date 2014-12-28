@@ -412,6 +412,55 @@ vector<Command> AI::searchResourceCommand(int assign) {
     return commands;
 }
 
+vector<Command> AI::searchEnemyCastle(int assign) {
+    vector<Command> commands;
+
+    map<int, Position> targets = field->enemyCastlePositions();
+
+    map<int, Position>::iterator targetIte;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    vector<pair<int, pair<int, int> > > dists; // (dist, (targetID, unitID))
+    for (targetIte = targets.begin(); targetIte != targets.end(); targetIte++) {
+        for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+            if (!pUnitIte->second.isMovable()) continue;
+            if (field->willBeVisited[targetIte->second.first][targetIte->second.second]) continue;
+            if (field->isVisited[targetIte->second.first][targetIte->second.second]) continue;
+            
+            int d = dist(targetIte->second.first, targetIte->second.second, pUnitIte->second.x, pUnitIte->second.y);
+            dists.push_back(make_pair(d, make_pair(targetIte->first, pUnitIte->second.ID)));
+        }
+    }
+    
+    sort(dists.begin(), dists.end());
+    
+    map<int, bool> willBeVisitedTarget;
+    int curAssign = 0;
+    for (int i = 0; i < dists.size(); i++) {
+        int unitID = dists[i].second.second;
+        int targetID = dists[i].second.first;
+
+        PlayerUnit *pUnit = &player->units[unitID];
+        Position pos = targets[targetID];
+
+        if (willBeVisitedTarget.find(targetID) != willBeVisitedTarget.end()) continue;
+        if (!pUnit->isMovable()) continue;
+        
+        int d = dists[i].first;
+        if (d != 0) {
+            PlayerUnitActionType at = pUnit->moveToTargetAction(pos.first, pos.second);
+            Command com(pUnit->ID, at);
+            commands.push_back(com);
+            pUnit->fix(at);
+            willBeVisitedTarget[targetID] = true;
+        }
+        
+        curAssign++;
+        if (curAssign >= assign) break;
+    }
+    
+    return commands;
+}
+
 vector<Command> AI::attackCastleCommand(int assign) {
     vector<Command> commands;
     

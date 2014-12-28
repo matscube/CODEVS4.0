@@ -7,7 +7,12 @@
 //
 
 #include "Library.h"
+#include "Field.h"
 
 int dist(int x1, int y1, int x2, int y2) {
     return abs(x1 - x2) + abs(y1 - y2);
+}
+
+int getHashID(int x, int y) {
+    return y * MAX_FIELD_WIDTH + x;
 }

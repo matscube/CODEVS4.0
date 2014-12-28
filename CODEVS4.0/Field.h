@@ -62,6 +62,7 @@ public:
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     Position allyCastle;
     Position EnemyCastle;
+    map<int, Position> enemyCastlePositions(); // <hashID, position>
 
     map<int, FieldUnit> resources;
     int allyWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];

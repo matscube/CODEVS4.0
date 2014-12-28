@@ -47,6 +47,18 @@ FieldUnit::FieldUnit(int x, int y, FieldUnitType type) {
     FieldUnit::hashID = getHashID(x, y);
 }
 
+map<int, Position> Field::enemyCastlePositions() {
+    map<int, Position> res;
+    for (int dx = 0; dx <= 40; dx++) {
+        for (int dy = 0; dy <= 40 - dx; dy++) {
+            Position pos = Position(MAX_FIELD_WIDTH - dx, MAX_FIELD_HEIGHT - dy);
+            int hashID = getHashID(pos.first, pos.second);
+            res[hashID] = pos;
+        }
+    }
+    return res;
+}
+
 
 void Field::resetStatusWithTurn() {
     memset(allyWorkers, 0, sizeof(allyWorkers));

@@ -17,5 +17,6 @@
 #define INF 1<<29
 
 int dist(int x1, int y1, int x2, int y2);
+int getHashID(int x, int y);
 
 #endif /* defined(__CODEVS4_0__Library__) */

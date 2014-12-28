@@ -128,7 +128,7 @@ void IOManager::output(vector<Command> commands) {
     vector<Command>::iterator ite;
     for (ite = commands.begin(); ite != commands.end(); ite++) {
         if (ite->second == PlayerUnitActionType::None) {
-            cerr << "[IOManager::output] Error: 'None' action is called." << endl;
+            cerr << "[IOManager::output] Warning: 'None' action is called." << endl;
             continue;
         } else {
             resCommands.push_back(*ite);
@@ -146,7 +146,7 @@ void IOManager::output(vector<Command> commands) {
     
     for (ite = resCommands.begin(); ite != resCommands.end(); ite++) {
         if (ite->second == PlayerUnitActionType::None) {
-            cerr << "[IOManager::output] Error: 'None' action is called." << endl;
+            cerr << "[IOManager::output] Error: 'None' action is included in output." << endl;
             continue;
         }
         cout << ite->first << " " << PlayerUnit::action(ite->second) << endl; cout.flush();

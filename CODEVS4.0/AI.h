@@ -51,7 +51,7 @@ public:
     vector<Command> getMinimumResourceCommand(int assign);
     vector<Command> createVillageOnResource(int assign);
     vector<Command> createWorkerOnResource(int assign);
-
+    
     // get resource utility
     vector<Command> getResourceCommand(int assign);
     vector<Command> searchResourceCommand(int assign);
@@ -60,6 +60,7 @@ public:
     vector<Command> createBaseOnNearestEnemy(int assign);
 
     // attack castle
+    vector<Command> searchEnemyCastle(int assign);
     vector<Command> attackCastleCommand(int assign);
 
     // utility
