@@ -51,7 +51,7 @@ map<int, Position> Field::enemyCastlePositions() {
     map<int, Position> res;
     for (int dx = 0; dx <= 40; dx++) {
         for (int dy = 0; dy <= 40 - dx; dy++) {
-            Position pos = Position(MAX_FIELD_WIDTH - dx, MAX_FIELD_HEIGHT - dy);
+            Position pos = Position(MAX_FIELD_WIDTH - 1 - dx, MAX_FIELD_HEIGHT - 1 - dy);
             int hashID = getHashID(pos.first, pos.second);
             res[hashID] = pos;
         }
