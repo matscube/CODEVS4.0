@@ -8,6 +8,19 @@
 
 #include "Game.h"
 
-Game::Game() {
-    
+Game::Game(int firstStage) {
+    currentStage = firstStage;
+    currentTurn = -1;
+}
+
+bool Game::isNextStage(int newStage) {
+    if (newStage != currentStage) {
+        cerr << "Reset New Stage: " << newStage << endl;
+        currentTurn = -1;
+        currentStage = newStage;
+        return true;
+    } else {
+        return false;
+    }
+
 }

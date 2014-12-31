@@ -21,24 +21,25 @@ using namespace std;
 int main(int argc, const char * argv[]) {
     cout << "matscube" << endl;
     
-    Game game = Game();
+    Game game = Game(0);
     Field field = Field();
     Player player = Player();
     AI ai = AI(game, field, player);
+    IOManager iOManager(game, field, player);
     
-    
-    IOManager iOManager = IOManager(game, field, player);
+    while (true) {
+        if (game.isNextStage(iOManager.inputStage())) {
+            field.resetWithStage();
+            player.resetWithStage();
+            iOManager.resetWithStage(game, field, player);
+        }
+        iOManager.inputBody();
 
-    for (int i = 0; i < 1000; i++) {
-
-        iOManager.input();
         // debug output
         ai.debug();
         
         // AI
         ai.resetWithTurn();
-
-        
         
         // get resource fastly
         if (player.calcWorkerCount() < 10) {

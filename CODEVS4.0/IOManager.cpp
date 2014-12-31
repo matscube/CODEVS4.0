@@ -15,6 +15,13 @@ IOManager::IOManager(Game &game, Field &field, Player &player) {
     ofs = ofstream("/Users/matscube/iomanager.txt");
 }
 
+void IOManager::resetWithStage(Game &game, Field &field, Player &player) {
+    IOManager::game = &game;
+    IOManager::field = &field;
+    IOManager::player = &player;
+    ofs = ofstream("/Users/matscube/iomanager.txt");
+}
+
 int IOManager::nextInt() {
     int n = -1;
     cin >> n;
@@ -57,13 +64,16 @@ void IOManager::testInput() {
     finishInput();
 }
 
-void IOManager::input() {
+int IOManager::inputStage() {
     // Input game information
     int timeLimit = nextInt();
-    game->currentStage = nextInt();
+    return nextInt();
+}
+
+void IOManager::inputBody() {
     game->currentTurn = nextInt();
     player->resourceCount = nextInt();
-    cerr << "Current Stage, Turn: " << game->currentStage << ", " << game->currentTurn << endl;
+//    cerr << "Current Stage, Turn: " << game->currentStage << ", " << game->currentTurn << endl;
     
     // Input PlayerUnit Information
     player->resetWithTurn();
@@ -128,7 +138,7 @@ void IOManager::output(vector<Command> commands) {
     vector<Command>::iterator ite;
     for (ite = commands.begin(); ite != commands.end(); ite++) {
         if (ite->second == PlayerUnitActionType::None) {
-            cerr << "[IOManager::output] Warning: 'None' action is called." << endl;
+//            cerr << "[IOManager::output] Warning: 'None' action is called." << endl;
             continue;
         } else {
             resCommands.push_back(*ite);

@@ -30,9 +30,11 @@ class IOManager {
     ofstream ofs;
 public:
     IOManager(Game &game, Field &field, Player &player);
+    void resetWithStage(Game &game, Field &field, Player &player);
     int nextInt();
     void testInput();
-    void input();
+    int inputStage();
+    void inputBody();
     void firstOutput();
     void output(vector<Command> commands);
     void testOutput();

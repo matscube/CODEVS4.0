@@ -253,7 +253,16 @@ void PlayerUnit::fixOnlyPosition() {
 /*------------------------------------------------------------*/
 
 Player::Player() {
-    
+//    resourceCount = 0;
+//    necessaryResourceCount = 0;
+//    units.clear();
+    resetWithStage();
+}
+
+void Player::resetWithStage() {
+    resourceCount = 0;
+    necessaryResourceCount = 0;
+    units.clear();
 }
 
 void Player::resetWithTurn() {

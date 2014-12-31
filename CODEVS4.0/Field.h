@@ -57,10 +57,10 @@ public:
     Position castlePosition;
 
     Field();
+    void resetWithStage();
     FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
-    Position allyCastle;
     Position EnemyCastle;
     map<int, Position> enemyCastlePositions(); // <hashID, position>
 

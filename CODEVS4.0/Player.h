@@ -94,6 +94,7 @@ public:
 class Player {
 public:
     Player();
+    void resetWithStage();
     int resourceCount;
     int necessaryResourceCount;
   

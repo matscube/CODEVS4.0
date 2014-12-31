@@ -27,6 +27,7 @@ string FieldStatusName(FieldStatus s) {
 }
 
 Field::Field() {
+    /*
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
         for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
             status[x][y] = FieldStatus::Unknown;
@@ -36,6 +37,38 @@ Field::Field() {
     }
     ofs = ofstream("/Users/matscube/field.txt");
     castlePosition = Position(-1, -1);
+    EnemyCastle = Position(-1, -1);
+    for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
+        for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
+            status[x][y] = FieldStatus::Unknown;
+            isVisited[x][y] = false;
+            willBeVisited[x][y] = false;
+        }
+    }
+    resources.clear();*/
+    
+    resetWithStage();
+}
+
+void Field::resetWithStage() {
+    for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
+        for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
+            status[x][y] = FieldStatus::Unknown;
+            isVisited[x][y] = false;
+            willBeVisited[x][y] = false;
+        }
+    }
+    ofs = ofstream("/Users/matscube/field.txt");
+    castlePosition = Position(-1, -1);
+    EnemyCastle = Position(-1, -1);
+    for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
+        for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
+            status[x][y] = FieldStatus::Unknown;
+            isVisited[x][y] = false;
+            willBeVisited[x][y] = false;
+        }
+    }
+    resources.clear();
 }
 
 FieldUnit::FieldUnit() {}

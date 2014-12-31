@@ -10,12 +10,14 @@
 #define __CODEVS4_0__Game__
 
 #include <stdio.h>
+#include <iostream>
 
 using namespace std;
 
 class Game {
 public:
-    Game();
+    Game(int firstStage);
+    bool isNextStage(int newStage);
     int currentStage;
     int currentTurn;
 };
