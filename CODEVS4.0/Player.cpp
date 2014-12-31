@@ -253,9 +253,6 @@ void PlayerUnit::fixOnlyPosition() {
 /*------------------------------------------------------------*/
 
 Player::Player() {
-//    resourceCount = 0;
-//    necessaryResourceCount = 0;
-//    units.clear();
     resetWithStage();
 }
 

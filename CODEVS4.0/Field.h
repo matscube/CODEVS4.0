@@ -58,18 +58,16 @@ public:
 
     Field();
     void resetWithStage();
+
     FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
-    Position EnemyCastle;
     map<int, Position> enemyCastlePositions(); // <hashID, position>
 
     map<int, FieldUnit> resources;
     int allyWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     int reservedWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
 
-    
-//    vector<FieldUnit> units;
     void resetStatusWithTurn();
     void updateStatusWithAllyUnit(PlayerUnit playerUnit);
     void updateStatusWithFieldUnit(FieldUnit fieldUnit);

@@ -287,8 +287,8 @@ vector<Command> AI::createBaseOnNearestEnemy(int assign) {
     vector<Command> commands;
     
     Position target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
-    if (isValidIndex(field->EnemyCastle.first, field->EnemyCastle.second)) {
-        target = field->EnemyCastle;
+    if (isValidIndex(field->castlePosition.first, field->castlePosition.second)) {
+        target = field->castlePosition;
     }
     
     int curAssign = 0;
