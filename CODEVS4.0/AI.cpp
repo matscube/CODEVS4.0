@@ -348,8 +348,11 @@ vector<Command> AI::randomWalkCommand() {
     return commands;
 }
 
-vector<Command> AI::searchResourceCommand(int assign) {
+vector<Command> AI::searchResourceNearestCommand(int assign) {
     vector<Command> commands;
+
+    vector<Position> viewRange = viewRangePositions(PlayerUnit::viewRange(PlayerUnitType::Worker));
+    vector<Position>::iterator viewRangeIte;
 
     int curAssign = 0;
     map<int, PlayerUnit>::iterator unitIte = player->units.begin();
@@ -357,38 +360,14 @@ vector<Command> AI::searchResourceCommand(int assign) {
         PlayerUnit *unit = &unitIte->second;
 
         if (!unit->isMovable()) continue;
+        if (!isSearchable()) break;
 
         for (int d = 5; d < 100; d++) {
-            for (int dx = -d; dx <= d; dx++) {
-                int dy = (d - abs(dx));
-                int multi = (rand() % 2) ? 1 : -1;
-                dy *= multi;
-                
-                int x = unit->x + dx;
-                int y = unit->y + dy;
-                
-/*                if (isValidIndex(x, y)) {
-                    ofs << "d: " << d << " dx:" << dx << " x:" << x << " y:" << y << " isVisited:" << field->willBeVisited[x][y] << endl;
-                }*/
-                
-                if (isValidIndex(x, y) && !field->willBeVisited[x][y]) {
-                    PlayerUnitActionType at = unit->moveToTargetAction(x, y);
-                    Command com(unit->ID, at);
-                    commands.push_back(com);
-                    unit->fix(at);
-                    field->willBeVisited[x][y] = true;
-
-                    curAssign++;
-                    if (curAssign >= assign) goto finishAssign;
-
-                    goto breakLoop;
-                }
-
-                y = unit->y - dy;
-                
-/*                if (isValidIndex(x, y)) {
-                    ofs << "d: " << d << " dx:" << dx << " x:" << x << " y:" << y << " isVisited:" << field->willBeVisited[x][y] << endl;
-                }*/
+            vector<Position> positions = framePositions(d, true);
+            vector<Position>::iterator posIte;
+            for (posIte = positions.begin(); posIte != positions.end(); posIte++) {
+                int x = unit->x + posIte->first;
+                int y = unit->y + posIte->second;
 
                 if (isValidIndex(x, y) && !field->willBeVisited[x][y]) {
                     PlayerUnitActionType at = unit->moveToTargetAction(x, y);
@@ -397,9 +376,16 @@ vector<Command> AI::searchResourceCommand(int assign) {
                     unit->fix(at);
                     field->willBeVisited[x][y] = true;
                     
+                    for (viewRangeIte = viewRange.begin(); viewRangeIte != viewRange.end(); viewRangeIte++) {
+                        int x2 = x + viewRangeIte->first;
+                        int y2 = y + viewRangeIte->second;
+                        if (isValidIndex(x2, y2))
+                            field->willBeVisited[x2][y2] = true;
+                    }
+                    
                     curAssign++;
                     if (curAssign >= assign) goto finishAssign;
-
+                    
                     goto breakLoop;
                 }
             }
@@ -411,6 +397,81 @@ vector<Command> AI::searchResourceCommand(int assign) {
     
     return commands;
 }
+
+vector<Command> AI::searchResourceWithRangeCommand(int assign, int depth) {
+    vector<Command> commands;
+
+    if (!isSearchable()) {
+        cerr << "Searchable field is nowhere." << endl;
+        return commands;
+    }
+    
+    vector<Position> viewRange = viewRangePositions(PlayerUnit::viewRange(PlayerUnitType::Worker));
+    vector<Position>::iterator viewRangeIte;
+    
+    int curAssign = 0;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        PlayerUnit *pUnit = &pUnitIte->second;
+        
+        if (!pUnit->isMovable()) continue;
+        
+        int maxNewCellCount = 0;
+        Position target;
+
+        for (int d = depth; d < MAX_FIELD_WIDTH; d++) {
+
+            vector<Position> positions = framePositions(d, true);
+            vector<Position>::iterator posIte;
+            
+            for (posIte = positions.begin(); posIte != positions.end(); posIte++) {
+
+                int newCellCount = 0;
+                int baseX = pUnit->x + posIte->first;
+                int baseY = pUnit->y + posIte->second;
+
+                if (!isValidIndex(baseX, baseY)) continue;
+
+                for (viewRangeIte = viewRange.begin(); viewRangeIte != viewRange.end(); viewRangeIte++) {
+
+                    int x = baseX + viewRangeIte->first;
+                    int y = baseY + viewRangeIte->second;
+                    if (isValidIndex(x, y) && !field->willBeVisited[x][y]) {
+                        newCellCount++;
+                    }
+                }
+
+                if (newCellCount > maxNewCellCount) {
+                    maxNewCellCount = newCellCount;
+                    target = Position(baseX, baseY);
+                }
+            }
+            
+            if (maxNewCellCount) break;
+        }
+
+        if (maxNewCellCount) {
+            PlayerUnitActionType at = pUnit->moveToTargetAction(target.first, target.second);
+            Command com(pUnit->ID, at);
+            commands.push_back(com);
+            pUnit->fix(at);
+            
+            for (viewRangeIte = viewRange.begin(); viewRangeIte != viewRange.end(); viewRangeIte++) {
+                int x = target.first + viewRangeIte->first;
+                int y = target.second + viewRangeIte->second;
+                if (isValidIndex(x, y))
+                    field->willBeVisited[x][y] = true;
+            }
+            
+            curAssign++;
+            if (curAssign >= assign) break;
+        }
+    }
+    
+    return commands;
+}
+
 
 vector<Command> AI::searchEnemyCastle(int assign) {
     vector<Command> commands;

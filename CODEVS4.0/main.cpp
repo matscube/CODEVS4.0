@@ -41,26 +41,25 @@ int main(int argc, const char * argv[]) {
         // AI
         ai.resetWithTurn();
         
-        // get resource fastly
-        if (player.calcWorkerCount() < 10) {
-            ai.addCommands(ai.searchEnemyCastle(1));
-        } else {
-            ai.addCommands(ai.searchEnemyCastle(3));
+        if (!isValidIndex(field.castlePosition.first, field.castlePosition.second)) {
+            if (player.calcWorkerCount() < 10) {
+                ai.addCommands(ai.searchEnemyCastle(1));
+            } else {
+                ai.addCommands(ai.searchEnemyCastle(3));
+            }
         }
 
         
-        // ready to create base
-//        if (player.calcVillageCount() > 5) {
-//            ai.setResourceLimit(PlayerUnit::cost(PlayerUnitActionType::CreateBase));
-//        }
         ai.addCommands(ai.getMinimumResourceCommand(INF));
         ai.addCommands(ai.createVillageOnResource(INF));
         ai.addCommands(ai.createWorkerOnResource(INF));
         ai.setResourceLimit(PlayerUnit::cost(PlayerUnitActionType::CreateWorker) * 10);
 
-        
-        if (ai.isSearchable())
-            ai.addCommands(ai.searchResourceCommand(10));
+        if (player.calcVillageCount() < 20) {
+            if (ai.isSearchable()) {
+                ai.addCommands(ai.searchResourceWithRangeCommand(5, 8));
+            }
+        }
 
         // create base
         if (player.calcVillageCount() > 5 && player.calcBaseCount() < 5) {
@@ -72,7 +71,8 @@ int main(int argc, const char * argv[]) {
 
         // set resource other workers
         ai.addCommands(ai.getResourceCommand(INF));
-        ai.addCommands(ai.searchResourceCommand(INF));
+        if (player.calcVillageCount() < 20 && ai.isSearchable())
+            ai.addCommands(ai.searchResourceNearestCommand(INF));
         
         // attack castle
         if (isValidIndex(field.castlePosition.first, field.castlePosition.second))
@@ -80,8 +80,6 @@ int main(int argc, const char * argv[]) {
                 
         
         iOManager.output(ai.getCommands());
-//        iOManager.testInput();
-//        iOManager.testOutput();
     }
 
 

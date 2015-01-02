@@ -71,6 +71,8 @@ int PlayerUnit::cost(PlayerUnitActionType at) {
         case PlayerUnitActionType::CreateAssassin: return 60;
         case PlayerUnitActionType::CreateVillage: return 100;
         case PlayerUnitActionType::CreateBase: return 500;
+            
+        case PlayerUnitActionType::None: return 0;
         default:
             cerr << "[PlayerUnit::cost] Error: Unknonwn PlayerUnitActionType is called" << endl;
             return 0;

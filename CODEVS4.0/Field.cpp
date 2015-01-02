@@ -50,6 +50,16 @@ void Field::resetWithStage() {
     resources.clear();
 }
 
+int Field::calcVisited() {
+    int cnt = 0;
+    for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
+        for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
+            if (isVisited[x][y]) cnt++;
+        }
+    }
+    return cnt;
+}
+
 FieldUnit::FieldUnit() {}
 FieldUnit::FieldUnit(int x, int y, FieldUnitType type) {
     FieldUnit::x = x;

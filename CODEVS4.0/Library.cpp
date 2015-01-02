@@ -16,3 +16,32 @@ int dist(int x1, int y1, int x2, int y2) {
 int getHashID(int x, int y) {
     return y * MAX_FIELD_WIDTH + x;
 }
+
+vector<Position> framePositions(int d, bool shuffle) {
+    vector<Position> positions;
+    for (int dx = -d; dx <= d; dx++) {
+        for (int dy = -d; dy <= d; dy++) {
+            if (dist(0, 0, dx, dy) == d) {
+                Position p = Position(dx, dy);
+                positions.push_back(p);
+            }
+        }
+    }
+    
+    if (shuffle) random_shuffle(positions.begin(), positions.end());
+
+    return positions;
+}
+
+vector<Position> viewRangePositions(int d) {
+    vector<Position> positions;
+    for (int dx = -d; dx <= d; dx++) {
+        for (int dy = -d; dy <= d; dy++) {
+            if (dist(0, 0, dx, dy) <= d) {
+                Position p = Position(dx, dy);
+                positions.push_back(p);
+            }
+        }
+    }
+    return positions;
+}

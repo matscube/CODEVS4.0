@@ -54,7 +54,8 @@ public:
     
     // get resource utility
     vector<Command> getResourceCommand(int assign);
-    vector<Command> searchResourceCommand(int assign);
+    vector<Command> searchResourceNearestCommand(int assign);
+    vector<Command> searchResourceWithRangeCommand(int assign, int depth);
     
     // create base
     vector<Command> createBaseOnNearestEnemy(int assign);

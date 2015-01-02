@@ -17,6 +17,7 @@
 
 #define MAX_FIELD_WIDTH 100
 #define MAX_FIELD_HEIGHT 100
+#define MAX_FIELD_CELL_COUNT 10000
 #define MAX_GETTING_RESOURCE 5
 
 
@@ -62,6 +63,7 @@ public:
     FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    int calcVisited();
     map<int, Position> enemyCastlePositions(); // <hashID, position>
 
     map<int, FieldUnit> resources;
