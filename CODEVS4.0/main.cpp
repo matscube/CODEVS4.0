@@ -41,6 +41,9 @@ int main(int argc, const char * argv[]) {
         // AI
         ai.resetWithTurn();
         
+        // Mark: AI Commands **********************************************************
+        
+        // Search Enemy Castle
         if (!isValidIndex(field.castlePosition.first, field.castlePosition.second)) {
             if (player.calcWorkerCount() < 10) {
                 ai.addCommands(ai.searchEnemyCastle(1));
@@ -49,21 +52,28 @@ int main(int argc, const char * argv[]) {
             }
         }
 
-        
+        // Get Resource
         ai.addCommands(ai.getMinimumResourceCommand(INF));
         ai.addCommands(ai.createVillageOnResource(INF));
         ai.addCommands(ai.createWorkerOnResource(INF));
         ai.setResourceLimit(PlayerUnit::cost(PlayerUnitActionType::CreateWorker) * 10);
 
+        // Search Resource
         if (player.calcVillageCount() < 20) {
             if (ai.isSearchable()) {
-                ai.addCommands(ai.searchResourceWithRangeCommand(5, 8));
+                if (game.currentTurn < 50) {
+                    ai.addCommands(ai.searchResourceWithRangeCommand(5, 8));
+                } else if (game.currentTurn < 80) {
+                    ai.addCommands(ai.searchResourceWithRangeCommand(10, 8));
+                } else {
+                    ai.addCommands(ai.searchResourceWithRangeCommand(15, 8));
+                }
             }
         }
 
         // create base
-        if (player.calcVillageCount() > 5 && player.calcBaseCount() < 5) {
-            ai.addCommands(ai.createBaseOnNearestEnemy(INF));
+        if (player.calcBaseCount() < 3) {
+            ai.addCommands(ai.createBaseOnNearestEnemy());
         }
         
         ai.addCommands(ai.createAttakerCommand(INF));

@@ -283,7 +283,46 @@ vector<Command> AI::createWorkerOnResource(int assign) {
     return commands;
 }
 
-vector<Command> AI::createBaseOnNearestEnemy(int assign) {
+// MARK: create base
+
+Position AI::basePointNearestToEnemy() {
+    Position target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
+    if (isValidIndex(field->castlePosition.first, field->castlePosition.second)) {
+        target = field->castlePosition;
+    }
+
+    Position bestPos;
+    int distToCastle = INF;
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+
+        if (pUnitIte->second.type != PlayerUnitType::Village) continue;
+
+        int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+        if (field->resources.find(hashID) == field->resources.end()) continue;
+
+        int d = dist(pUnitIte->second.x, pUnitIte->second.y, target.first, target.second);
+        if (d < distToCastle) {
+            bestPos = Position(pUnitIte->second.x, pUnitIte->second.y);
+            distToCastle = d;
+        }
+    }
+    
+    return bestPos;
+}
+
+int AI::calcDistanceToEnemy(Position p) {
+    Position target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
+    if (isValidIndex(field->castlePosition.first, field->castlePosition.second)) {
+        target = field->castlePosition;
+    }
+    
+    return dist(p.first, p.second, target.first, target.second);
+}
+
+/*
+vector<Command> AI::createBaseOnNearestEnemyOld(int assign) {
     vector<Command> commands;
     
     Position target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
@@ -305,6 +344,27 @@ vector<Command> AI::createBaseOnNearestEnemy(int assign) {
             curAssign++;
             if (curAssign >= assign) break;
         }
+    }
+    
+    return commands;
+}*/
+vector<Command> AI::createBaseOnNearestEnemy() {
+    vector<Command> commands;
+
+    Position basePos = basePointNearestToEnemy();
+    if (calcDistanceToEnemy(basePos) > 40 && player->calcVillageCount() < 12) return commands;
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+
+        if (!pUnitIte->second.isCreatableBase()) continue;
+        if (dist(pUnitIte->second.x, pUnitIte->second.y, basePos.first, basePos.second) != 0) continue;
+        
+        PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+        Command com(pUnitIte->second.ID, at);
+        commands.push_back(com);
+        pUnitIte->second.fix(at);
+        break;
     }
     
     return commands;

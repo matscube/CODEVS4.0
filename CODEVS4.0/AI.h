@@ -47,7 +47,8 @@ public:
 
     vector<Command> createAttakerCommand(int assign);
 
-    // get resource fastly
+    // *********** get resource *************
+    // get resource system
     vector<Command> getMinimumResourceCommand(int assign);
     vector<Command> createVillageOnResource(int assign);
     vector<Command> createWorkerOnResource(int assign);
@@ -56,10 +57,17 @@ public:
     vector<Command> getResourceCommand(int assign);
     vector<Command> searchResourceNearestCommand(int assign);
     vector<Command> searchResourceWithRangeCommand(int assign, int depth);
-    
-    // create base
-    vector<Command> createBaseOnNearestEnemy(int assign);
 
+    // ************ create base **************
+    // create base
+    Position basePointNearestToEnemy();
+    int calcDistanceToEnemy(Position p);
+    
+//    vector<Command> createBaseOnNearestEnemyOld(int assign);
+    vector<Command> createBaseOnNearestEnemy();
+
+    
+    // ************ attack castle ****************
     // attack castle
     vector<Command> searchEnemyCastle(int assign);
     vector<Command> attackCastleCommand(int assign);
