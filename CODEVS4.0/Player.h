@@ -89,12 +89,17 @@ public:
     void fixOnlyPosition();
 };
 
-
+enum class PlayerType {
+    Ally,
+    Enemy,
+};
 
 class Player {
 public:
     Player();
     void resetWithStage();
+    PlayerType type;
+    void updateType(PlayerUnit p);
     int resourceCount;
     int necessaryResourceCount;
   

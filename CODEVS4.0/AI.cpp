@@ -286,7 +286,12 @@ vector<Command> AI::createWorkerOnResource(int assign) {
 // MARK: create base
 
 Position AI::basePointNearestToEnemy() {
-    Position target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
+    Position target;
+    if (player->type == PlayerType::Ally) {
+        target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
+    } else {
+        target = Position(0, 0);
+    }
     if (isValidIndex(field->castlePosition.first, field->castlePosition.second)) {
         target = field->castlePosition;
     }
@@ -313,7 +318,13 @@ Position AI::basePointNearestToEnemy() {
 }
 
 int AI::calcDistanceToEnemy(Position p) {
-    Position target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
+    Position target;
+    if (player->type == PlayerType::Ally) {
+        target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
+    } else {
+        target = Position(0, 0);
+    }
+    
     if (isValidIndex(field->castlePosition.first, field->castlePosition.second)) {
         target = field->castlePosition;
     }
@@ -321,33 +332,6 @@ int AI::calcDistanceToEnemy(Position p) {
     return dist(p.first, p.second, target.first, target.second);
 }
 
-/*
-vector<Command> AI::createBaseOnNearestEnemyOld(int assign) {
-    vector<Command> commands;
-    
-    Position target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
-    if (isValidIndex(field->castlePosition.first, field->castlePosition.second)) {
-        target = field->castlePosition;
-    }
-    
-    int curAssign = 0;
-    map<int, PlayerUnit>::iterator pUnitIte;
-    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
-        int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
-        if (field->resources.find(hashID) != field->resources.end()) {
-            if (!pUnitIte->second.isCreatableBase()) continue;
-            PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
-            Command com(pUnitIte->second.ID, at);
-            commands.push_back(com);
-            pUnitIte->second.fix(at);
-            
-            curAssign++;
-            if (curAssign >= assign) break;
-        }
-    }
-    
-    return commands;
-}*/
 vector<Command> AI::createBaseOnNearestEnemy() {
     vector<Command> commands;
 
@@ -536,7 +520,7 @@ vector<Command> AI::searchResourceWithRangeCommand(int assign, int depth) {
 vector<Command> AI::searchEnemyCastle(int assign) {
     vector<Command> commands;
 
-    map<int, Position> targets = field->enemyCastlePositions();
+    map<int, Position> targets = field->enemyCastlePositions(player->type);
 
     map<int, Position>::iterator targetIte;
     map<int, PlayerUnit>::iterator pUnitIte;

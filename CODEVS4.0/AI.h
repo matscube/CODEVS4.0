@@ -62,8 +62,6 @@ public:
     // create base
     Position basePointNearestToEnemy();
     int calcDistanceToEnemy(Position p);
-    
-//    vector<Command> createBaseOnNearestEnemyOld(int assign);
     vector<Command> createBaseOnNearestEnemy();
 
     

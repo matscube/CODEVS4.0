@@ -253,9 +253,20 @@ void PlayerUnit::fixOnlyPosition() {
 }
 
 /*------------------------------------------------------------*/
+// MARK: Player
 
 Player::Player() {
     resetWithStage();
+}
+
+void Player::updateType(PlayerUnit p) {
+    if (p.type != PlayerUnitType::Castle) return;
+
+    if (dist(p.x, p.y, 0, 0) < dist(p.x, p.y, MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1)) {
+        type = PlayerType::Ally;
+    } else {
+        type = PlayerType::Enemy;
+    }
 }
 
 void Player::resetWithStage() {

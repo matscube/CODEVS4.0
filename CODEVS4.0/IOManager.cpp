@@ -90,6 +90,9 @@ void IOManager::inputBody() {
         unit.setHitPoint(unitHP);
         field->updateStatusWithAllyUnit(unit);
         field->updateVisited(&unit);
+        if (unit.type == PlayerUnitType::Castle) {
+            player->updateType(unit);
+        }
         player->units[unit.ID] = unit;
     }
     
