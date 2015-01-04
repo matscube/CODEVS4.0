@@ -92,6 +92,7 @@ void IOManager::inputBody() {
         field->updateVisited(&unit);
         if (unit.type == PlayerUnitType::Castle) {
             player->updateType(unit);
+            player->castleUnitID = unit.ID;
         }
         player->units[unit.ID] = unit;
     }
@@ -106,7 +107,7 @@ void IOManager::inputBody() {
         int unitType = nextInt();
         
         if (PlayerUnitType(unitType) == PlayerUnitType::Castle) {
-            field->castlePosition = Position(unitPosX, unitPosY);
+            field->enemyCastlePosition = Position(unitPosX, unitPosY);
         }
     }
     

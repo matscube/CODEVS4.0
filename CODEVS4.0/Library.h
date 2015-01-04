@@ -21,7 +21,9 @@ using namespace std;
 
 int dist(int x1, int y1, int x2, int y2);
 int getHashID(int x, int y);
+bool isValidUnitID(int ID);
 vector<Position> framePositions(int d, bool shuffle);
+vector<Position> areaPositions(int d, bool shuffle);
 vector<Position> viewRangePositions(int d);
 
 #endif /* defined(__CODEVS4_0__Library__) */

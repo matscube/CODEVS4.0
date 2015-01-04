@@ -55,7 +55,8 @@ string FieldStatusName(FieldStatus s);
 class Field {
     ofstream ofs;
 public:
-    Position castlePosition;
+    Position allyCastlePosition;
+    Position enemyCastlePosition;
 
     Field();
     void resetWithStage();

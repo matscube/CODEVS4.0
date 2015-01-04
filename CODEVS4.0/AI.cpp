@@ -292,8 +292,8 @@ Position AI::basePointNearestToEnemy() {
     } else {
         target = Position(0, 0);
     }
-    if (isValidIndex(field->castlePosition.first, field->castlePosition.second)) {
-        target = field->castlePosition;
+    if (isValidIndex(field->enemyCastlePosition.first, field->enemyCastlePosition.second)) {
+        target = field->enemyCastlePosition;
     }
 
     Position bestPos;
@@ -325,8 +325,8 @@ int AI::calcDistanceToEnemy(Position p) {
         target = Position(0, 0);
     }
     
-    if (isValidIndex(field->castlePosition.first, field->castlePosition.second)) {
-        target = field->castlePosition;
+    if (isValidIndex(field->enemyCastlePosition.first, field->enemyCastlePosition.second)) {
+        target = field->enemyCastlePosition;
     }
     
     return dist(p.first, p.second, target.first, target.second);
@@ -516,7 +516,116 @@ vector<Command> AI::searchResourceWithRangeCommand(int assign, int depth) {
     return commands;
 }
 
+// MARK: defend castle
+vector<Command> AI::setWorkerOnCastle() {
+    vector<Command> commands;
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.type != PlayerUnitType::Worker) continue;
+        if (dist(pUnitIte->second.x, pUnitIte->second.y, field->allyCastlePosition.first, field->allyCastlePosition.second) == 0) return commands;
+    }
+    
+    // no worker, then create by castle
+    PlayerUnit *castle = &player->units[player->castleUnitID];
+    
+    if (castle->isCreatableWorker()) {
+        PlayerUnitActionType at = PlayerUnitActionType::CreateWorker;
+        Command com(castle->ID, at);
+        commands.push_back(com);
+        castle->fix(at);
+    }
+    
+    return commands;
+}
 
+vector<Command> AI::createBaseOnCastle() {
+    vector<Command> commands;
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (dist(pUnitIte->second.x, pUnitIte->second.y, field->allyCastlePosition.first, field->allyCastlePosition.second) != 0) continue;
+        if (!pUnitIte->second.isCreatableBase()) continue;
+        
+        PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+        Command com(pUnitIte->second.ID, at);
+        commands.push_back(com);
+        pUnitIte->second.fix(at);
+    }
+    
+    return commands;
+}
+
+vector<Position> AI::defendingArea() {
+    vector<Position> area = areaPositions(2, true);
+    vector<Position>::iterator areaIte;
+    vector<Position> defArea;
+    for (areaIte = area.begin(); areaIte != area.end(); areaIte++) {
+        Position pos = Position(areaIte->first + field->allyCastlePosition.first, areaIte->second + field->allyCastlePosition.second);
+        if (isValidIndex(pos.first, pos.second)) {
+            defArea.push_back(pos);
+        }
+    }
+    return defArea;
+}
+
+bool AI::isBaseReady() {
+    bool isReady = false;
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (dist(pUnitIte->second.x, pUnitIte->second.y, field->allyCastlePosition.first, field->allyCastlePosition.second) != 0) continue;
+        if (pUnitIte->second.type == PlayerUnitType::Base) isReady = true;
+    }
+    
+    return  isReady;
+}
+
+vector<Command> AI::createDefenderOnCastle() {
+    vector<Command> commands;
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (dist(pUnitIte->second.x, pUnitIte->second.y, field->allyCastlePosition.first, field->allyCastlePosition.second) != 0) continue;
+        if (pUnitIte->second.type != PlayerUnitType::Base) continue;
+        
+        // base on castle
+        PlayerUnitType pType = PlayerUnitType::Knight;
+        if (pUnitIte->second.isCreatableAttacker(pType)) {
+            PlayerUnitActionType at = CreateAttackerAction(pType);
+            Command com(pUnitIte->second.ID, at);
+            commands.push_back(com);
+            pUnitIte->second.fix(at);
+        }
+    }
+    
+    return commands;
+}
+
+vector<Command> AI::setDefenderOnCastle() {
+    vector<Command> commands;
+    
+    vector<Position> targets = defendingArea();
+    int targetSize = (int)targets.size();
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (dist(pUnitIte->second.x, pUnitIte->second.y, field->allyCastlePosition.first, field->allyCastlePosition.second) >= 10) continue;
+        // TODO: experiment value
+        if (!pUnitIte->second.isAttacker()) continue;
+        if (!pUnitIte->second.isMovable()) continue;
+        
+        Position target = targets[rand() % targetSize];
+        PlayerUnitActionType at = pUnitIte->second.moveToTargetAction(target.first, target.second);
+        Command com(pUnitIte->second.ID, at);
+        commands.push_back(com);
+        pUnitIte->second.fix(at);
+    }
+    
+    return commands;
+}
+
+
+// MARK: attack castle
 vector<Command> AI::searchEnemyCastle(int assign) {
     vector<Command> commands;
 
@@ -573,7 +682,7 @@ vector<Command> AI::attackCastleCommand(int assign) {
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (pUnitIte->second.isMovable()) {
-            PlayerUnitActionType at = pUnitIte->second.moveToTargetAction(field->castlePosition.first, field->castlePosition.second);
+            PlayerUnitActionType at = pUnitIte->second.moveToTargetAction(field->enemyCastlePosition.first, field->enemyCastlePosition.second);
             Command com(pUnitIte->second.ID, at);
             commands.push_back(com);
             pUnitIte->second.fix(at);

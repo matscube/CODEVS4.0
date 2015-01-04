@@ -64,6 +64,13 @@ public:
     int calcDistanceToEnemy(Position p);
     vector<Command> createBaseOnNearestEnemy();
 
+    // ************ defend castle ****************
+    vector<Command> setWorkerOnCastle();
+    vector<Command> createBaseOnCastle();
+    vector<Position> defendingArea();
+    bool isBaseReady();
+    vector<Command> createDefenderOnCastle();
+    vector<Command> setDefenderOnCastle();
     
     // ************ attack castle ****************
     // attack castle

@@ -78,12 +78,13 @@ public:
     static string action(PlayerUnitActionType type);
     static int viewRange(PlayerUnitType type);
     static int attackRange(PlayerUnitType type);
-    // TODO : including calcing cost
     bool isMovable();
     bool isCreatableWorker();
     bool isCreatableAttacker(PlayerUnitType t);
     bool isCreatableVillage();
     bool isCreatableBase();
+
+    bool isAttacker();
 
     void fix(PlayerUnitActionType at);
     void fixOnlyPosition();
@@ -106,6 +107,7 @@ public:
     // TODO : units by type
 //    map<int, PlayerUnit> villageUnits;
     map<int, PlayerUnit> units;
+    int castleUnitID = -1;
     
     int calcWorkerCount();
     int calcVillageCount();

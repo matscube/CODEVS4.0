@@ -39,7 +39,8 @@ void Field::resetWithStage() {
         }
     }
     ofs = ofstream("/Users/matscube/field.txt");
-    castlePosition = Position(-1, -1);
+    enemyCastlePosition = Position(-1, -1);
+    allyCastlePosition = Position(-1, -1);
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
         for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
             status[x][y] = FieldStatus::Unknown;
@@ -115,6 +116,10 @@ void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
     
     // Update Resource Occupancy
     allyWorkers[cx][cy]++;
+    
+    if (allyUnit.type == PlayerUnitType::Castle) {
+        allyCastlePosition = Position(allyUnit.x, allyUnit.y);
+    }
 }
 
 void Field::updateStatusWithFieldUnit(FieldUnit fieldUnit) {

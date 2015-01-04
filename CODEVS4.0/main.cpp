@@ -42,15 +42,25 @@ int main(int argc, const char * argv[]) {
         ai.resetWithTurn();
         
         // Mark: AI Commands **********************************************************
+        // defender
+        if (player.resourceCount >= PlayerUnit::cost(PlayerUnitActionType::CreateBase)) {
+            if (!ai.isBaseReady()) {
+                ai.addCommands(ai.setWorkerOnCastle());
+                ai.addCommands(ai.createBaseOnCastle());
+            }
+            ai.addCommands(ai.createDefenderOnCastle());
+            ai.addCommands(ai.setDefenderOnCastle());
+        }
         
         // Search Enemy Castle
-        if (!isValidIndex(field.castlePosition.first, field.castlePosition.second)) {
+        if (!isValidIndex(field.enemyCastlePosition.first, field.enemyCastlePosition.second)) {
             if (player.calcWorkerCount() < 10) {
                 ai.addCommands(ai.searchEnemyCastle(1));
             } else {
                 ai.addCommands(ai.searchEnemyCastle(3));
             }
         }
+
 
         // Get Resource
         ai.addCommands(ai.getMinimumResourceCommand(INF));
@@ -70,13 +80,14 @@ int main(int argc, const char * argv[]) {
                 }
             }
         }
+        
 
         // create base
         if (player.calcBaseCount() < 3) {
-            ai.addCommands(ai.createBaseOnNearestEnemy());
+//            ai.addCommands(ai.createBaseOnNearestEnemy());
         }
         
-        ai.addCommands(ai.createAttakerCommand(INF));
+//        ai.addCommands(ai.createAttakerCommand(INF));
 
 
         // set resource other workers
@@ -85,7 +96,7 @@ int main(int argc, const char * argv[]) {
             ai.addCommands(ai.searchResourceNearestCommand(INF));
         
         // attack castle
-        if (isValidIndex(field.castlePosition.first, field.castlePosition.second))
+        if (isValidIndex(field.enemyCastlePosition.first, field.enemyCastlePosition.second))
             ai.addCommands(ai.attackCastleCommand(INF));
                 
         

@@ -244,6 +244,20 @@ bool PlayerUnit::isCreatableBase() {
     return false;
 }
 
+bool PlayerUnit::isAttacker() {
+    switch (type) {
+        case PlayerUnitType::Worker: return false;
+        case PlayerUnitType::Knight: return true;
+        case PlayerUnitType::Fighter: return true;
+        case PlayerUnitType::Assassin: return true;
+        case PlayerUnitType::Castle: return false;
+        case PlayerUnitType::Village: return false;
+        case PlayerUnitType::Base: return false;
+    }
+    cerr << "[PlayerUnit::isAttacker] Error: Unkwon Type" << endl;
+    return false;
+}
+
 void PlayerUnit::fix(PlayerUnitActionType at) {
     player->resourceCount -= PlayerUnit::cost(at);
     status = PlayerUnitStatus::Reserved;
