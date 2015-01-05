@@ -72,6 +72,16 @@ public:
     vector<Command> createDefenderOnCastle();
     vector<Command> setDefenderOnCastle();
     
+    // ************ defend resource ***************
+    vector<Command> setWorkerFieldCenter();
+    vector<Command> createVillageOnFieldCenter();
+    vector<Command> createBaseOnFieldCenter();
+    vector<Position> fieldCenterArea();
+    bool isFieldCenterVillageReady();
+    bool isFieldCenterBaseReady();
+    vector<Command> createDefenderOnFieldCenter();
+    vector<Command> setDefenderOnResource();
+    
     // ************ attack castle ****************
     // attack castle
     vector<Command> searchEnemyCastle(int assign);

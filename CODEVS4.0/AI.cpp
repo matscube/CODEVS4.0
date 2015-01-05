@@ -582,6 +582,12 @@ bool AI::isBaseReady() {
 
 vector<Command> AI::createDefenderOnCastle() {
     vector<Command> commands;
+
+    vector<int> prob;
+    for (int i = 0; i < 30; i++) prob.push_back(0);
+    for (int i = 0; i < 50; i++) prob.push_back(1);
+    for (int i = 0; i < 20; i++) prob.push_back(2);
+    
     
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
@@ -589,7 +595,12 @@ vector<Command> AI::createDefenderOnCastle() {
         if (pUnitIte->second.type != PlayerUnitType::Base) continue;
         
         // base on castle
-        PlayerUnitType pType = PlayerUnitType::Knight;
+        int p = prob[rand() % 100];
+        PlayerUnitType pType;
+        if (p == 0) pType = PlayerUnitType::Knight;
+        if (p == 1) pType = PlayerUnitType::Fighter;
+        if (p == 2) pType = PlayerUnitType::Assassin;
+
         if (pUnitIte->second.isCreatableAttacker(pType)) {
             PlayerUnitActionType at = CreateAttackerAction(pType);
             Command com(pUnitIte->second.ID, at);
@@ -624,6 +635,162 @@ vector<Command> AI::setDefenderOnCastle() {
     return commands;
 }
 
+// MARK: defend resource
+vector<Command> AI::setWorkerFieldCenter() {
+    vector<Command> commands;
+    
+    vector<Position> positions = fieldCenterArea();
+    if (positions.size() == 0) return commands;
+    
+    vector<Position>::iterator posIte;
+    bool pos[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {false};
+    for (posIte = positions.begin(); posIte != positions.end(); posIte++) {
+        pos[posIte->first][posIte->second] = true;
+    }
+    Position target = positions[0];
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    PlayerUnit *worker;
+    int distant = INF;
+    for (pUnitIte = player->units.end(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.type != PlayerUnitType::Worker) continue;
+        
+        if (pos[pUnitIte->second.x][pUnitIte->second.y]) {
+            return commands;
+        } else {
+            if (!pUnitIte->second.isMovable()) continue;
+            int newDist = dist(pUnitIte->second.x, pUnitIte->second.y, target.first, target.second);
+            if (newDist < distant) {
+                distant = newDist;
+                worker = &pUnitIte->second;
+            }
+        }
+    }
+    
+    // no commandable worker anywhere
+    if (distant == INF) return commands;
+    
+    // no worker in area, then set worker
+    PlayerUnitActionType at = worker->moveToTargetAction(target.first, target.second);
+    Command com(worker->ID, at);
+    commands.push_back(com);
+    worker->fix(at);
+    
+    return commands;
+}
+
+vector<Command> AI::createVillageOnFieldCenter() {
+    vector<Command> commands;
+    
+    vector<Position> positions = fieldCenterArea();
+    vector<Position>::iterator posIte;
+    bool pos[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {false};
+    for (posIte = positions.begin(); posIte != positions.end(); posIte++) {
+        pos[posIte->first][posIte->second] = true;
+    }
+
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (!pUnitIte->second.isCreatableVillage()) continue;
+        if (!pos[pUnitIte->second.x][pUnitIte->second.y]) continue;
+        
+        PlayerUnitActionType at = PlayerUnitActionType::CreateVillage;
+        Command com(pUnitIte->second.ID, at);
+        commands.push_back(com);
+        pUnitIte->second.fix(at);
+    }
+    
+    return commands;
+}
+vector<Command> AI::createBaseOnFieldCenter() {
+    vector<Command> commands;
+    
+    vector<Position> positions = fieldCenterArea();
+    vector<Position>::iterator posIte;
+    bool pos[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {false};
+    for (posIte = positions.begin(); posIte != positions.end(); posIte++) {
+        pos[posIte->first][posIte->second] = true;
+    }
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (!pUnitIte->second.isCreatableBase()) continue;
+        if (!pos[pUnitIte->second.x][pUnitIte->second.y]) continue;
+        
+        PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+        Command com(pUnitIte->second.ID, at);
+        commands.push_back(com);
+        pUnitIte->second.fix(at);
+    }
+    
+    return commands;
+}
+
+vector<Position> AI::fieldCenterArea() {
+    vector<Position> positions;
+    
+    for (int x = 40; x <= 60; x++) {
+        for (int y = 40; y <= 60; y++) {
+            if (field->isVisited[x][y]) {
+                int hashID = getHashID(x, y);
+                if (field->resources.find(hashID) == field->resources.end()) {
+                    positions.push_back(Position(x, y));
+                }
+            }
+        }
+    }
+    
+    random_shuffle(positions.begin(), positions.end());
+    
+    return positions;
+}
+
+bool AI::isFieldCenterVillageReady() {
+    vector<Position> positions = fieldCenterArea();
+    vector<Position>::iterator posIte;
+    bool pos[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {false};
+    for (posIte = positions.begin(); posIte != positions.end(); posIte++) {
+        pos[posIte->first][posIte->second] = true;
+    }
+
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.type != PlayerUnitType::Village) continue;
+        int hashID = getHashID(pUnitIte->second.x, pUnitIte->second.y);
+        if (field->resources.find(hashID) != field->resources.end()) continue;
+        if (pos[pUnitIte->second.x][pUnitIte->second.y]) return true;
+    }
+    
+    return false;
+}
+bool AI::isFieldCenterBaseReady() {
+    vector<Position> positions = fieldCenterArea();
+    vector<Position>::iterator posIte;
+    bool pos[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {false};
+    for (posIte = positions.begin(); posIte != positions.end(); posIte++) {
+        pos[posIte->first][posIte->second] = true;
+    }
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.type != PlayerUnitType::Base) continue;
+        int hashID = getHashID(pUnitIte->second.x, pUnitIte->second.y);
+//        if (field->resources.find(hashID) != field->resources.end()) continue;
+        if (pos[pUnitIte->second.x][pUnitIte->second.y]) return true;
+    }
+    
+    return false;
+}
+
+vector<Command> AI::createDefenderOnFieldCenter() {
+    vector<Command> commands;
+    return commands;
+}
+
+vector<Command> AI::setDefenderOnResource() {
+    vector<Command> commands;
+    return commands;
+}
 
 // MARK: attack castle
 vector<Command> AI::searchEnemyCastle(int assign) {

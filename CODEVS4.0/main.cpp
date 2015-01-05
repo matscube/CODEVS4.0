@@ -42,7 +42,26 @@ int main(int argc, const char * argv[]) {
         ai.resetWithTurn();
         
         // Mark: AI Commands **********************************************************
-        // defender
+        // resource defender
+        if (player.resourceCount >= PlayerUnit::cost(PlayerUnitActionType::CreateVillage)) {
+            if (!ai.isFieldCenterVillageReady()) {
+                ai.addCommands(ai.setWorkerFieldCenter());
+                ai.addCommands(ai.createVillageOnFieldCenter());
+            }
+//            ai.addCommands(ai.createDefenderOnCastle());
+//            ai.addCommands(ai.setDefenderOnCastle());
+        }
+        if (player.resourceCount >= PlayerUnit::cost(PlayerUnitActionType::CreateBase)) {
+            if (!ai.isFieldCenterBaseReady()) {
+                ai.addCommands(ai.setWorkerFieldCenter());
+                ai.addCommands(ai.createBaseOnFieldCenter());
+            }
+            //            ai.addCommands(ai.createDefenderOnCastle());
+            //            ai.addCommands(ai.setDefenderOnCastle());
+        }
+
+        // castle defender
+        
         if (player.resourceCount >= PlayerUnit::cost(PlayerUnitActionType::CreateBase)) {
             if (!ai.isBaseReady()) {
                 ai.addCommands(ai.setWorkerOnCastle());
