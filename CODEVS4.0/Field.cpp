@@ -70,8 +70,10 @@ FieldUnit::FieldUnit(int x, int y, FieldUnitType type) {
     FieldUnit::hashID = getHashID(x, y);
 }
 
-map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
-    map<int, Position> res;
+//map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
+vector<Position> Field::enemyCastlePositions(PlayerType pType) {
+//    map<int, Position> res;
+    vector<Position> res;
     for (int dx = 0; dx <= 40; dx++) {
         for (int dy = 0; dy <= 40 - dx; dy++) {
             Position pos;
@@ -80,8 +82,9 @@ map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
             } else {
                 pos = Position(dx, dy);
             }
-            int hashID = getHashID(pos.first, pos.second);
-            res[hashID] = pos;
+//            int hashID = getHashID(pos.first, pos.second);
+//            res[hashID] = pos;
+            res.push_back(pos);
         }
     }
     return res;

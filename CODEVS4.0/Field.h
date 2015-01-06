@@ -65,7 +65,8 @@ public:
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     int calcVisited();
-    map<int, Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
+//    map<int, Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
+    vector<Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
 
     map<int, FieldUnit> resources;
     int allyWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];

@@ -42,6 +42,26 @@ int main(int argc, const char * argv[]) {
         ai.resetWithTurn();
         
         // Mark: AI Commands **********************************************************
+#if 1
+        // Search Enemy Castle
+        if (!isValidIndex(field.enemyCastlePosition.first, field.enemyCastlePosition.second)) {
+            ai.addCommands(ai.searchEnemyCastle(5));
+        }
+        if (player.calcVillageCount() < 5) {
+            ai.addCommands(ai.createVillageOnNearestEnemy());
+        }
+        if (player.calcBaseCount()) {
+//            ai.addCommands(ai.createWorkerOnVillage());
+            ai.addCommands(ai.createAttackerOnBase());
+        }
+        ai.addCommands(ai.attackCastleCommand(INF));
+        
+
+#endif
+        
+        
+        
+#if 0
         // resource defender
         if (player.resourceCount >= PlayerUnit::cost(PlayerUnitActionType::CreateVillage)) {
             if (!ai.isFieldCenterVillageReady()) {
@@ -117,7 +137,7 @@ int main(int argc, const char * argv[]) {
         // attack castle
         if (isValidIndex(field.enemyCastlePosition.first, field.enemyCastlePosition.second))
             ai.addCommands(ai.attackCastleCommand(INF));
-                
+#endif
         
         iOManager.output(ai.getCommands());
     }

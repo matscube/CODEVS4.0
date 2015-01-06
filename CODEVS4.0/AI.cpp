@@ -354,6 +354,96 @@ vector<Command> AI::createBaseOnNearestEnemy() {
     return commands;
 }
 
+// MARK: create village
+Position AI::villagePointNearestToEnemy() {
+    Position target;
+    if (player->type == PlayerType::Ally) {
+        target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
+    } else {
+        target = Position(0, 0);
+    }
+    if (isValidIndex(field->enemyCastlePosition.first, field->enemyCastlePosition.second)) {
+        target = field->enemyCastlePosition;
+    }
+    
+    Position bestPos;
+    if (player->type == PlayerType::Ally) {
+        bestPos = Position(target.first - 6, target.second - 5);
+    }
+    return bestPos;
+}
+vector<Command> AI::createVillageOnNearestEnemy() {
+    vector<Command> commands;
+    
+    Position target = villagePointNearestToEnemy();
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    PlayerUnit *pUnit = nullptr;
+    int distance = INF;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        
+//        if (!pUnitIte->second.isCreatableVillage()) continue;
+        if (!pUnitIte->second.isCreatableBase()) continue;
+        int newDist = dist(pUnitIte->second.x, pUnitIte->second.y, target.first, target.second);
+        
+        if (newDist < distance) {
+            distance = newDist;
+            pUnit = &pUnitIte->second;
+        }
+    }
+
+
+    if (distance == 0) {
+//        PlayerUnitActionType at = PlayerUnitActionType::CreateVillage;
+        PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+        Command com(pUnit->ID, at);
+        commands.push_back(com);
+        pUnit->fix(at);
+    } else if (distance < INF) {
+        PlayerUnitActionType at = pUnit->moveToTargetAction(target.first, target.second);
+        Command com(pUnit->ID, at);
+        commands.push_back(com);
+        pUnit->fix(at);
+    }
+    
+    return commands;
+}
+
+vector<Command> AI::createWorkerOnVillage() {
+    vector<Command> commands;
+
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.type != PlayerUnitType::Village) continue;
+        if (!pUnitIte->second.isCreatableWorker()) continue;
+        PlayerUnitActionType at = PlayerUnitActionType::CreateWorker;
+        Command com(pUnitIte->second.ID, at);
+        commands.push_back(com);
+        pUnitIte->second.fix(at);
+    }
+
+    return commands;
+}
+vector<Command> AI::createAttackerOnBase() {
+    vector<Command> commands;
+    
+    map<int, PlayerUnit>::iterator pUnitIte;
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.type != PlayerUnitType::Base) continue;
+        
+        PlayerUnitType t = PlayerUnitType::Knight;
+        
+        if (!pUnitIte->second.isCreatableAttacker(t)) continue;
+        PlayerUnitActionType at = CreateAttackerAction(t);
+        Command com(pUnitIte->second.ID, at);
+        commands.push_back(com);
+        pUnitIte->second.fix(at);
+    }
+    
+    return commands;
+}
+
+
 vector<Command> AI::randomWalkCommand() {
     vector<Command> commands;
 
@@ -796,18 +886,20 @@ vector<Command> AI::setDefenderOnResource() {
 vector<Command> AI::searchEnemyCastle(int assign) {
     vector<Command> commands;
 
-    map<int, Position> targets = field->enemyCastlePositions(player->type);
+//    map<int, Position> targets = field->enemyCastlePositions(player->type);
+    vector<Position> targets = field->enemyCastlePositions(player->type);
 
-    map<int, Position>::iterator targetIte;
+//    map<int, Position>::iterator targetIte;
+    vector<Position>::iterator targetIte;
     map<int, PlayerUnit>::iterator pUnitIte;
     vector<pair<int, pair<int, int> > > dists; // (dist, (targetID, unitID))
     for (targetIte = targets.begin(); targetIte != targets.end(); targetIte++) {
         for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
             if (!pUnitIte->second.isMovable()) continue;
-            if (field->willBeVisited[targetIte->second.first][targetIte->second.second]) continue;
-            if (field->isVisited[targetIte->second.first][targetIte->second.second]) continue;
+            if (field->willBeVisited[targetIte->first][targetIte->second]) continue;
+            if (field->isVisited[targetIte->first][targetIte->second]) continue;
             
-            int d = dist(targetIte->second.first, targetIte->second.second, pUnitIte->second.x, pUnitIte->second.y);
+            int d = dist(targetIte->first, targetIte->second, pUnitIte->second.x, pUnitIte->second.y);
             dists.push_back(make_pair(d, make_pair(targetIte->first, pUnitIte->second.ID)));
         }
     }
