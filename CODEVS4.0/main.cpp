@@ -14,6 +14,7 @@
 #include "Player.h"
 #include "Game.h"
 #include "AI.h"
+#include "QuickAI.h"
 #include "Library.h"
 
 using namespace std;
@@ -24,9 +25,10 @@ int main(int argc, const char * argv[]) {
     Game game = Game(0);
     Field field = Field();
     Player player = Player();
-    AI ai = AI(game, field, player);
     IOManager iOManager(game, field, player);
-    
+
+    QuickAI ai = QuickAI(game, field, player);
+
     while (true) {
         if (game.isNextStage(iOManager.inputStage())) {
             field.resetWithStage();
@@ -38,107 +40,18 @@ int main(int argc, const char * argv[]) {
         // debug output
         ai.debug();
         
-        // AI
+        // reset AI
         ai.resetWithTurn();
         
         // Mark: AI Commands **********************************************************
-#if 1
-        // Search Enemy Castle
-        if (!isValidIndex(field.enemyCastlePosition.first, field.enemyCastlePosition.second)) {
-            ai.addCommands(ai.searchEnemyCastle(5));
-        }
-        if (player.calcVillageCount() < 5) {
-            ai.addCommands(ai.createVillageOnNearestEnemy());
-        }
-        if (player.calcBaseCount()) {
-//            ai.addCommands(ai.createWorkerOnVillage());
-            ai.addCommands(ai.createAttackerOnBase());
-        }
-        ai.addCommands(ai.attackCastleCommand(INF));
-        
 
-#endif
-        
-        
-        
-#if 0
-        // resource defender
-        if (player.resourceCount >= PlayerUnit::cost(PlayerUnitActionType::CreateVillage)) {
-            if (!ai.isFieldCenterVillageReady()) {
-                ai.addCommands(ai.setWorkerFieldCenter());
-                ai.addCommands(ai.createVillageOnFieldCenter());
-            }
-//            ai.addCommands(ai.createDefenderOnCastle());
-//            ai.addCommands(ai.setDefenderOnCastle());
-        }
-        if (player.resourceCount >= PlayerUnit::cost(PlayerUnitActionType::CreateBase)) {
-            if (!ai.isFieldCenterBaseReady()) {
-                ai.addCommands(ai.setWorkerFieldCenter());
-                ai.addCommands(ai.createBaseOnFieldCenter());
-            }
-            //            ai.addCommands(ai.createDefenderOnCastle());
-            //            ai.addCommands(ai.setDefenderOnCastle());
-        }
+        ai.searchCommand(ai.searchLine1(), 1);
+        ai.searchCommand(ai.searchLine2(), 1);
+        ai.searchCommand(ai.searchLine3(), 1);
+        ai.searchCommand(ai.searchLine4(), 1);
+        ai.searchCommand(ai.searchLine5(), 1);
 
-        // castle defender
-        
-        if (player.resourceCount >= PlayerUnit::cost(PlayerUnitActionType::CreateBase)) {
-            if (!ai.isBaseReady()) {
-                ai.addCommands(ai.setWorkerOnCastle());
-                ai.addCommands(ai.createBaseOnCastle());
-            }
-            ai.addCommands(ai.createDefenderOnCastle());
-            ai.addCommands(ai.setDefenderOnCastle());
-        }
-        
-        // Search Enemy Castle
-        if (!isValidIndex(field.enemyCastlePosition.first, field.enemyCastlePosition.second)) {
-            if (player.calcWorkerCount() < 10) {
-                ai.addCommands(ai.searchEnemyCastle(1));
-            } else {
-                ai.addCommands(ai.searchEnemyCastle(3));
-            }
-        }
-
-
-        // Get Resource
-        ai.addCommands(ai.getMinimumResourceCommand(INF));
-        ai.addCommands(ai.createVillageOnResource(INF));
-        ai.addCommands(ai.createWorkerOnResource(INF));
-        ai.setResourceLimit(PlayerUnit::cost(PlayerUnitActionType::CreateWorker) * 10);
-
-        // Search Resource
-        if (player.calcVillageCount() < 20) {
-            if (ai.isSearchable()) {
-                if (game.currentTurn < 50) {
-                    ai.addCommands(ai.searchResourceWithRangeCommand(5, 8));
-                } else if (game.currentTurn < 80) {
-                    ai.addCommands(ai.searchResourceWithRangeCommand(10, 8));
-                } else {
-                    ai.addCommands(ai.searchResourceWithRangeCommand(15, 8));
-                }
-            }
-        }
-        
-
-        // create base
-        if (player.calcBaseCount() < 3) {
-//            ai.addCommands(ai.createBaseOnNearestEnemy());
-        }
-        
-//        ai.addCommands(ai.createAttakerCommand(INF));
-
-
-        // set resource other workers
-        ai.addCommands(ai.getResourceCommand(INF));
-        if (player.calcVillageCount() < 20 && ai.isSearchable())
-            ai.addCommands(ai.searchResourceNearestCommand(INF));
-        
-        // attack castle
-        if (isValidIndex(field.enemyCastlePosition.first, field.enemyCastlePosition.second))
-            ai.addCommands(ai.attackCastleCommand(INF));
-#endif
-        
+        // Output AI Commands
         iOManager.output(ai.getCommands());
     }
 

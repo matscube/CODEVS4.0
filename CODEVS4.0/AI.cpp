@@ -117,6 +117,8 @@ vector<Command> AI::createAttakerCommand(int assign) {
     return commands;
 }
 
+
+// MARK: get resource
 vector<Command> AI::getResourceCommand(int assign) {
     vector<Command> commands;
 
@@ -409,6 +411,45 @@ vector<Command> AI::createVillageOnNearestEnemy() {
     return commands;
 }
 
+vector<Command> AI::createBaseEnemyArea(int assign) {
+    vector<Command> commands;
+    
+//    Position target = Position(80, 80);
+    Position target = Position(99, 99);
+    map<int, PlayerUnit>::iterator pUnitIte;
+    
+    vector<pair<int, int> >distUnits; // <distance, pUnit ID>
+    for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
+        if (pUnitIte->second.type != PlayerUnitType::Worker) continue;
+        if (!pUnitIte->second.isMovable()) continue;
+        int d = dist(pUnitIte->second.x, pUnitIte->second.y, target.first, target.second);
+        distUnits.push_back(make_pair(d, pUnitIte->second.ID));
+    }
+    sort(distUnits.begin(), distUnits.end());
+    
+    int currentAssign = 0;
+    vector<pair<int, int> >::iterator distUnitIte;
+    for (distUnitIte = distUnits.begin(); distUnitIte != distUnits.end(); distUnitIte++) {
+        PlayerUnit *pUnit = &player->units[distUnitIte->second];
+        if (distUnitIte->first == 0) {
+            if (!pUnit->isCreatableBase()) continue;
+            PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+            Command com(pUnit->ID, at);
+            commands.push_back(com);
+            pUnit->fix(at);
+        } else {
+            PlayerUnitActionType at = pUnit->moveToTargetAction(target.first, target.second);
+            Command com(pUnit->ID, at);
+            commands.push_back(com);
+            pUnit->fix(at);
+        }
+        
+        if (currentAssign++ >= assign) break;
+    }
+    
+    return commands;
+}
+
 vector<Command> AI::createWorkerOnVillage() {
     vector<Command> commands;
 
@@ -432,6 +473,8 @@ vector<Command> AI::createAttackerOnBase() {
         if (pUnitIte->second.type != PlayerUnitType::Base) continue;
         
         PlayerUnitType t = PlayerUnitType::Knight;
+//        PlayerUnitType t = PlayerUnitType::Assassin;
+//        PlayerUnitType t = PlayerUnitType::Fighter;
         
         if (!pUnitIte->second.isCreatableAttacker(t)) continue;
         PlayerUnitActionType at = CreateAttackerAction(t);
@@ -886,20 +929,20 @@ vector<Command> AI::setDefenderOnResource() {
 vector<Command> AI::searchEnemyCastle(int assign) {
     vector<Command> commands;
 
-//    map<int, Position> targets = field->enemyCastlePositions(player->type);
-    vector<Position> targets = field->enemyCastlePositions(player->type);
+    map<int, Position> targets = field->enemyCastlePositions(player->type);
+//    vector<Position> targets = field->enemyCastlePositions(player->type);
 
-//    map<int, Position>::iterator targetIte;
-    vector<Position>::iterator targetIte;
+    map<int, Position>::iterator targetIte;
+//    vector<Position>::iterator targetIte;
     map<int, PlayerUnit>::iterator pUnitIte;
     vector<pair<int, pair<int, int> > > dists; // (dist, (targetID, unitID))
     for (targetIte = targets.begin(); targetIte != targets.end(); targetIte++) {
         for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
             if (!pUnitIte->second.isMovable()) continue;
-            if (field->willBeVisited[targetIte->first][targetIte->second]) continue;
-            if (field->isVisited[targetIte->first][targetIte->second]) continue;
+            if (field->willBeVisited[targetIte->second.first][targetIte->second.second]) continue;
+            if (field->isVisited[targetIte->second.first][targetIte->second.second]) continue;
             
-            int d = dist(targetIte->first, targetIte->second, pUnitIte->second.x, pUnitIte->second.y);
+            int d = dist(targetIte->second.first, targetIte->second.second, pUnitIte->second.x, pUnitIte->second.y);
             dists.push_back(make_pair(d, make_pair(targetIte->first, pUnitIte->second.ID)));
         }
     }

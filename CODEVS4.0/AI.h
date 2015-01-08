@@ -68,6 +68,7 @@ public:
     // create village
     Position villagePointNearestToEnemy();
     vector<Command> createVillageOnNearestEnemy();
+    vector<Command> createBaseEnemyArea(int assign);
     vector<Command> createWorkerOnVillage();
 
     vector<Command> createAttackerOnBase();

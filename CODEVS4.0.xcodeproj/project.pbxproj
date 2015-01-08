@@ -12,6 +12,7 @@
 		2161211B1A4890AD00C7C139 /* Field.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216121191A4890AD00C7C139 /* Field.cpp */; };
 		2161211E1A4890BD00C7C139 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2161211C1A4890BD00C7C139 /* Game.cpp */; };
 		216121211A48925100C7C139 /* AI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2161211F1A48925100C7C139 /* AI.cpp */; };
+		216DBDB61A5ECA62002942FF /* QuickAI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216DBDB41A5ECA62002942FF /* QuickAI.cpp */; };
 		219D56411A3F47BE00162FEA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 219D56401A3F47BE00162FEA /* main.cpp */; };
 		219D56491A3F497F00162FEA /* IOManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 219D56471A3F497F00162FEA /* IOManager.cpp */; };
 /* End PBXBuildFile section */
@@ -39,6 +40,8 @@
 		2161211D1A4890BD00C7C139 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
 		2161211F1A48925100C7C139 /* AI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AI.cpp; sourceTree = "<group>"; };
 		216121201A48925100C7C139 /* AI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AI.h; sourceTree = "<group>"; };
+		216DBDB41A5ECA62002942FF /* QuickAI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = QuickAI.cpp; sourceTree = "<group>"; };
+		216DBDB51A5ECA62002942FF /* QuickAI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuickAI.h; sourceTree = "<group>"; };
 		219D563D1A3F47BE00162FEA /* CODEVS4.0 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CODEVS4.0; sourceTree = BUILT_PRODUCTS_DIR; };
 		219D56401A3F47BE00162FEA /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		219D56471A3F497F00162FEA /* IOManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IOManager.cpp; sourceTree = "<group>"; };
@@ -96,6 +99,8 @@
 				219D56401A3F47BE00162FEA /* main.cpp */,
 				2161211F1A48925100C7C139 /* AI.cpp */,
 				216121201A48925100C7C139 /* AI.h */,
+				216DBDB41A5ECA62002942FF /* QuickAI.cpp */,
+				216DBDB51A5ECA62002942FF /* QuickAI.h */,
 			);
 			path = CODEVS4.0;
 			sourceTree = "<group>";
@@ -159,6 +164,7 @@
 				219D56411A3F47BE00162FEA /* main.cpp in Sources */,
 				219D56491A3F497F00162FEA /* IOManager.cpp in Sources */,
 				2161211B1A4890AD00C7C139 /* Field.cpp in Sources */,
+				216DBDB61A5ECA62002942FF /* QuickAI.cpp in Sources */,
 				213DC4381A492BFE00E5DC85 /* Library.cpp in Sources */,
 				216121181A4890A100C7C139 /* Player.cpp in Sources */,
 				2161211E1A4890BD00C7C139 /* Game.cpp in Sources */,
