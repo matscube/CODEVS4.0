@@ -74,6 +74,8 @@ public:
     void setHitPoint(int hitPoint);
     PlayerUnitActionType moveToTargetAction(int targetX, int targetY);
     
+    int getHashID();
+    
     static int cost(PlayerUnitActionType at);
     static string action(PlayerUnitActionType type);
     static int viewRange(PlayerUnitType type);

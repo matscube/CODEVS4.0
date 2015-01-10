@@ -96,7 +96,7 @@ void QuickAI::searchUnkownAreaCommand(vector<Position> area, int assign) {
         for (areaIte = area.begin(); areaIte != area.end(); areaIte++) {
             if (field->willBeVisited[areaIte->first][areaIte->second]) continue;
 
-            int d = dist(uIte->second->x, uIte->second->y, areaIte->first, areaIte->second);
+            int d = utl::dist(uIte->second->x, uIte->second->y, areaIte->first, areaIte->second);
             if (d > 0) {
                 dToLine.push_back(make_pair(d, make_pair(uIte->second->ID, *areaIte)));
             }
@@ -105,7 +105,7 @@ void QuickAI::searchUnkownAreaCommand(vector<Position> area, int assign) {
     
     sort(dToLine.begin(), dToLine.end());
     
-    vector<Position> viewRange = viewRangePositions(PlayerUnit::viewRange(PlayerUnitType::Worker));
+    vector<Position> viewRange = utl::viewRangePositions(PlayerUnit::viewRange(PlayerUnitType::Worker));
     vector<Position>::iterator viewRangeIte;
 
     int currentAssign = 0;
@@ -151,7 +151,7 @@ void QuickAI::createVillageOnResourceCommand() {
     map<int, PlayerUnit>::iterator uIte;
     map<int, bool> isVillage; // <hashID, exist>
     for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
-        int hashID = getHashID(uIte->second.x, uIte->second.y);
+        int hashID = uIte->second.getHashID();
         isVillage[hashID] = true;
     }
     
@@ -162,7 +162,7 @@ void QuickAI::createVillageOnResourceCommand() {
         if (isVillage.find(resIte->second.hashID) != isVillage.end()) continue; // resource has village
         
         for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
-            int d = dist(uIte->second.x, uIte->second.y, resIte->second.x, resIte->second.y);
+            int d = utl::dist(uIte->second.x, uIte->second.y, resIte->second.x, resIte->second.y);
             dToRes.push_back(make_pair(d, make_pair(uIte->second.ID, resIte->second.hashID)));
         }
     }
@@ -200,11 +200,20 @@ void QuickAI::createVillageOnResourceCommand() {
 void QuickAI::fixResourceCommand() {
     vector<Command> commands;
     
-/*    map<int, PlayerUnit>::iterator
+    map<int, int> workerCountOnResource; // <workerCount, res/village hashID>
+    map<int, PlayerUnit>::iterator uIte;
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+//        if (workerCountOnResource[uIte.g])
+    }
+    
     map<int, FieldUnit>::iterator resIte;
+    for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
+        
+    }
+    
     for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
         
-    }*/
+    }
     
     addCommands(commands);
 }

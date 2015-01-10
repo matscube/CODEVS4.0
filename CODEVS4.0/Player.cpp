@@ -55,6 +55,11 @@ PlayerUnitActionType CreateAttackerAction(PlayerUnitType t) {
     return PlayerUnitActionType::None;
 }
 
+// MARK: Utility
+int PlayerUnit::getHashID() {
+    return utl::getHashID(x, y);
+}
+
 /*------------------------------------------------*/
 int PlayerUnit::cost(PlayerUnitActionType at) {
     switch (at) {
@@ -321,7 +326,7 @@ void Player::updateUnit(PlayerUnit pUnit) {
 void Player::updateType(PlayerUnit p) {
     if (p.type != PlayerUnitType::Castle) return;
 
-    if (dist(p.x, p.y, 0, 0) < dist(p.x, p.y, MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1)) {
+    if (utl::dist(p.x, p.y, 0, 0) < utl::dist(p.x, p.y, MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1)) {
         type = PlayerType::Ally;
     } else {
         type = PlayerType::Enemy;

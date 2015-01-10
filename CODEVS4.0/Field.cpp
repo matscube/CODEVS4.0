@@ -82,7 +82,7 @@ map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
             } else {
                 pos = Position(dx, dy);
             }
-            int hashID = getHashID(pos.first, pos.second);
+            int hashID = utl::getHashID(pos.first, pos.second);
             res[hashID] = pos;
 //            res.push_back(pos);
         }
@@ -110,7 +110,7 @@ void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
     for (int x = cx - viewRange; x <= cx + viewRange; x++) {
         for (int y = cy - viewRange; y <= cy + viewRange; y++) {
             if (!isValidIndex(x, y)) continue;
-            if (dist(cx, cy, x, y) > viewRange) continue;
+            if (utl::dist(cx, cy, x, y) > viewRange) continue;
             if (status[x][y] != FieldStatus::Unknown) continue;
             
             status[x][y] = FieldStatus::Visited;
@@ -141,7 +141,7 @@ void Field::updateVisited(PlayerUnit *playerUnit) {
     for (int x = cx - viewRange; x <= cx + viewRange; x++) {
         for (int y = cy - viewRange; y <= cy + viewRange; y++) {
             if (!isValidIndex(x, y)) continue;
-            if (dist(cx, cy, x, y) > viewRange) continue;
+            if (utl::dist(cx, cy, x, y) > viewRange) continue;
             isVisited[x][y] = true;
             // set value on willBeVisited by resetWithTurn
         }

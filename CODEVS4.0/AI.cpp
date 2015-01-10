@@ -333,7 +333,7 @@ int AI::calcDistanceToEnemy(Position p) {
         target = field->enemyCastlePosition;
     }
     
-    return dist(p.first, p.second, target.first, target.second);
+    return utl::dist(p.first, p.second, target.first, target.second);
 }
 
 vector<Command> AI::createBaseOnNearestEnemy() {
@@ -692,7 +692,7 @@ vector<Command> AI::createBaseOnCastle() {
 }
 
 vector<Position> AI::defendingArea() {
-    vector<Position> area = areaPositions(2, true);
+    vector<Position> area = utl::areaPositions(2, true);
     vector<Position>::iterator areaIte;
     vector<Position> defArea;
     for (areaIte = area.begin(); areaIte != area.end(); areaIte++) {
@@ -867,7 +867,7 @@ vector<Position> AI::fieldCenterArea() {
     for (int x = 40; x <= 60; x++) {
         for (int y = 40; y <= 60; y++) {
             if (field->isVisited[x][y]) {
-                int hashID = getHashID(x, y);
+                int hashID = utl::getHashID(x, y);
                 if (field->resources.find(hashID) == field->resources.end()) {
                     positions.push_back(Position(x, y));
                 }
