@@ -19,6 +19,8 @@
 
 using namespace std;
 
+// TODO: Logger
+
 int dist(int x1, int y1, int x2, int y2);
 int getHashID(int x, int y);
 bool isValidUnitID(int ID);

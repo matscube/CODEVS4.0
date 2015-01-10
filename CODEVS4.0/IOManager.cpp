@@ -88,13 +88,10 @@ void IOManager::inputBody() {
 
         PlayerUnit unit = PlayerUnit(unitID, unitPosX, unitPosY, PlayerUnitType(unitType), player);
         unit.setHitPoint(unitHP);
+
         field->updateStatusWithAllyUnit(unit);
         field->updateVisited(&unit);
-        if (unit.type == PlayerUnitType::Castle) {
-            player->updateType(unit);
-            player->castleUnitID = unit.ID;
-        }
-        player->units[unit.ID] = unit;
+        player->updateUnit(unit);
     }
     
     // Input EnemyUnit Information

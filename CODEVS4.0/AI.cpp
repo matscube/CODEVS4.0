@@ -39,7 +39,7 @@ void AI::releaseResourceLimit() {
 
 vector<Command> AI::createWorkerCommand(int assign) {
     vector<Command> commands;
-
+    /*
     int curAssign = 0;
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
@@ -53,12 +53,12 @@ vector<Command> AI::createWorkerCommand(int assign) {
         curAssign++;
         if (curAssign >= assign) break;
     }
-    
+    */
     return commands;
 }
 vector<Command> AI::createVillageCommand(int assign) {
     vector<Command> commands;
-    
+    /*
     int curAssign = 0;
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
@@ -72,12 +72,12 @@ vector<Command> AI::createVillageCommand(int assign) {
         curAssign++;
         if (curAssign >= assign) break;
     }
-    
+    */
     return commands;
 }
 vector<Command> AI::createBaseCommand(int assign) {
     vector<Command> commands;
-    
+    /*
     int curAssign = 0;
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
@@ -91,14 +91,14 @@ vector<Command> AI::createBaseCommand(int assign) {
         curAssign++;
         if (curAssign >= assign) break;
     }
-    
+    */
     return commands;
 }
 
 // Create only assasin
 vector<Command> AI::createAttakerCommand(int assign) {
     vector<Command> commands;
-    
+    /*
     int curAssign = 0;
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
@@ -113,7 +113,7 @@ vector<Command> AI::createAttakerCommand(int assign) {
         curAssign++;
         if (curAssign >= assign) break;
     }
-    
+    */
     return commands;
 }
 
@@ -121,7 +121,7 @@ vector<Command> AI::createAttakerCommand(int assign) {
 // MARK: get resource
 vector<Command> AI::getResourceCommand(int assign) {
     vector<Command> commands;
-
+    /*
     map<int, FieldUnit>::iterator resIte;
     map<int, PlayerUnit>::iterator pUnitIte;
     vector<pair<int, pair<int, int> > > dists; // (dist, (resID, unitID))
@@ -160,13 +160,13 @@ vector<Command> AI::getResourceCommand(int assign) {
         curAssign++;
         if (curAssign >= assign) break;
     }
-
+     */
     return commands;
 }
 
 vector<Command> AI::getMinimumResourceCommand(int assign) {
     vector<Command> commands;
-    
+    /*
     map<int, FieldUnit>::iterator resIte;
     map<int, PlayerUnit>::iterator pUnitIte;
     vector<pair<int, pair<int, int> > > dists; // (dist, (resID, unitID))
@@ -206,13 +206,13 @@ vector<Command> AI::getMinimumResourceCommand(int assign) {
         curAssign++;
         if (curAssign >= assign) break;
     }
-    
+    */
     return commands;
 }
 
 vector<Command> AI::createVillageOnResource(int assign) {
     vector<Command> commands;
-    
+    /*
     map<int, int> villageCount; // <hashID, count>
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
@@ -242,12 +242,13 @@ vector<Command> AI::createVillageOnResource(int assign) {
             }
         }
     }
+    */
     return commands;
 }
 
 vector<Command> AI::createWorkerOnResource(int assign) {
     vector<Command> commands;
-    
+    /*
     map<int, int> workerCount; // <hashID, count>
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
@@ -282,6 +283,7 @@ vector<Command> AI::createWorkerOnResource(int assign) {
             }
         }
     }
+    */
     return commands;
 }
 
@@ -300,7 +302,7 @@ Position AI::basePointNearestToEnemy() {
 
     Position bestPos;
     int distToCastle = INF;
-    
+    /*
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
 
@@ -314,7 +316,7 @@ Position AI::basePointNearestToEnemy() {
             bestPos = Position(pUnitIte->second.x, pUnitIte->second.y);
             distToCastle = d;
         }
-    }
+    }*/
     
     return bestPos;
 }
@@ -336,7 +338,7 @@ int AI::calcDistanceToEnemy(Position p) {
 
 vector<Command> AI::createBaseOnNearestEnemy() {
     vector<Command> commands;
-
+    /*
     Position basePos = basePointNearestToEnemy();
     if (calcDistanceToEnemy(basePos) > 40 && player->calcVillageCount() < 12) return commands;
     
@@ -352,7 +354,7 @@ vector<Command> AI::createBaseOnNearestEnemy() {
         pUnitIte->second.fix(at);
         break;
     }
-    
+    */
     return commands;
 }
 
@@ -376,7 +378,7 @@ Position AI::villagePointNearestToEnemy() {
 }
 vector<Command> AI::createVillageOnNearestEnemy() {
     vector<Command> commands;
-    
+    /*
     Position target = villagePointNearestToEnemy();
     
     map<int, PlayerUnit>::iterator pUnitIte;
@@ -407,13 +409,13 @@ vector<Command> AI::createVillageOnNearestEnemy() {
         commands.push_back(com);
         pUnit->fix(at);
     }
-    
+    */
     return commands;
 }
 
 vector<Command> AI::createBaseEnemyArea(int assign) {
     vector<Command> commands;
-    
+    /*
 //    Position target = Position(80, 80);
     Position target = Position(99, 99);
     map<int, PlayerUnit>::iterator pUnitIte;
@@ -446,13 +448,13 @@ vector<Command> AI::createBaseEnemyArea(int assign) {
         
         if (currentAssign++ >= assign) break;
     }
-    
+    */
     return commands;
 }
 
 vector<Command> AI::createWorkerOnVillage() {
     vector<Command> commands;
-
+    /*
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (pUnitIte->second.type != PlayerUnitType::Village) continue;
@@ -462,12 +464,12 @@ vector<Command> AI::createWorkerOnVillage() {
         commands.push_back(com);
         pUnitIte->second.fix(at);
     }
-
+     */
     return commands;
 }
 vector<Command> AI::createAttackerOnBase() {
     vector<Command> commands;
-    
+    /*
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (pUnitIte->second.type != PlayerUnitType::Base) continue;
@@ -482,14 +484,14 @@ vector<Command> AI::createAttackerOnBase() {
         commands.push_back(com);
         pUnitIte->second.fix(at);
     }
-    
+    */
     return commands;
 }
 
 
 vector<Command> AI::randomWalkCommand() {
     vector<Command> commands;
-
+/*
     map<int, PlayerUnit>::iterator unitIte = player->units.begin();
     for (; unitIte != player->units.end(); unitIte++) {
         PlayerUnit *unit = &unitIte->second;
@@ -521,13 +523,13 @@ vector<Command> AI::randomWalkCommand() {
             commands.push_back(com);
         }
         unit->fix(at);
-    }
+    }*/
     return commands;
 }
 
 vector<Command> AI::searchResourceNearestCommand(int assign) {
     vector<Command> commands;
-
+/*
     vector<Position> viewRange = viewRangePositions(PlayerUnit::viewRange(PlayerUnitType::Worker));
     vector<Position>::iterator viewRangeIte;
 
@@ -571,13 +573,13 @@ vector<Command> AI::searchResourceNearestCommand(int assign) {
         continue;
     }
     finishAssign:
-    
+    */
     return commands;
 }
 
 vector<Command> AI::searchResourceWithRangeCommand(int assign, int depth) {
     vector<Command> commands;
-
+/*
     if (!isSearchable()) {
         cerr << "Searchable field is nowhere." << endl;
         return commands;
@@ -644,7 +646,7 @@ vector<Command> AI::searchResourceWithRangeCommand(int assign, int depth) {
             curAssign++;
             if (curAssign >= assign) break;
         }
-    }
+    }*/
     
     return commands;
 }
@@ -652,7 +654,7 @@ vector<Command> AI::searchResourceWithRangeCommand(int assign, int depth) {
 // MARK: defend castle
 vector<Command> AI::setWorkerOnCastle() {
     vector<Command> commands;
-    
+    /*
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (pUnitIte->second.type != PlayerUnitType::Worker) continue;
@@ -668,13 +670,13 @@ vector<Command> AI::setWorkerOnCastle() {
         commands.push_back(com);
         castle->fix(at);
     }
-    
+    */
     return commands;
 }
 
 vector<Command> AI::createBaseOnCastle() {
     vector<Command> commands;
-    
+    /*
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (dist(pUnitIte->second.x, pUnitIte->second.y, field->allyCastlePosition.first, field->allyCastlePosition.second) != 0) continue;
@@ -685,7 +687,7 @@ vector<Command> AI::createBaseOnCastle() {
         commands.push_back(com);
         pUnitIte->second.fix(at);
     }
-    
+    */
     return commands;
 }
 
@@ -703,19 +705,19 @@ vector<Position> AI::defendingArea() {
 }
 
 bool AI::isBaseReady() {
-    bool isReady = false;
+    bool isReady = false;/*
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (dist(pUnitIte->second.x, pUnitIte->second.y, field->allyCastlePosition.first, field->allyCastlePosition.second) != 0) continue;
         if (pUnitIte->second.type == PlayerUnitType::Base) isReady = true;
     }
-    
+    */
     return  isReady;
 }
 
 vector<Command> AI::createDefenderOnCastle() {
     vector<Command> commands;
-
+    /*
     vector<int> prob;
     for (int i = 0; i < 30; i++) prob.push_back(0);
     for (int i = 0; i < 50; i++) prob.push_back(1);
@@ -740,14 +742,14 @@ vector<Command> AI::createDefenderOnCastle() {
             commands.push_back(com);
             pUnitIte->second.fix(at);
         }
-    }
+    }*/
     
     return commands;
 }
 
 vector<Command> AI::setDefenderOnCastle() {
     vector<Command> commands;
-    
+    /*
     vector<Position> targets = defendingArea();
     int targetSize = (int)targets.size();
     
@@ -763,7 +765,7 @@ vector<Command> AI::setDefenderOnCastle() {
         Command com(pUnitIte->second.ID, at);
         commands.push_back(com);
         pUnitIte->second.fix(at);
-    }
+    }*/
     
     return commands;
 }
@@ -771,7 +773,7 @@ vector<Command> AI::setDefenderOnCastle() {
 // MARK: defend resource
 vector<Command> AI::setWorkerFieldCenter() {
     vector<Command> commands;
-    
+    /*
     vector<Position> positions = fieldCenterArea();
     if (positions.size() == 0) return commands;
     
@@ -807,14 +809,14 @@ vector<Command> AI::setWorkerFieldCenter() {
     PlayerUnitActionType at = worker->moveToTargetAction(target.first, target.second);
     Command com(worker->ID, at);
     commands.push_back(com);
-    worker->fix(at);
+    worker->fix(at);*/
     
     return commands;
 }
 
 vector<Command> AI::createVillageOnFieldCenter() {
     vector<Command> commands;
-    
+    /*
     vector<Position> positions = fieldCenterArea();
     vector<Position>::iterator posIte;
     bool pos[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {false};
@@ -831,13 +833,13 @@ vector<Command> AI::createVillageOnFieldCenter() {
         Command com(pUnitIte->second.ID, at);
         commands.push_back(com);
         pUnitIte->second.fix(at);
-    }
+    }*/
     
     return commands;
 }
 vector<Command> AI::createBaseOnFieldCenter() {
     vector<Command> commands;
-    
+    /*
     vector<Position> positions = fieldCenterArea();
     vector<Position>::iterator posIte;
     bool pos[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {false};
@@ -854,7 +856,7 @@ vector<Command> AI::createBaseOnFieldCenter() {
         Command com(pUnitIte->second.ID, at);
         commands.push_back(com);
         pUnitIte->second.fix(at);
-    }
+    }*/
     
     return commands;
 }
@@ -885,14 +887,14 @@ bool AI::isFieldCenterVillageReady() {
     for (posIte = positions.begin(); posIte != positions.end(); posIte++) {
         pos[posIte->first][posIte->second] = true;
     }
-
+/*
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (pUnitIte->second.type != PlayerUnitType::Village) continue;
         int hashID = getHashID(pUnitIte->second.x, pUnitIte->second.y);
         if (field->resources.find(hashID) != field->resources.end()) continue;
         if (pos[pUnitIte->second.x][pUnitIte->second.y]) return true;
-    }
+    }*/
     
     return false;
 }
@@ -903,14 +905,14 @@ bool AI::isFieldCenterBaseReady() {
     for (posIte = positions.begin(); posIte != positions.end(); posIte++) {
         pos[posIte->first][posIte->second] = true;
     }
-    
+    /*
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (pUnitIte->second.type != PlayerUnitType::Base) continue;
         int hashID = getHashID(pUnitIte->second.x, pUnitIte->second.y);
 //        if (field->resources.find(hashID) != field->resources.end()) continue;
         if (pos[pUnitIte->second.x][pUnitIte->second.y]) return true;
-    }
+    }*/
     
     return false;
 }
@@ -928,7 +930,7 @@ vector<Command> AI::setDefenderOnResource() {
 // MARK: attack castle
 vector<Command> AI::searchEnemyCastle(int assign) {
     vector<Command> commands;
-
+/*
     map<int, Position> targets = field->enemyCastlePositions(player->type);
 //    vector<Position> targets = field->enemyCastlePositions(player->type);
 
@@ -973,13 +975,13 @@ vector<Command> AI::searchEnemyCastle(int assign) {
         curAssign++;
         if (curAssign >= assign) break;
     }
-    
+    */
     return commands;
 }
 
 vector<Command> AI::attackCastleCommand(int assign) {
     vector<Command> commands;
-    
+    /*
     int curAssign = 0;
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
@@ -992,7 +994,7 @@ vector<Command> AI::attackCastleCommand(int assign) {
             curAssign++;
             if (curAssign >= assign) break;
         }
-    }
+    }*/
     
     return commands;
 }

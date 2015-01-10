@@ -32,15 +32,19 @@ public:
     void resetWithTurn();
     vector<Command> getCommands();
     
+    // MARK: Search
     vector<Position> searchLine1();
     vector<Position> searchLine2();
     vector<Position> searchLine3();
     vector<Position> searchLine4();
     vector<Position> searchLine5();
     vector<Position> searchArea();
-    void searchCommand(vector<Position> area, int assign);
-    
-    void resourceAssignCommand(int assign);
+    void searchUnkownAreaCommand(vector<Position> area, int assign);
+    void searchUnkownFieldCommand();
+
+    // MARK: Resource
+    void createVillageOnResourceCommand();
+    void fixResourceCommand();
 
     
     void debug();

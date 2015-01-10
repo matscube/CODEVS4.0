@@ -98,22 +98,33 @@ enum class PlayerType {
 class Player {
 public:
     Player();
-    void resetWithStage();
-    PlayerType type;
-    void updateType(PlayerUnit p);
     int resourceCount;
     int necessaryResourceCount;
-  
-    // TODO : units by type
-//    map<int, PlayerUnit> villageUnits;
-    map<int, PlayerUnit> units;
-    int castleUnitID = -1;
+
+    PlayerType type;
+    void updateType(PlayerUnit p);
+
+    // MARK: Unit
+    void clearUnits();
+    void updateUnit(PlayerUnit pUnit);
+    map<int, PlayerUnit *> units;
+    PlayerUnit castle;
+    map<int, PlayerUnit> villages;
+    map<int, PlayerUnit> bases;
+    map<int, PlayerUnit> workers;
+    map<int, PlayerUnit> knights;
+    map<int, PlayerUnit> fighters;
+    map<int, PlayerUnit> assassins;
     
+    // MARK: Reset
+    void resetWithStage();
+    void resetWithTurn();
+    
+    // MARK: Calc count
     int calcWorkerCount();
     int calcVillageCount();
     int calcBaseCount();
     int calcAssassinCount();
-    void resetWithTurn();
 };
 
 

@@ -26,7 +26,7 @@ void QuickAI::addCommands(vector<Command> newCommands) {
     commands.insert(commands.begin(), newCommands.begin(), newCommands.end());
 }
 
-
+// MARK: Search
 vector<Position> QuickAI::searchLine1() {
     vector<Position> line;
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
@@ -83,21 +83,22 @@ vector<Position> QuickAI::searchArea() {
     return area;
 }
 
-void QuickAI::searchCommand(vector<Position> area, int assign) {
+void QuickAI::searchUnkownAreaCommand(vector<Position> area, int assign) {
     vector<Command> commands;
     
+    map<int, PlayerUnit *> units = player->units;
+    map<int, PlayerUnit *>::iterator uIte;
     vector<Position>::iterator areaIte;
-    map<int, PlayerUnit>::iterator uIte;
     vector<pair<int, pair<int, Position> > > dToLine; // <d, <unitID, Position>>
-    for (uIte = player->units.begin(); uIte != player->units.end(); uIte++) {
-        if (!uIte->second.isMovable()) continue;
+    for (uIte = units.begin(); uIte != units.end(); uIte++) {
+        if (!uIte->second->isMovable()) continue;
         
         for (areaIte = area.begin(); areaIte != area.end(); areaIte++) {
             if (field->willBeVisited[areaIte->first][areaIte->second]) continue;
 
-            int d = dist(uIte->second.x, uIte->second.y, areaIte->first, areaIte->second);
+            int d = dist(uIte->second->x, uIte->second->y, areaIte->first, areaIte->second);
             if (d > 0) {
-                dToLine.push_back(make_pair(d, make_pair(uIte->second.ID, *areaIte)));
+                dToLine.push_back(make_pair(d, make_pair(uIte->second->ID, *areaIte)));
             }
         }
     }
@@ -110,7 +111,7 @@ void QuickAI::searchCommand(vector<Position> area, int assign) {
     int currentAssign = 0;
     vector<pair<int, pair<int, Position> > >::iterator dIte;
     for (dIte = dToLine.begin(); dIte != dToLine.end(); dIte++) {
-        PlayerUnit *pUnit = &player->units[dIte->second.first];
+        PlayerUnit *pUnit = units[dIte->second.first];
         Position pos = dIte->second.second;
         
         if (!pUnit->isMovable()) continue;
@@ -134,14 +135,23 @@ void QuickAI::searchCommand(vector<Position> area, int assign) {
     addCommands(commands);
 }
 
-void QuickAI::resourceAssignCommand(int assign) {
+void QuickAI::searchUnkownFieldCommand() {
+    searchUnkownAreaCommand(searchLine1(), 1);
+    searchUnkownAreaCommand(searchLine2(), 1);
+    searchUnkownAreaCommand(searchLine3(), 1);
+    searchUnkownAreaCommand(searchLine4(), 1);
+    searchUnkownAreaCommand(searchLine5(), 1);
+}
+
+
+// MARK: Resource
+void QuickAI::createVillageOnResourceCommand() {
     vector<Command> commands;
     
-    map<int, PlayerUnit>::iterator pIte;
+    map<int, PlayerUnit>::iterator uIte;
     map<int, bool> isVillage; // <hashID, exist>
-    for (pIte = player->units.begin(); pIte != player->units.end(); pIte++) {
-        if (pIte->second.type != PlayerUnitType::Village) continue;
-        int hashID = getHashID(pIte->second.x, pIte->second.y);
+    for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
+        int hashID = getHashID(uIte->second.x, uIte->second.y);
         isVillage[hashID] = true;
     }
     
@@ -151,9 +161,9 @@ void QuickAI::resourceAssignCommand(int assign) {
     for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
         if (isVillage.find(resIte->second.hashID) != isVillage.end()) continue; // resource has village
         
-        for (pIte = player->units.begin(); pIte != player->units.end(); pIte++) {
-            int d = dist(pIte->second.x, pIte->second.y, resIte->second.x, resIte->second.y);
-            dToRes.push_back(make_pair(d, make_pair(pIte->second.ID, resIte->second.hashID)));
+        for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+            int d = dist(uIte->second.x, uIte->second.y, resIte->second.x, resIte->second.y);
+            dToRes.push_back(make_pair(d, make_pair(uIte->second.ID, resIte->second.hashID)));
         }
     }
     
@@ -162,7 +172,7 @@ void QuickAI::resourceAssignCommand(int assign) {
     vector<pair<int, pair<int, int> > >::iterator dIte;
     map<int, bool> resWillHaveVillage; // <resID, villageOK>
     for (dIte = dToRes.begin(); dIte != dToRes.end(); dIte++) {
-        PlayerUnit *pUnit = &player->units[dIte->second.first];
+        PlayerUnit *pUnit = &player->workers[dIte->second.first];
         FieldUnit *res = &field->resources[dIte->second.second];
         
         if (resWillHaveVillage.find(res->hashID) != resWillHaveVillage.end()) continue;
@@ -184,10 +194,17 @@ void QuickAI::resourceAssignCommand(int assign) {
         }
     }
     
-    // create village
+    addCommands(commands);
+}
 
-    // village resource
-    //
+void QuickAI::fixResourceCommand() {
+    vector<Command> commands;
+    
+/*    map<int, PlayerUnit>::iterator
+    map<int, FieldUnit>::iterator resIte;
+    for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
+        
+    }*/
     
     addCommands(commands);
 }

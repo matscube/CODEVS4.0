@@ -45,13 +45,8 @@ int main(int argc, const char * argv[]) {
         
         // Mark: AI Commands **********************************************************
         
-        ai.resourceAssignCommand(INF);
-
-        ai.searchCommand(ai.searchLine1(), 1);
-        ai.searchCommand(ai.searchLine2(), 1);
-        ai.searchCommand(ai.searchLine3(), 1);
-        ai.searchCommand(ai.searchLine4(), 1);
-        ai.searchCommand(ai.searchLine5(), 1);
+        ai.createVillageOnResourceCommand();
+        ai.searchUnkownFieldCommand();
 
         // Output AI Commands
         iOManager.output(ai.getCommands());

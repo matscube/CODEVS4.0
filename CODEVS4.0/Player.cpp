@@ -273,6 +273,51 @@ Player::Player() {
     resetWithStage();
 }
 
+// MARK: Unit
+void Player::clearUnits() {
+    villages.clear();
+    workers.clear();
+    knights.clear();
+    fighters.clear();
+    assassins.clear();
+    bases.clear();
+}
+void Player::updateUnit(PlayerUnit pUnit) {
+    switch (pUnit.type) {
+        case PlayerUnitType::Castle:
+            updateType(pUnit);
+            castle = pUnit;
+            break;
+        case PlayerUnitType::Worker:
+            workers[pUnit.ID] = pUnit;
+            units[pUnit.ID] = &workers[pUnit.ID];
+            break;
+        case PlayerUnitType::Knight:
+            knights[pUnit.ID] = pUnit;
+            units[pUnit.ID] = &knights[pUnit.ID];
+            break;
+        case PlayerUnitType::Fighter:
+            fighters[pUnit.ID] = pUnit;
+            units[pUnit.ID] = &fighters[pUnit.ID];
+            break;
+        case PlayerUnitType::Assassin:
+            assassins[pUnit.ID] = pUnit;
+            units[pUnit.ID] = &assassins[pUnit.ID];
+            break;
+        case PlayerUnitType::Village:
+            villages[pUnit.ID] = pUnit;
+            units[pUnit.ID] = &villages[pUnit.ID];
+            break;
+        case PlayerUnitType::Base:
+            bases[pUnit.ID] = pUnit;
+            units[pUnit.ID] = &bases[pUnit.ID];
+            break;
+        case PlayerUnitType::Unknown:
+            cerr << "[PlayerUnit::updateUnit] Error: Unkown Type" << endl;
+    }
+    
+}
+
 void Player::updateType(PlayerUnit p) {
     if (p.type != PlayerUnitType::Castle) return;
 
@@ -283,48 +328,34 @@ void Player::updateType(PlayerUnit p) {
     }
 }
 
+
+
+
+// MARK: Reset
 void Player::resetWithStage() {
     resourceCount = 0;
     necessaryResourceCount = 0;
-    units.clear();
+    
+    clearUnits();
 }
 
 void Player::resetWithTurn() {
-    units.clear();
+    clearUnits();
     necessaryResourceCount = 0;
 }
 
+// MARK: Calc Count
 int Player::calcWorkerCount() {
-    int cnt = 0;
-    map<int, PlayerUnit>::iterator pUnitIte;
-    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
-        if (pUnitIte->second.type == PlayerUnitType::Worker) cnt++;
-    }
-    return cnt;
+    return workers.size();
 }
 
 int Player::calcVillageCount() {
-    int cnt = 0;
-    map<int, PlayerUnit>::iterator pUnitIte;
-    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
-        if (pUnitIte->second.type == PlayerUnitType::Village) cnt++;
-    }
-    return cnt;
+    return villages.size();
 }
 
 int Player::calcBaseCount() {
-    int cnt = 0;
-    map<int, PlayerUnit>::iterator pUnitIte;
-    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
-        if (pUnitIte->second.type == PlayerUnitType::Base) cnt++;
-    }
-    return cnt;
+    return bases.size();
 }
 int Player::calcAssassinCount() {
-    int cnt = 0;
-    map<int, PlayerUnit>::iterator pUnitIte;
-    for (pUnitIte = units.begin(); pUnitIte != units.end(); pUnitIte++) {
-        if (pUnitIte->second.type == PlayerUnitType::Assassin) cnt++;
-    }
-    return cnt;
+    return assassins.size();
 }
