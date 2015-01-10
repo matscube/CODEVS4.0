@@ -44,6 +44,8 @@ int main(int argc, const char * argv[]) {
         ai.resetWithTurn();
         
         // Mark: AI Commands **********************************************************
+        
+        ai.resourceAssignCommand(INF);
 
         ai.searchCommand(ai.searchLine1(), 1);
         ai.searchCommand(ai.searchLine2(), 1);

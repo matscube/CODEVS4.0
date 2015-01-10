@@ -160,11 +160,27 @@ void QuickAI::resourceAssignCommand(int assign) {
     sort(dToRes.begin(), dToRes.end());
     
     vector<pair<int, pair<int, int> > >::iterator dIte;
+    map<int, bool> resWillHaveVillage; // <resID, villageOK>
     for (dIte = dToRes.begin(); dIte != dToRes.end(); dIte++) {
+        PlayerUnit *pUnit = &player->units[dIte->second.first];
+        FieldUnit *res = &field->resources[dIte->second.second];
+        
+        if (resWillHaveVillage.find(res->hashID) != resWillHaveVillage.end()) continue;
+        
         if (dIte->first == 0) {
-            
+            // create village
+            PlayerUnitActionType at = PlayerUnitActionType::CreateVillage;
+            Command com(pUnit->ID, at);
+            commands.push_back(com);
+            pUnit->fix(at);
+            resWillHaveVillage[res->hashID] = true;
         } else {
-            
+            // move to village
+            PlayerUnitActionType at = pUnit->moveToTargetAction(res->x, res->y);
+            Command com(pUnit->ID, at);
+            commands.push_back(com);
+            pUnit->fix(at);
+            resWillHaveVillage[res->hashID] = true;
         }
     }
     
