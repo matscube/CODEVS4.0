@@ -178,6 +178,11 @@ void QuickAI::createVillageOnResourceCommand() {
         if (resWillHaveVillage.find(res->hashID) != resWillHaveVillage.end()) continue;
         
         if (dIte->first == 0) {
+            if (!pUnit->isCreatableVillage()) {
+                pUnit->fixOnlyPosition(); // wait
+                resWillHaveVillage[res->hashID] = true;
+                continue;
+            }
             // create village
             PlayerUnitActionType at = PlayerUnitActionType::CreateVillage;
             Command com(pUnit->ID, at);
@@ -185,6 +190,7 @@ void QuickAI::createVillageOnResourceCommand() {
             pUnit->fix(at);
             resWillHaveVillage[res->hashID] = true;
         } else {
+            if (!pUnit->isMovable()) continue;
             // move to village
             PlayerUnitActionType at = pUnit->moveToTargetAction(res->x, res->y);
             Command com(pUnit->ID, at);
@@ -200,19 +206,52 @@ void QuickAI::createVillageOnResourceCommand() {
 void QuickAI::fixResourceCommand() {
     vector<Command> commands;
     
-    map<int, int> workerCountOnResource; // <workerCount, res/village hashID>
+    // calc worker count on resource
+    map<int, int> workerCount; // <hashID, worker cnt>
     map<int, PlayerUnit>::iterator uIte;
     for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
-//        if (workerCountOnResource[uIte.g])
+        int hashID = uIte->second.getHashID();
+        if (workerCount.find(hashID) == workerCount.end()) {
+            workerCount[hashID] = 1;
+        } else {
+            workerCount[hashID]++;
+        }
     }
     
+    // create worker on village/resource
     map<int, FieldUnit>::iterator resIte;
     for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
+        int hashID = uIte->second.getHashID();
+        int count = 0;
+        if (workerCount.find(hashID) != workerCount.end()) {
+            count = workerCount[hashID];
+        }
         
+        if (count < MAX_GETTING_RESOURCE) {
+            if (!uIte->second.isCreatableWorker()) continue;
+            PlayerUnitActionType at = PlayerUnitActionType::CreateWorker;
+            Command com(uIte->second.ID, at);
+            commands.push_back(com);
+            uIte->second.fix(at);
+        }
     }
     
-    for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
-        
+    // fix worker on vilalge/resource
+    map<int, int> fixedWorkerCount; // <res hashID, worker cnt>
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        int hashID = uIte->second.getHashID();
+        if (field->resources.find(hashID) != field->resources.end()) {
+            
+            if (fixedWorkerCount.find(hashID) == fixedWorkerCount.end()) {
+                fixedWorkerCount[hashID] = 1;
+                uIte->second.fixOnlyPosition();
+            } else {
+                if (fixedWorkerCount[hashID] < MAX_GETTING_RESOURCE) {
+                    fixedWorkerCount[hashID]++;
+                    uIte->second.fixOnlyPosition();
+                }
+            }
+        }
     }
     
     addCommands(commands);

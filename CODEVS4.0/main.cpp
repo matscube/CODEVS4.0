@@ -47,6 +47,7 @@ int main(int argc, const char * argv[]) {
         
         ai.createVillageOnResourceCommand();
         ai.searchUnkownFieldCommand();
+        ai.fixResourceCommand();
 
         // Output AI Commands
         iOManager.output(ai.getCommands());
