@@ -21,9 +21,11 @@ void QuickAI::resetWithTurn() {
 vector<Command> QuickAI::getCommands() {
     return commands;
 }
-
+void QuickAI::addCommand(Command newCommand) {
+    commands.push_back(newCommand);
+}
 void QuickAI::addCommands(vector<Command> newCommands) {
-    commands.insert(commands.begin(), newCommands.begin(), newCommands.end());
+    commands.insert(commands.end(), newCommands.begin(), newCommands.end());
 }
 
 // MARK: Search
@@ -67,6 +69,7 @@ vector<Position> QuickAI::searchLine5() {
     }
     return line;
 }
+
 vector<Position> QuickAI::searchArea() {
     vector<Position> area;
     vector<Position> line1 = searchLine1();
@@ -82,7 +85,14 @@ vector<Position> QuickAI::searchArea() {
     
     return area;
 }
-
+vector<Position> QuickAI::moveEnemyBackLine() {
+    vector<Position> line;
+    for (int y = 50; y < MAX_FIELD_HEIGHT; y++) {
+        Position p(99, y);
+        line.push_back(p);
+    }
+    return line;
+}
 void QuickAI::searchUnkownAreaCommand(vector<Position> area, int assign) {
     vector<Command> commands;
     
@@ -142,7 +152,44 @@ void QuickAI::searchUnkownFieldCommand() {
     searchUnkownAreaCommand(searchLine4(), 1);
     searchUnkownAreaCommand(searchLine5(), 1);
 }
-
+void QuickAI::moveEnemyBackCommand() {
+    vector<Position> line = moveEnemyBackLine();
+    vector<Position>::iterator pIte;
+    bool isOnLine[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {false};
+    for (pIte = line.begin(); pIte != line.end(); pIte++) {
+        isOnLine[pIte->first][pIte->second] = true;
+    }
+    
+    // Worker creatable worker on line
+    map<int, PlayerUnit>::iterator uIte;
+    PlayerUnit *bestUnit = nullptr;
+    int distToTarget = INF;
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        if (isOnLine[uIte->second.x][uIte->second.y]) {
+            int d = utl::dist(uIte->second.x, uIte->second.y, MAX_FIELD_WIDTH, MAX_FIELD_HEIGHT);
+            if (d < distToTarget) {
+                d = distToTarget;
+                bestUnit = &uIte->second;
+            }
+        }
+    }
+    
+    bool baseIsNeeded = true;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        if (isOnLine[uIte->second.x][uIte->second.y]) {
+            baseIsNeeded = false;
+        }
+    }
+    
+    if (baseIsNeeded && bestUnit != nullptr && bestUnit->isCreatableBase()) {
+        PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+        Command com(bestUnit->ID, at);
+        addCommand(com);
+        bestUnit->fix(at);
+    } else {
+        searchUnkownAreaCommand(moveEnemyBackLine(), 1);
+    }
+}
 
 // MARK: Resource
 void QuickAI::createVillageOnResourceCommand() {
@@ -255,6 +302,11 @@ void QuickAI::fixResourceCommand() {
     }
     
     addCommands(commands);
+}
+
+// MARK: Worker
+void QuickAI::supplyWorker(int need) {
+    
 }
 
 void QuickAI::debug() {

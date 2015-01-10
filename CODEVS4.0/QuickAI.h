@@ -26,6 +26,7 @@ class QuickAI {
     Field *field;
     Player *player;
     vector<Command> commands;
+    void addCommand(Command newCommand);
     void addCommands(vector<Command> newCommands);
 public:
     QuickAI(Game &game, Field &field, Player &player);
@@ -33,18 +34,25 @@ public:
     vector<Command> getCommands();
     
     // MARK: Search
+    void searchUnkownAreaCommand(vector<Position> area, int assign);
+
     vector<Position> searchLine1();
     vector<Position> searchLine2();
     vector<Position> searchLine3();
     vector<Position> searchLine4();
     vector<Position> searchLine5();
     vector<Position> searchArea();
-    void searchUnkownAreaCommand(vector<Position> area, int assign);
     void searchUnkownFieldCommand();
+
+    vector<Position> moveEnemyBackLine();
+    void moveEnemyBackCommand();
 
     // MARK: Resource
     void createVillageOnResourceCommand();
     void fixResourceCommand();
+    
+    // MARK: Worker
+    void supplyWorker(int need);
 
     
     void debug();

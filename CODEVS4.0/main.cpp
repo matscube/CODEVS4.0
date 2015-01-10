@@ -45,6 +45,7 @@ int main(int argc, const char * argv[]) {
         
         // Mark: AI Commands **********************************************************
         
+        ai.moveEnemyBackCommand();
         ai.createVillageOnResourceCommand();
         ai.searchUnkownFieldCommand();
         ai.fixResourceCommand();
