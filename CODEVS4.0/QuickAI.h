@@ -35,23 +35,33 @@ public:
     void resetWithTurn();
     vector<Command> getCommands();
     
-    // MARK: Search
+    // MARK: Search----------------------
     void searchNoVisitedAreaCommand(vector<Position> area, int assign, map<PlayerUnitType, bool> types);
     map<PlayerUnitType, bool> allTypes();
     map<PlayerUnitType, bool> workerTypes();
     map<PlayerUnitType, bool> attackerTypes();
 
-    vector<Position> searchLine1();
-    vector<Position> searchLine2();
-    vector<Position> searchLine3();
-    vector<Position> searchLine4();
-    vector<Position> searchLine5();
-    vector<Position> searchArea();
+    // MARK: searchLine
+    vector<Position> searchLineToRight1();
+    vector<Position> searchLineToRight2();
+    vector<Position> searchLineToRight3();
+    vector<Position> searchLineToRight4();
+    vector<Position> searchLineToRight5();
+    vector<Position> searchLineToDown1();
+    vector<Position> searchLineToDown2();
+    vector<Position> searchLineToDown3();
+    vector<Position> searchLineToDown4();
+    vector<Position> searchLineToDown5();
+    vector<Position> searchLineAlly();
     void searchUnkownFieldCommand();
 
+    // pattern 2
     void createBaseOnRightLine();
     void createAttackerOnRightLineCommand();
+    void createBaseOnDownLine();
+    void createAttackerOnDownLineCommand();
     
+    // pattern 1
     vector<Position> createBaseOnLine();
     void createBaseOnLineCommand();
     void createAttackerOnLineCommand();
@@ -70,7 +80,7 @@ public:
     void fixResourceCommand();
     
     // MARK: Worker
-    void supplyWorker(int need);
+    void supplyMovableWorkerWithCastle(int need);
 
     
     void debug();

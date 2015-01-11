@@ -57,8 +57,10 @@ int main(int argc, const char * argv[]) {
 //        ai.createAttackerOnLineCommand();
         
         if (game.currentTurn > 60) {
-            ai.createBaseOnRightLine();
             ai.createAttackerOnRightLineCommand();
+            ai.createAttackerOnDownLineCommand();
+            ai.createBaseOnRightLine();
+            ai.createBaseOnDownLine();
             ai.searchEnemyCastleCommand();
         }
 
@@ -67,6 +69,12 @@ int main(int argc, const char * argv[]) {
         ai.fixResourceCommand();
         
         ai.attackCastleCommand();
+        
+        if (game.currentTurn < 50) {
+            ai.supplyMovableWorkerWithCastle(6);
+        } else {
+            ai.supplyMovableWorkerWithCastle(7);
+        }
 
         // Output AI Commands
         iOManager.output(ai.getCommands());
