@@ -389,3 +389,6 @@ int Player::calcBaseCount() {
 int Player::calcAssassinCount() {
     return (int)assassins.size();
 }
+int Player::calcAttackerCount() {
+    return (int)attackers.size();
+}

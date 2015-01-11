@@ -406,6 +406,64 @@ void QuickAI::createAttackerOnDownLineCommand() {
         }
     }
 }
+void QuickAI::poolAttackerOnBaseCommand() {
+    map<int, PlayerUnit *>::iterator uPIte;
+    map<int, PlayerUnit>::iterator uIte;
+
+    vector<pair<int, pair<PlayerUnit *, PlayerUnit *> > > distToBase; // <dist, <base, attacke>>
+    map<int, int> attackerCount; // <baseID, attackerCount>
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        PlayerUnit *base = &uIte->second;
+        for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
+            PlayerUnit *attacker = uPIte->second;
+            
+            int d = utl::dist(attacker->position, base->position);
+            distToBase.push_back(make_pair(d, make_pair(base, attacker)));
+            
+            if (d == 0) {
+                if (attackerCount.find(base->ID) == attackerCount.end()) {
+                    attackerCount[base->ID] = 1;
+                } else {
+                    attackerCount[base->ID]++;
+                }
+            }
+        }
+    }
+    
+    sort(distToBase.begin(), distToBase.end());
+    
+    // lock attacker
+    int poolCount = 50;
+    map<int, bool> isLockedBase; // <baseID, isLocked>
+    map<int, int>::iterator aIte;
+    for (aIte = attackerCount.begin(); aIte != attackerCount.end(); aIte++) {
+        if (aIte->second < poolCount) {
+            isLockedBase[aIte->first] = true;
+        } else {
+            isLockedBase[aIte->first] = false;
+        }
+    }
+    
+    vector<pair<int, pair<PlayerUnit *, PlayerUnit *> > >::iterator dIte;
+    for (dIte = distToBase.begin(); dIte != distToBase.end(); dIte++) {
+
+        int baseID = dIte->second.first->ID;
+        if (isLockedBase[baseID]) {
+            
+            PlayerUnit *attacker = dIte->second.second;
+            if (!attacker->isMovable()) continue;
+
+            if (dIte->first == 0) {
+                attacker->fixOnlyPosition();
+            } else {
+                PlayerUnitActionType at = attacker->moveToTargetAction(dIte->second.first->position);
+                Command com(attacker->ID, at);
+                addCommand(com);
+                attacker->fix(at);
+            }
+        }
+    }
+}
 void QuickAI::createBaseOnLineCommand() {
     vector<Position> line = createBaseOnLine();
     vector<Position>::iterator pIte;

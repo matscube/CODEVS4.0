@@ -133,6 +133,7 @@ public:
     int calcVillageCount();
     int calcBaseCount();
     int calcAssassinCount();
+    int calcAttackerCount();
 };
 
 

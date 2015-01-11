@@ -61,6 +61,7 @@ int main(int argc, const char * argv[]) {
             ai.createAttackerOnDownLineCommand();
             ai.createBaseOnRightLine();
             ai.createBaseOnDownLine();
+
             ai.searchEnemyCastleCommand();
         }
 
@@ -68,7 +69,11 @@ int main(int argc, const char * argv[]) {
         ai.searchUnkownFieldCommand();
         ai.fixResourceCommand();
         
-        ai.attackCastleCommand();
+        if (player.calcAttackerCount() < 60) {
+            ai.poolAttackerOnBaseCommand();
+        } else {
+            ai.attackCastleCommand();
+        }
         
         if (game.currentTurn < 50) {
             ai.supplyMovableWorkerWithCastle(6);

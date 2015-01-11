@@ -60,6 +60,7 @@ public:
     void createAttackerOnRightLineCommand();
     void createBaseOnDownLine();
     void createAttackerOnDownLineCommand();
+    void poolAttackerOnBaseCommand();
     
     // pattern 1
     vector<Position> createBaseOnLine();
