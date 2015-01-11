@@ -26,11 +26,12 @@ class IOManager {
     Game *game;
     Field *field;
     Player *player;
+    Player *enemy;
     void finishInput();
     ofstream ofs;
 public:
-    IOManager(Game &game, Field &field, Player &player);
-    void resetWithStage(Game &game, Field &field, Player &player);
+    IOManager(Game &game, Field &field, Player &player, Player &enemy);
+    void resetWithStage(Game &game, Field &field, Player &player, Player &enemy);
     int nextInt();
     void testInput();
     int inputStage();

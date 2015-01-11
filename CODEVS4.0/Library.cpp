@@ -9,8 +9,8 @@
 #include "Library.h"
 #include "Field.h"
 
-int utl::dist(int x1, int y1, int x2, int y2) {
-    return abs(x1 - x2) + abs(y1 - y2);
+int utl::dist(Position pos1, Position pos2) {
+    return abs(pos1.first - pos2.first) + abs(pos1.second - pos2.second);
 }
 
 int utl::getHashID(int x, int y) {
@@ -26,7 +26,7 @@ vector<Position> utl::framePositions(int d, bool shuffle) {
     vector<Position> positions;
     for (int dx = -d; dx <= d; dx++) {
         for (int dy = -d; dy <= d; dy++) {
-            if (dist(0, 0, dx, dy) == d) {
+            if (dist(Position(0, 0), Position(dx, dy)) == d) {
                 Position p = Position(dx, dy);
                 positions.push_back(p);
             }
@@ -41,7 +41,7 @@ vector<Position> utl::areaPositions(int d, bool shuffle) {
     vector<Position> positions;
     for (int dx = -d; dx <= d; dx++) {
         for (int dy = -d; dy <= d; dy++) {
-            if (dist(0, 0, dx, dy) <= d) {
+            if (dist(Position(0, 0), Position(dx, dy)) <= d) {
                 Position p = Position(dx, dy);
                 positions.push_back(p);
             }
@@ -56,7 +56,7 @@ vector<Position> utl::viewRangePositions(int d) {
     vector<Position> positions;
     for (int dx = -d; dx <= d; dx++) {
         for (int dy = -d; dy <= d; dy++) {
-            if (dist(0, 0, dx, dy) <= d) {
+            if (dist(Position(0, 0), Position(dx, dy)) <= d) {
                 Position p = Position(dx, dy);
                 positions.push_back(p);
             }

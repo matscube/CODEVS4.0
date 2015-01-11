@@ -290,19 +290,20 @@ vector<Command> AI::createWorkerOnResource(int assign) {
 // MARK: create base
 
 Position AI::basePointNearestToEnemy() {
+    /*
     Position target;
     if (player->type == PlayerType::Ally) {
         target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
     } else {
         target = Position(0, 0);
     }
-    if (isValidIndex(field->enemyCastlePosition.first, field->enemyCastlePosition.second)) {
+    if (isValidIndex(field->enemyCastlePosition)) {
         target = field->enemyCastlePosition;
     }
 
     Position bestPos;
     int distToCastle = INF;
-    /*
+    
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
 
@@ -318,10 +319,12 @@ Position AI::basePointNearestToEnemy() {
         }
     }*/
     
-    return bestPos;
+//    return bestPos;
+    return Position(0, 0);
 }
 
 int AI::calcDistanceToEnemy(Position p) {
+    /*
     Position target;
     if (player->type == PlayerType::Ally) {
         target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
@@ -329,11 +332,13 @@ int AI::calcDistanceToEnemy(Position p) {
         target = Position(0, 0);
     }
     
-    if (isValidIndex(field->enemyCastlePosition.first, field->enemyCastlePosition.second)) {
+    if (isValidIndex(field->enemyCastlePosition)) {
         target = field->enemyCastlePosition;
     }
     
     return utl::dist(p.first, p.second, target.first, target.second);
+     */
+    return 0;
 }
 
 vector<Command> AI::createBaseOnNearestEnemy() {
@@ -360,13 +365,13 @@ vector<Command> AI::createBaseOnNearestEnemy() {
 
 // MARK: create village
 Position AI::villagePointNearestToEnemy() {
-    Position target;
+    /*    Position target;
     if (player->type == PlayerType::Ally) {
         target = Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1);
     } else {
         target = Position(0, 0);
     }
-    if (isValidIndex(field->enemyCastlePosition.first, field->enemyCastlePosition.second)) {
+    if (isValidIndex(field->enemyCastlePosition)) {
         target = field->enemyCastlePosition;
     }
     
@@ -374,7 +379,8 @@ Position AI::villagePointNearestToEnemy() {
     if (player->type == PlayerType::Ally) {
         bestPos = Position(target.first - 6, target.second - 5);
     }
-    return bestPos;
+    return bestPos;*/
+    return Position(0, 0);
 }
 vector<Command> AI::createVillageOnNearestEnemy() {
     vector<Command> commands;
@@ -692,16 +698,18 @@ vector<Command> AI::createBaseOnCastle() {
 }
 
 vector<Position> AI::defendingArea() {
+    /*
     vector<Position> area = utl::areaPositions(2, true);
     vector<Position>::iterator areaIte;
     vector<Position> defArea;
     for (areaIte = area.begin(); areaIte != area.end(); areaIte++) {
         Position pos = Position(areaIte->first + field->allyCastlePosition.first, areaIte->second + field->allyCastlePosition.second);
-        if (isValidIndex(pos.first, pos.second)) {
+        if (isValidIndex(pos)) {
             defArea.push_back(pos);
         }
     }
-    return defArea;
+    return defArea;*/
+    return vector<Position>();
 }
 
 bool AI::isBaseReady() {

@@ -19,6 +19,7 @@
 
 
 using namespace std;
+typedef pair<int, int> Position;
 
 enum class PlayerUnitType {
     Worker,
@@ -63,16 +64,18 @@ class Player;
 class PlayerUnit {
 public:
     int ID;
-    int x, y;
+//    int x, y;
+    Position position;
     int hitPoint;
     PlayerUnitType type;
     PlayerUnitStatus status;
     Player *player;
 
     PlayerUnit();
-    PlayerUnit(int ID, int x, int y, PlayerUnitType type, Player *player);
+    PlayerUnit(int ID, Position position, PlayerUnitType type, Player *player);
     void setHitPoint(int hitPoint);
-    PlayerUnitActionType moveToTargetAction(int targetX, int targetY);
+    // TODO: use Position type;
+    PlayerUnitActionType moveToTargetAction(Position target);
     
     int getHashID();
     
@@ -92,6 +95,7 @@ public:
     void fixOnlyPosition();
 };
 
+// TODO: rename
 enum class PlayerType {
     Ally,
     Enemy,
@@ -102,6 +106,7 @@ public:
     Player();
     int resourceCount;
     int necessaryResourceCount;
+    bool isViewdCastle;
 
     PlayerType type;
     void updateType(PlayerUnit p);
@@ -110,6 +115,7 @@ public:
     void clearUnits();
     void updateUnit(PlayerUnit pUnit);
     map<int, PlayerUnit *> units;
+    map<int, PlayerUnit *> attackers;
     PlayerUnit castle;
     map<int, PlayerUnit> villages;
     map<int, PlayerUnit> bases;

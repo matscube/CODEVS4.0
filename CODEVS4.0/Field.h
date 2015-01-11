@@ -9,6 +9,8 @@
 #ifndef __CODEVS4_0__Field__
 #define __CODEVS4_0__Field__
 
+
+#include "Library.h"
 #include "Player.h"
 #include <stdio.h>
 #include <vector>
@@ -22,11 +24,10 @@
 
 
 using namespace std;
-
-
 typedef pair<int, int> Position;
 
-bool isValidIndex(int x, int y);
+
+bool isValidIndex(Position p);
 
 enum class FieldUnitType {
     Resource,
@@ -34,13 +35,14 @@ enum class FieldUnitType {
 
 class FieldUnit {
 public:
-    int x, y;
+//    int x, y;
+    Position position;
     int hashID;
     int occupancy;
     FieldUnitType type;
     FieldUnit();
-    FieldUnit(int x, int y, FieldUnitType type);
-    static int getHashID(int x, int y);
+    FieldUnit(Position position, FieldUnitType type);
+    static int getHashID(Position position);
 };
 
 enum class FieldStatus {
@@ -55,13 +57,17 @@ string FieldStatusName(FieldStatus s);
 class Field {
     ofstream ofs;
 public:
-    Position allyCastlePosition;
-    Position enemyCastlePosition;
+//    bool isViewdEnemyCastle;
+//    Position allyCastlePosition;
+//    Position enemyCastlePosition;
 
     Field();
     void resetWithStage();
 
+    // TODO: status unuesd?
     FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    bool isViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    bool willBeViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     int calcVisited();
@@ -75,7 +81,7 @@ public:
     void resetStatusWithTurn();
     void updateStatusWithAllyUnit(PlayerUnit playerUnit);
     void updateStatusWithFieldUnit(FieldUnit fieldUnit);
-    void updateVisited(PlayerUnit *playerUnit);
+    void updateWithPlayerUnit(PlayerUnit *playerUnit);
     
 };
 

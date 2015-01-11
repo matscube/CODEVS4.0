@@ -20,6 +20,7 @@ string PlayerUnitTypeName(PlayerUnitType t) {
         case PlayerUnitType::Castle: return "Castle";
         case PlayerUnitType::Village: return "Village";
         case PlayerUnitType::Base: return "Base";
+        case PlayerUnitType::Unknown: break;
     }
     return "Unkown Type";
 }
@@ -28,6 +29,7 @@ string PlayerUnitStatusName(PlayerUnitStatus s) {
     switch (s) {
         case PlayerUnitStatus::Idle: return "Idle";
         case PlayerUnitStatus::Reserved: return "Reserved";
+        case PlayerUnitStatus::FixPosition: return "FixPosition";
     }
     return "Unkwon Type";
 }
@@ -40,6 +42,8 @@ PlayerUnitType UnitTypeCreated(PlayerUnitActionType at) {
         case PlayerUnitActionType::CreateAssassin: return PlayerUnitType::Assassin;
         case PlayerUnitActionType::CreateVillage: return PlayerUnitType::Village;
         case PlayerUnitActionType::CreateBase: return PlayerUnitType::Base;
+            
+        default: break;
     }
     cerr << "[UnitTypeCreated] Error: Unknown PlayerUnitTypeAction is called" << endl;
     return PlayerUnitType::Unknown;
@@ -50,6 +54,9 @@ PlayerUnitActionType CreateAttackerAction(PlayerUnitType t) {
         case PlayerUnitType::Knight: return PlayerUnitActionType::CreateKnight;
         case PlayerUnitType::Fighter: return PlayerUnitActionType::CreateFighter;
         case PlayerUnitType::Assassin: return PlayerUnitActionType::CreateAssassin;
+            
+        default:
+            break;
     }
     cerr << "[PlayerUnitActionType] Error: Unknown Attacker Type is called" << endl;
     return PlayerUnitActionType::None;
@@ -57,7 +64,7 @@ PlayerUnitActionType CreateAttackerAction(PlayerUnitType t) {
 
 // MARK: Utility
 int PlayerUnit::getHashID() {
-    return utl::getHashID(x, y);
+    return utl::getHashID(position.first, position.second);
 }
 
 /*------------------------------------------------*/
@@ -138,18 +145,17 @@ int PlayerUnit::attackRange(PlayerUnitType type) {
 
 
 PlayerUnit::PlayerUnit() {}
-PlayerUnit::PlayerUnit(int ID, int x, int y, PlayerUnitType type, Player *player) {
+PlayerUnit::PlayerUnit(int ID, Position position, PlayerUnitType type, Player *player) {
     PlayerUnit::ID = ID;
-    PlayerUnit::x = x;
-    PlayerUnit::y = y;
+    PlayerUnit::position = position;
     PlayerUnit::type = type;
     PlayerUnit::player = player;
     status = PlayerUnitStatus::Idle;
 }
 
-PlayerUnitActionType PlayerUnit::moveToTargetAction(int targetX,int targetY) {
-    int dx = targetX - x;
-    int dy = targetY - y;
+PlayerUnitActionType PlayerUnit::moveToTargetAction(Position target) {
+    int dx = target.first - position.first;
+    int dy = target.second - position.second;
 
     if (dx == 0 && dy == 0) {
         return PlayerUnitActionType::None;
@@ -170,7 +176,7 @@ void PlayerUnit::setHitPoint(int hitPoint) {
 
 bool PlayerUnit::isMovable() {
     if (status != PlayerUnitStatus::Idle) return false;
-    
+
     switch (type) {
         case PlayerUnitType::Worker: return true;
         case PlayerUnitType::Knight: return true;
@@ -179,6 +185,7 @@ bool PlayerUnit::isMovable() {
         case PlayerUnitType::Castle: return false;
         case PlayerUnitType::Village: return false;
         case PlayerUnitType::Base: return false;
+        case PlayerUnitType::Unknown: return false;
     }
     cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
     return false;
@@ -196,8 +203,10 @@ bool PlayerUnit::isCreatableWorker() {
         case PlayerUnitType::Castle: return true;
         case PlayerUnitType::Village: return true;
         case PlayerUnitType::Base: return false;
+
+        default: break;
     }
-    cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
+    cerr << "[PlayerUnit::isCreatableWorker] Error: Unkwon Type" << endl;
     return false;
 }
 bool PlayerUnit::isCreatableVillage() {
@@ -212,8 +221,10 @@ bool PlayerUnit::isCreatableVillage() {
         case PlayerUnitType::Castle: return false;
         case PlayerUnitType::Village: return false;
         case PlayerUnitType::Base: return false;
+            
+        default: break;
     }
-    cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
+    cerr << "[PlayerUnit::isCreatableVillage] Error: Unkwon Type" << endl;
     return false;
 }
 bool PlayerUnit::isCreatableAttacker(PlayerUnitType t) {
@@ -228,8 +239,10 @@ bool PlayerUnit::isCreatableAttacker(PlayerUnitType t) {
         case PlayerUnitType::Castle: return false;
         case PlayerUnitType::Village: return false;
         case PlayerUnitType::Base: return true;
+            
+        default: break;
     }
-    cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
+    cerr << "[PlayerUnit::isCreatableAttacker] Error: Unkwon Type" << endl;
     return false;
 }
 bool PlayerUnit::isCreatableBase() {
@@ -244,8 +257,10 @@ bool PlayerUnit::isCreatableBase() {
         case PlayerUnitType::Castle: return false;
         case PlayerUnitType::Village: return false;
         case PlayerUnitType::Base: return false;
+            
+        default: break;
     }
-    cerr << "[PlayerUnit::isMovable] Error: Unkwon Type" << endl;
+    cerr << "[PlayerUnit::isCreatableBase] Error: Unkwon Type" << endl;
     return false;
 }
 
@@ -258,6 +273,8 @@ bool PlayerUnit::isAttacker() {
         case PlayerUnitType::Castle: return false;
         case PlayerUnitType::Village: return false;
         case PlayerUnitType::Base: return false;
+            
+        default: break;
     }
     cerr << "[PlayerUnit::isAttacker] Error: Unkwon Type" << endl;
     return false;
@@ -280,6 +297,9 @@ Player::Player() {
 
 // MARK: Unit
 void Player::clearUnits() {
+    // clear castle
+    units.clear();
+    attackers.clear();
     villages.clear();
     workers.clear();
     knights.clear();
@@ -290,6 +310,7 @@ void Player::clearUnits() {
 void Player::updateUnit(PlayerUnit pUnit) {
     switch (pUnit.type) {
         case PlayerUnitType::Castle:
+            isViewdCastle = true;
             updateType(pUnit);
             castle = pUnit;
             break;
@@ -300,13 +321,16 @@ void Player::updateUnit(PlayerUnit pUnit) {
         case PlayerUnitType::Knight:
             knights[pUnit.ID] = pUnit;
             units[pUnit.ID] = &knights[pUnit.ID];
+            units[pUnit.ID] = &knights[pUnit.ID];
             break;
         case PlayerUnitType::Fighter:
             fighters[pUnit.ID] = pUnit;
             units[pUnit.ID] = &fighters[pUnit.ID];
+            units[pUnit.ID] = &fighters[pUnit.ID];
             break;
         case PlayerUnitType::Assassin:
             assassins[pUnit.ID] = pUnit;
+            units[pUnit.ID] = &assassins[pUnit.ID];
             units[pUnit.ID] = &assassins[pUnit.ID];
             break;
         case PlayerUnitType::Village:
@@ -326,7 +350,7 @@ void Player::updateUnit(PlayerUnit pUnit) {
 void Player::updateType(PlayerUnit p) {
     if (p.type != PlayerUnitType::Castle) return;
 
-    if (utl::dist(p.x, p.y, 0, 0) < utl::dist(p.x, p.y, MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1)) {
+    if (utl::dist(p.position, Position(0, 0)) < utl::dist(p.position, Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1))) {
         type = PlayerType::Ally;
     } else {
         type = PlayerType::Enemy;
@@ -338,6 +362,7 @@ void Player::updateType(PlayerUnit p) {
 
 // MARK: Reset
 void Player::resetWithStage() {
+    isViewdCastle = false;
     resourceCount = 0;
     necessaryResourceCount = 0;
     
@@ -351,16 +376,16 @@ void Player::resetWithTurn() {
 
 // MARK: Calc Count
 int Player::calcWorkerCount() {
-    return workers.size();
+    return (int)workers.size();
 }
 
 int Player::calcVillageCount() {
-    return villages.size();
+    return (int)villages.size();
 }
 
 int Player::calcBaseCount() {
-    return bases.size();
+    return (int)bases.size();
 }
 int Player::calcAssassinCount() {
-    return assassins.size();
+    return (int)assassins.size();
 }

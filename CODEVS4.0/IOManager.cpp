@@ -8,17 +8,19 @@
 
 #include "IOManager.h"
 
-IOManager::IOManager(Game &game, Field &field, Player &player) {
+IOManager::IOManager(Game &game, Field &field, Player &player, Player &enemy) {
     IOManager::game = &game;
     IOManager::field = &field;
     IOManager::player = &player;
+    IOManager::enemy = &enemy;
     ofs = ofstream("/Users/matscube/iomanager.txt");
 }
 
-void IOManager::resetWithStage(Game &game, Field &field, Player &player) {
+void IOManager::resetWithStage(Game &game, Field &field, Player &player, Player &enemy) {
     IOManager::game = &game;
     IOManager::field = &field;
     IOManager::player = &player;
+    IOManager::enemy = &enemy;
     ofs = ofstream("/Users/matscube/iomanager.txt");
 }
 
@@ -66,7 +68,7 @@ void IOManager::testInput() {
 
 int IOManager::inputStage() {
     // Input game information
-    int timeLimit = nextInt();
+    nextInt(); // timelimit;
     return nextInt();
 }
 
@@ -77,6 +79,7 @@ void IOManager::inputBody() {
     
     // Input PlayerUnit Information
     player->resetWithTurn();
+    enemy->resetWithTurn();
     field->resetStatusWithTurn();
     int playerUnitCount = nextInt();
     for (int i = 0; i < playerUnitCount; i++) {
@@ -86,11 +89,11 @@ void IOManager::inputBody() {
         int unitHP = nextInt();
         int unitType = nextInt();
 
-        PlayerUnit unit = PlayerUnit(unitID, unitPosX, unitPosY, PlayerUnitType(unitType), player);
+        PlayerUnit unit = PlayerUnit(unitID, Position(unitPosX, unitPosY), PlayerUnitType(unitType), player);
         unit.setHitPoint(unitHP);
 
         field->updateStatusWithAllyUnit(unit);
-        field->updateVisited(&unit);
+        field->updateWithPlayerUnit(&unit);
         player->updateUnit(unit);
     }
     
@@ -103,9 +106,10 @@ void IOManager::inputBody() {
         int unitHP = nextInt();
         int unitType = nextInt();
         
-        if (PlayerUnitType(unitType) == PlayerUnitType::Castle) {
-            field->enemyCastlePosition = Position(unitPosX, unitPosY);
-        }
+        PlayerUnit unit = PlayerUnit(unitID, Position(unitPosX, unitPosY), PlayerUnitType(unitType), enemy);
+        unit.setHitPoint(unitHP);
+        
+        enemy->updateUnit(unit);
     }
     
     // Input FieldUnit Information
@@ -114,7 +118,7 @@ void IOManager::inputBody() {
         int resourcePosY = nextInt();
         int resourcePosX = nextInt();
 
-        FieldUnit unit = FieldUnit(resourcePosX, resourcePosY, FieldUnitType::Resource);
+        FieldUnit unit = FieldUnit(Position(resourcePosX, resourcePosY), FieldUnitType::Resource);
         field->updateStatusWithFieldUnit(unit);
     }
     

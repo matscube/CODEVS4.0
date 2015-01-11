@@ -9,9 +9,9 @@
 #include "Field.h"
 #include "Library.h"
 
-bool isValidIndex(int x, int y) {
-    if (x < 0 || x >= MAX_FIELD_WIDTH) return false;
-    if (y < 0 || y >= MAX_FIELD_HEIGHT) return false;
+bool isValidIndex(Position p) {
+    if (p.first < 0 || p.first >= MAX_FIELD_WIDTH) return false;
+    if (p.second < 0 || p.second >= MAX_FIELD_HEIGHT) return false;
     return true;
 }
 
@@ -31,19 +31,24 @@ Field::Field() {
 }
 
 void Field::resetWithStage() {
+//    isViewdEnemyCastle = false;
+//    enemyCastlePosition = Position(-1, -1);
+//    allyCastlePosition = Position(-1, -1);
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
         for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
             status[x][y] = FieldStatus::Unknown;
+            isViewed[x][y] = false;
+            willBeViewed[x][y] = false;
             isVisited[x][y] = false;
             willBeVisited[x][y] = false;
         }
     }
     ofs = ofstream("/Users/matscube/field.txt");
-    enemyCastlePosition = Position(-1, -1);
-    allyCastlePosition = Position(-1, -1);
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
         for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
             status[x][y] = FieldStatus::Unknown;
+            isViewed[x][y] = false;
+            willBeViewed[x][y] = false;
             isVisited[x][y] = false;
             willBeVisited[x][y] = false;
         }
@@ -62,12 +67,11 @@ int Field::calcVisited() {
 }
 
 FieldUnit::FieldUnit() {}
-FieldUnit::FieldUnit(int x, int y, FieldUnitType type) {
-    FieldUnit::x = x;
-    FieldUnit::y = y;
+FieldUnit::FieldUnit(Position position, FieldUnitType type) {
+    FieldUnit::position = position;
     FieldUnit::type = type;
     FieldUnit::occupancy = 0;
-    FieldUnit::hashID = getHashID(x, y);
+    FieldUnit::hashID = getHashID(position);
 }
 
 map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
@@ -95,6 +99,7 @@ void Field::resetStatusWithTurn() {
     memset(allyWorkers, 0, sizeof(allyWorkers));
     memset(reservedWorkers, 0, sizeof(reservedWorkers));
     memcpy(willBeVisited, isVisited, sizeof(isVisited));
+    memcpy(willBeViewed, isViewed, sizeof(isViewed));
     map<int, FieldUnit>::iterator resIte = resources.begin();
     for (; resIte != resources.end(); resIte++) {
         resIte->second.occupancy = 0;
@@ -102,15 +107,14 @@ void Field::resetStatusWithTurn() {
 }
 
 void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
-    int cx = allyUnit.x;
-    int cy = allyUnit.y;
+    Position cPos = allyUnit.position;
     
     // Update FieldStatus
     int viewRange = PlayerUnit::viewRange(allyUnit.type);
-    for (int x = cx - viewRange; x <= cx + viewRange; x++) {
-        for (int y = cy - viewRange; y <= cy + viewRange; y++) {
-            if (!isValidIndex(x, y)) continue;
-            if (utl::dist(cx, cy, x, y) > viewRange) continue;
+    for (int x = cPos.first - viewRange; x <= cPos.first + viewRange; x++) {
+        for (int y = cPos.second - viewRange; y <= cPos.second + viewRange; y++) {
+            if (!isValidIndex(Position(x, y))) continue;
+            if (utl::dist(cPos, Position(x, y)) > viewRange) continue;
             if (status[x][y] != FieldStatus::Unknown) continue;
             
             status[x][y] = FieldStatus::Visited;
@@ -118,36 +122,37 @@ void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
     }
     
     // Update Resource Occupancy
-    allyWorkers[cx][cy]++;
+    allyWorkers[cPos.first][cPos.second]++;
     
-    if (allyUnit.type == PlayerUnitType::Castle) {
-        allyCastlePosition = Position(allyUnit.x, allyUnit.y);
-    }
+//    if (allyUnit.type == PlayerUnitType::Castle) {
+//        allyCastlePosition = Position(allyUnit.x, allyUnit.y);
+//    }
 }
 
 void Field::updateStatusWithFieldUnit(FieldUnit fieldUnit) {
     if (fieldUnit.type == FieldUnitType::Resource) {
-        status[fieldUnit.x][fieldUnit.y] = FieldStatus::Resource;
+        status[fieldUnit.position.first][fieldUnit.position.second] = FieldStatus::Resource;
         if (resources.find(fieldUnit.hashID) == resources.end()) {
             resources[fieldUnit.hashID] = fieldUnit;
         }
     }
 }
 
-void Field::updateVisited(PlayerUnit *playerUnit) {
-    int cx = playerUnit->x;
-    int cy = playerUnit->y;
+void Field::updateWithPlayerUnit(PlayerUnit *playerUnit) {
+    Position cPos = playerUnit->position;
+    if (isValidIndex(cPos)) isVisited[cPos.first][cPos.second] = true;
+
     int viewRange = PlayerUnit::viewRange(playerUnit->type);
-    for (int x = cx - viewRange; x <= cx + viewRange; x++) {
-        for (int y = cy - viewRange; y <= cy + viewRange; y++) {
-            if (!isValidIndex(x, y)) continue;
-            if (utl::dist(cx, cy, x, y) > viewRange) continue;
-            isVisited[x][y] = true;
+    for (int x = cPos.first - viewRange; x <= cPos.first + viewRange; x++) {
+        for (int y = cPos.second - viewRange; y <= cPos.second + viewRange; y++) {
+            if (!isValidIndex(Position(x, y))) continue;
+            if (utl::dist(cPos, Position(x, y)) > viewRange) continue;
+            isViewed[x][y] = true;
             // set value on willBeVisited by resetWithTurn
         }
     }
 }
 
-int FieldUnit::getHashID(int x, int y) {
-    return y * MAX_FIELD_WIDTH + x;
+int FieldUnit::getHashID(Position position) {
+    return position.second * MAX_FIELD_WIDTH + position.first;
 }

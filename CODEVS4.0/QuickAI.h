@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <vector>
 #include <fstream>
+#include <map>
 
 using namespace std;
 
@@ -25,16 +26,20 @@ class QuickAI {
     Game *game;
     Field *field;
     Player *player;
+    Player *enemy;
     vector<Command> commands;
     void addCommand(Command newCommand);
     void addCommands(vector<Command> newCommands);
 public:
-    QuickAI(Game &game, Field &field, Player &player);
+    QuickAI(Game &game, Field &field, Player &player, Player &enemy);
     void resetWithTurn();
     vector<Command> getCommands();
     
     // MARK: Search
-    void searchUnkownAreaCommand(vector<Position> area, int assign);
+    void searchNoVisitedAreaCommand(vector<Position> area, int assign, map<PlayerUnitType, bool> types);
+    map<PlayerUnitType, bool> allTypes();
+    map<PlayerUnitType, bool> workerTypes();
+    map<PlayerUnitType, bool> attackerTypes();
 
     vector<Position> searchLine1();
     vector<Position> searchLine2();
@@ -44,8 +49,14 @@ public:
     vector<Position> searchArea();
     void searchUnkownFieldCommand();
 
-    vector<Position> moveEnemyBackLine();
-    void moveEnemyBackCommand();
+    vector<Position> createBaseOnLine();
+    void createBaseOnLineCommand();
+    void createAttackerOnLineCommand();
+    
+    vector<Position> searchEnemyCastleLine();
+    void searchEnemyCastleCommand();
+    
+    void attackCastleCommand();
 
     // MARK: Resource
     void createVillageOnResourceCommand();

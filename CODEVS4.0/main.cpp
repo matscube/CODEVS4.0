@@ -25,15 +25,18 @@ int main(int argc, const char * argv[]) {
     Game game = Game(0);
     Field field = Field();
     Player player = Player();
-    IOManager iOManager(game, field, player);
+    Player enemy = Player();
+    IOManager iOManager(game, field, player, enemy);
 
-    QuickAI ai = QuickAI(game, field, player);
+    QuickAI ai = QuickAI(game, field, player, enemy);
 
     while (true) {
+//        cerr << game.currentTurn << endl;
+        
         if (game.isNextStage(iOManager.inputStage())) {
             field.resetWithStage();
             player.resetWithStage();
-            iOManager.resetWithStage(game, field, player);
+            iOManager.resetWithStage(game, field, player, enemy);
         }
         iOManager.inputBody();
 
@@ -45,10 +48,15 @@ int main(int argc, const char * argv[]) {
         
         // Mark: AI Commands **********************************************************
         
-        ai.moveEnemyBackCommand();
+        ai.createBaseOnLineCommand();
+        ai.createAttackerOnLineCommand();
+
         ai.createVillageOnResourceCommand();
         ai.searchUnkownFieldCommand();
         ai.fixResourceCommand();
+        ai.searchEnemyCastleCommand();
+        
+        ai.attackCastleCommand();
 
         // Output AI Commands
         iOManager.output(ai.getCommands());
