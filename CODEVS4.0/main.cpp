@@ -26,6 +26,10 @@ int main(int argc, const char * argv[]) {
     Field field = Field();
     Player player = Player();
     Player enemy = Player();
+    
+    PlayerUnit enemyCastle = PlayerUnit(INF, Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT), PlayerUnitType::Castle, &enemy);
+    enemy.castle = enemyCastle;
+    
     IOManager iOManager(game, field, player, enemy);
 
     QuickAI ai = QuickAI(game, field, player, enemy);
@@ -48,13 +52,19 @@ int main(int argc, const char * argv[]) {
         
         // Mark: AI Commands **********************************************************
         
-        ai.createBaseOnLineCommand();
-        ai.createAttackerOnLineCommand();
+        
+//        ai.createBaseOnLineCommand();
+//        ai.createAttackerOnLineCommand();
+        
+        if (game.currentTurn > 60) {
+            ai.createBaseOnRightLine();
+            ai.createAttackerOnRightLineCommand();
+            ai.searchEnemyCastleCommand();
+        }
 
         ai.createVillageOnResourceCommand();
         ai.searchUnkownFieldCommand();
         ai.fixResourceCommand();
-        ai.searchEnemyCastleCommand();
         
         ai.attackCastleCommand();
 

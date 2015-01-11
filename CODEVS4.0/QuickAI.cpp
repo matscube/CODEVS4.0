@@ -176,6 +176,101 @@ void QuickAI::searchUnkownFieldCommand() {
     searchNoVisitedAreaCommand(searchLine4(), 1, allTypes());
     searchNoVisitedAreaCommand(searchLine5(), 1, allTypes());
 }
+
+void QuickAI::createBaseOnRightLine() {
+    map<int, PlayerUnit>::iterator uIte;
+    vector<pair<int, PlayerUnit *> > workerOnLine; // <MAXY - y , unit>
+    vector<pair<int, PlayerUnit *> > workerOutLine; // <MAXX - x + MaxY - y, unit>
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        int d = MAX_FIELD_WIDTH - 1 - uIte->second.position.first;
+        int fromMaxY = MAX_FIELD_HEIGHT - 1 - uIte->second.position.second;
+
+        if (d == 0) {
+            workerOnLine.push_back(make_pair(fromMaxY, &uIte->second));
+        } else {
+            workerOutLine.push_back(make_pair(d + fromMaxY, &uIte->second));
+        }
+    }
+    
+    int baseCount = 0;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        int d = MAX_FIELD_HEIGHT - 1 - uIte->second.position.first;
+        if (d == 0) baseCount++;
+    }
+    
+    vector<pair<int, PlayerUnit *> >::iterator wIte;
+
+    int targetWorkerCount = 2;
+    int workerCount = (int)workerOnLine.size();
+    sort(workerOutLine.begin(), workerOutLine.end());
+    for (wIte = workerOutLine.begin(); wIte != workerOutLine.end(); wIte++) {
+        PlayerUnit *worker = wIte->second;
+        
+        if (workerCount >= targetWorkerCount) break;
+        
+        if (!worker->isMovable()) continue;
+        PlayerUnitActionType at = PlayerUnitActionType::MoveRight;
+        Command com(worker->ID, at);
+        addCommand(com);
+        worker->fix(at);
+        workerCount++;
+    }
+    
+    int targetBaseCount = 5;
+    int basePointTH = 80;
+    workerCount = 0;
+    sort(workerOnLine.begin(), workerOnLine.end());
+    for (wIte = workerOnLine.begin(); wIte != workerOnLine.end(); wIte++) {
+        PlayerUnit *worker = wIte->second;
+        
+        if (workerCount >= targetWorkerCount) break;
+
+        // create base
+        if (worker->position.second >= basePointTH && targetBaseCount > baseCount) {
+            if (!worker->isCreatableBase()) continue;
+            PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+            Command com(worker->ID, at);
+            addCommand(com);
+            worker->fix(at);
+            baseCount++;
+            workerCount++;
+            continue;
+        // move down
+        } else if (worker->position.second < MAX_FIELD_HEIGHT - 1) {
+            if (!worker->isMovable()) continue;
+            PlayerUnitActionType at = worker->moveToTargetAction(Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1));
+            Command com(worker->ID, at);
+            addCommand(com);
+            worker->fix(at);
+            workerCount++;
+        } else {
+            // on (99, 99)
+        }
+    }
+    
+}
+void QuickAI::createAttackerOnRightLineCommand() {
+    vector<PlayerUnitType> types;
+    for (int i = 0; i < 20; i++) types.push_back(PlayerUnitType::Knight);
+    for (int i = 0; i < 50; i++) types.push_back(PlayerUnitType::Fighter);
+    for (int i = 0; i < 30; i++) types.push_back(PlayerUnitType::Assassin);
+
+    map<int, PlayerUnit>::iterator uIte;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        PlayerUnit *base = &uIte->second;
+        if (base->position.first == MAX_FIELD_WIDTH - 1) {
+
+            PlayerUnitType pType = types[rand() % 100];
+            if (!base->isCreatableAttacker(pType)) continue;
+
+            PlayerUnitActionType at = CreateAttackerAction(pType);
+            Command com(base->ID, at);
+            addCommand(com);
+            base->fix(at);
+        }
+    }
+}
+
 void QuickAI::createBaseOnLineCommand() {
     vector<Position> line = createBaseOnLine();
     vector<Position>::iterator pIte;
@@ -253,32 +348,51 @@ void QuickAI::createAttackerOnLineCommand() {
 
 }
 
-vector<Position> QuickAI::searchEnemyCastleLine() {
+vector<Position> QuickAI::searchEnemyCastleLine1() {
     vector<Position> line;
     for (int y = 59; y < MAX_FIELD_HEIGHT; y++) {
         Position p(95, y);
         line.push_back(p);
     }
-    for (int y = 69; y < MAX_FIELD_HEIGHT; y++) {
-        Position p(86, y);
-        line.push_back(p);
-    }
+    return line;
+}
+vector<Position> QuickAI::searchEnemyCastleLine2() {
+    vector<Position> line;
     for (int x = 59; x < MAX_FIELD_HEIGHT; x++) {
         Position p(x, 95);
         line.push_back(p);
     }
+    return line;
+}
+vector<Position> QuickAI::searchEnemyCastleLine3() {
+    vector<Position> line;
+    for (int y = 69; y < MAX_FIELD_HEIGHT; y++) {
+        Position p(86, y);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> QuickAI::searchEnemyCastleLine4() {
+    vector<Position> line;
     for (int x = 69; x < MAX_FIELD_HEIGHT; x++) {
         Position p(x, 86);
         line.push_back(p);
     }
+    return line;
+}
+vector<Position> QuickAI::searchEnemyCastleLine5() {
+    vector<Position> line;
     Position p(81, 81);
     line.push_back(p);
-
     return line;
 }
 
 void QuickAI::searchEnemyCastleCommand() {
-    searchNoVisitedAreaCommand(searchEnemyCastleLine(), 1, attackerTypes());
+    searchNoVisitedAreaCommand(searchEnemyCastleLine1(), 1, attackerTypes());
+    searchNoVisitedAreaCommand(searchEnemyCastleLine2(), 1, attackerTypes());
+    searchNoVisitedAreaCommand(searchEnemyCastleLine3(), 1, attackerTypes());
+    searchNoVisitedAreaCommand(searchEnemyCastleLine4(), 1, attackerTypes());
+    searchNoVisitedAreaCommand(searchEnemyCastleLine5(), 1, attackerTypes());
 }
 
 void QuickAI::attackCastleCommand() {
@@ -286,6 +400,7 @@ void QuickAI::attackCastleCommand() {
 
     map<int, PlayerUnit *>::iterator uPIte;
     for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
+        
         PlayerUnit *pUnit = uPIte->second;
         if (!pUnit->isMovable()) continue;
         

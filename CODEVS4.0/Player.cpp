@@ -321,17 +321,17 @@ void Player::updateUnit(PlayerUnit pUnit) {
         case PlayerUnitType::Knight:
             knights[pUnit.ID] = pUnit;
             units[pUnit.ID] = &knights[pUnit.ID];
-            units[pUnit.ID] = &knights[pUnit.ID];
+            attackers[pUnit.ID] = &knights[pUnit.ID];
             break;
         case PlayerUnitType::Fighter:
             fighters[pUnit.ID] = pUnit;
             units[pUnit.ID] = &fighters[pUnit.ID];
-            units[pUnit.ID] = &fighters[pUnit.ID];
+            attackers[pUnit.ID] = &fighters[pUnit.ID];
             break;
         case PlayerUnitType::Assassin:
             assassins[pUnit.ID] = pUnit;
             units[pUnit.ID] = &assassins[pUnit.ID];
-            units[pUnit.ID] = &assassins[pUnit.ID];
+            attackers[pUnit.ID] = &assassins[pUnit.ID];
             break;
         case PlayerUnitType::Village:
             villages[pUnit.ID] = pUnit;

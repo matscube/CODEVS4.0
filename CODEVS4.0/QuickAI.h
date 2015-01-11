@@ -49,11 +49,18 @@ public:
     vector<Position> searchArea();
     void searchUnkownFieldCommand();
 
+    void createBaseOnRightLine();
+    void createAttackerOnRightLineCommand();
+    
     vector<Position> createBaseOnLine();
     void createBaseOnLineCommand();
     void createAttackerOnLineCommand();
     
-    vector<Position> searchEnemyCastleLine();
+    vector<Position> searchEnemyCastleLine1();
+    vector<Position> searchEnemyCastleLine2();
+    vector<Position> searchEnemyCastleLine3();
+    vector<Position> searchEnemyCastleLine4();
+    vector<Position> searchEnemyCastleLine5();
     void searchEnemyCastleCommand();
     
     void attackCastleCommand();
