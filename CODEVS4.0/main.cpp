@@ -56,30 +56,54 @@ int main(int argc, const char * argv[]) {
 //        ai.createBaseOnLineCommand();
 //        ai.createAttackerOnLineCommand();
         
-        if (game.currentTurn > 60) {
+        // create base
+        ai.assignRightLineCommand();
+        ai.assignDownLineCommand();
+        int baseCount = ai.baseCountOnEnemyArea();
+        if (baseCount == 0) {
+            ai.createOneBaseOnEnemyAreaCommand();
+        } else if (baseCount == 1) {
+            ai.createOneMoreBaseOnEnemyAreaCommand();
+        }
+        
+        // search castle by attacker
+        ai.createAttackerOnBaseCommand();
+        ai.searchEnemyCastleCommand();
+        
+        
+/*        if (game.currentTurn > 60) {
             ai.createAttackerOnRightLineCommand();
             ai.createAttackerOnDownLineCommand();
             ai.createBaseOnRightLine();
             ai.createBaseOnDownLine();
 
             ai.searchEnemyCastleCommand();
-        }
+        }*/
 
+        // get resource
         ai.createVillageOnResourceCommand();
-        ai.searchUnkownFieldCommand();
+        ai.searchUnkownFieldSmallCommand();
         ai.fixResourceCommand();
         
-        if (player.calcAttackerCount() < 60) {
+        // supply worker
+        if (game.currentTurn > 50) {
+            ai.supplyWorkerForSearchCommand(8);
+        }
+        ai.searchUnkownFieldMediumCommand();
+        
+        // pool attack
+        if (player.calcAttackerCount() < 10) {
             ai.poolAttackerOnBaseCommand();
         } else {
             ai.attackCastleCommand();
         }
         
+        /*
         if (game.currentTurn < 50) {
             ai.supplyMovableWorkerWithCastle(6);
         } else {
             ai.supplyMovableWorkerWithCastle(7);
-        }
+        }*/
 
         // Output AI Commands
         iOManager.output(ai.getCommands());

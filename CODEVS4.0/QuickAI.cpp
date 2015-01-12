@@ -208,13 +208,28 @@ map<PlayerUnitType, bool> QuickAI::attackerTypes() {
     return res;
 }
 
-void QuickAI::searchUnkownFieldCommand() {
+void QuickAI::searchUnkownFieldSmallCommand() {
     searchNoVisitedAreaCommand(searchLineToRight1(), 1, allTypes());
     searchNoVisitedAreaCommand(searchLineToRight3(), 1, allTypes());
     searchNoVisitedAreaCommand(searchLineToRight5(), 1, allTypes());
 
     searchNoVisitedAreaCommand(searchLineToDown1(), 1, allTypes());
     searchNoVisitedAreaCommand(searchLineToDown3(), 1, allTypes());
+    searchNoVisitedAreaCommand(searchLineToDown5(), 1, allTypes());
+    
+    searchNoVisitedAreaCommand(searchLineAlly(), 1, allTypes());
+}
+void QuickAI::searchUnkownFieldMediumCommand() {
+    searchNoVisitedAreaCommand(searchLineToRight1(), 1, allTypes());
+    searchNoVisitedAreaCommand(searchLineToRight2(), 1, allTypes());
+    searchNoVisitedAreaCommand(searchLineToRight3(), 1, allTypes());
+    searchNoVisitedAreaCommand(searchLineToRight4(), 1, allTypes());
+    searchNoVisitedAreaCommand(searchLineToRight5(), 1, allTypes());
+    
+    searchNoVisitedAreaCommand(searchLineToDown1(), 1, allTypes());
+    searchNoVisitedAreaCommand(searchLineToDown2(), 1, allTypes());
+    searchNoVisitedAreaCommand(searchLineToDown3(), 1, allTypes());
+    searchNoVisitedAreaCommand(searchLineToDown4(), 1, allTypes());
     searchNoVisitedAreaCommand(searchLineToDown5(), 1, allTypes());
     
     searchNoVisitedAreaCommand(searchLineAlly(), 1, allTypes());
@@ -409,7 +424,7 @@ void QuickAI::createAttackerOnDownLineCommand() {
 void QuickAI::poolAttackerOnBaseCommand() {
     map<int, PlayerUnit *>::iterator uPIte;
     map<int, PlayerUnit>::iterator uIte;
-
+    
     vector<pair<int, pair<PlayerUnit *, PlayerUnit *> > > distToBase; // <dist, <base, attacke>>
     map<int, int> attackerCount; // <baseID, attackerCount>
     for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
@@ -433,7 +448,7 @@ void QuickAI::poolAttackerOnBaseCommand() {
     sort(distToBase.begin(), distToBase.end());
     
     // lock attacker
-    int poolCount = 50;
+    int poolCount = 10;
     map<int, bool> isLockedBase; // <baseID, isLocked>
     map<int, int>::iterator aIte;
     for (aIte = attackerCount.begin(); aIte != attackerCount.end(); aIte++) {
@@ -464,6 +479,208 @@ void QuickAI::poolAttackerOnBaseCommand() {
         }
     }
 }
+
+// MARK: pattern 3
+void QuickAI::assignRightLineCommand() {
+    map<int, PlayerUnit>::iterator uIte;
+    PlayerUnit *pUnit = nullptr;
+    int d = INF;
+    int countOnRightLine = 0;
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        if (!uIte->second.isMovable()) continue;
+
+        int dX = MAX_FIELD_WIDTH - 1 - uIte->second.position.first;
+        int dY = MAX_FIELD_HEIGHT - 1 - uIte->second.position.second;
+        if (dX == 0) {
+            countOnRightLine++;
+            continue;
+        }
+        if (dY == 0) continue;
+
+        if (dX + dY < d) {
+            pUnit = &uIte->second;
+            d = dX + dY;
+        }
+    }
+    
+    if (countOnRightLine == 0 && pUnit != nullptr) {
+        PlayerUnitActionType at = PlayerUnitActionType::MoveRight;
+        Command com(pUnit->ID, at);
+        addCommand(com);
+        pUnit->fix(at);
+    }
+}
+void QuickAI::assignDownLineCommand() {
+    map<int, PlayerUnit>::iterator uIte;
+    PlayerUnit *pUnit = nullptr;
+    int d = INF;
+    int countOnDownLine = 0;
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        if (!uIte->second.isMovable()) continue;
+        
+        int dX = MAX_FIELD_WIDTH - 1 - uIte->second.position.first;
+        int dY = MAX_FIELD_HEIGHT - 1 - uIte->second.position.second;
+        if (dY == 0) {
+            countOnDownLine++;
+            continue;
+        }
+        if (dX == 0) continue;
+
+        if (dX + dY < d) {
+            pUnit = &uIte->second;
+            d = dX + dY;
+        }
+    }
+    
+    if (countOnDownLine == 0 && pUnit != nullptr) {
+        PlayerUnitActionType at = PlayerUnitActionType::MoveDown;
+        Command com(pUnit->ID, at);
+        addCommand(com);
+        pUnit->fix(at);
+    }
+}
+int QuickAI::baseCountOnEnemyArea() {
+    map<int, PlayerUnit>::iterator uIte;
+    int count = 0;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        PlayerUnit *base = &uIte->second;
+        int x = base->position.first;
+        int y = base->position.second;
+        if (x == MAX_FIELD_WIDTH - 1 || y == MAX_FIELD_HEIGHT - 1) count++;
+    }
+    return count;
+}
+void QuickAI::createOneBaseOnEnemyAreaCommand() {
+    map<int, PlayerUnit>::iterator uIte;
+    vector<pair<int, PlayerUnit *> > downWorkers; // <dist, worker>
+    vector<pair<int, PlayerUnit *> > rightWorkers; // <dist, worker>
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        if (!uIte->second.isMovable()) continue;
+        
+        if (uIte->second.position.first == MAX_FIELD_WIDTH - 1) {
+            int d = MAX_FIELD_HEIGHT - 1 - uIte->second.position.second;
+            rightWorkers.push_back(make_pair(d, &uIte->second));
+        } else if (uIte->second.position.second == MAX_FIELD_HEIGHT - 1) {
+            int d = MAX_FIELD_WIDTH - 1 - uIte->second.position.first;
+            downWorkers.push_back(make_pair(d, &uIte->second));
+        }
+    }
+    
+    vector<pair<int, PlayerUnit *> > workers;
+    workers.insert(workers.end(), downWorkers.begin(), downWorkers.end());
+    workers.insert(workers.end(), rightWorkers.begin(), rightWorkers.end());
+    sort(workers.begin(), workers.end());
+
+    vector<pair<int, PlayerUnit *> >::iterator wIte;
+    for (wIte = workers.begin(); wIte != workers.end(); wIte++) {
+        PlayerUnit *worker = wIte->second;
+        if (!worker->isCreatableBase()) continue;
+        if (utl::dist(worker->position, Position(MAX_FIELD_WIDTH - 1, MAX_FIELD_HEIGHT - 1)) > 40) continue;
+        
+        PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+        Command com(worker->ID, at);
+        addCommand(com);
+        worker->fix(at);
+        break;
+    }
+    
+    sort(downWorkers.begin(), downWorkers.end());
+    sort(rightWorkers.begin(), rightWorkers.end());
+    
+    for (wIte = rightWorkers.begin(); wIte != rightWorkers.end(); wIte++) {
+        PlayerUnit *worker = wIte->second;
+        if (!worker->isMovable()) continue;
+        
+        PlayerUnitActionType at = PlayerUnitActionType::MoveDown;
+        Command com(worker->ID, at);
+        addCommand(com);
+        worker->fix(at);
+    }
+    for (wIte = downWorkers.begin(); wIte != downWorkers.end(); wIte++) {
+        PlayerUnit *worker = wIte->second;
+        if (!worker->isMovable()) continue;
+
+        PlayerUnitActionType at = PlayerUnitActionType::MoveRight;
+        Command com(worker->ID, at);
+        addCommand(com);
+        worker->fix(at);
+    }
+}
+
+void QuickAI::createOneMoreBaseOnEnemyAreaCommand() {
+    map<int, PlayerUnit>::iterator uIte;
+    PlayerUnit *targetBase = nullptr;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        PlayerUnit *base = &uIte->second;
+        if (base->position.first == MAX_FIELD_WIDTH - 1 || base->position.second == MAX_FIELD_HEIGHT - 1) {
+            targetBase= base;
+        }
+    }
+    
+    if (targetBase == nullptr) {
+        cerr << "Error base is nowhere." << endl;
+        return;
+    }
+    
+    PlayerUnit *targetWorker = nullptr;
+    int dToBase = INF;
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        PlayerUnit *worker = &uIte->second;
+        int d = utl::dist(worker->position, targetBase->position);
+
+        if (d != 0 && !worker->isMovable()) continue;
+
+        if (d < dToBase) {
+            dToBase = d;
+            targetWorker = worker;
+        }
+    }
+    
+    if (targetWorker == nullptr) {
+        cerr << "Warning: missing commandable worker." << endl;
+        return;
+    }
+
+    if (dToBase == 0) {
+        if (targetWorker->isCreatableBase()) {
+            PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+            Command com(targetWorker->ID, at);
+            addCommand(com);
+            targetWorker->fix(at);
+        } else {
+            targetWorker->fixOnlyPosition();
+        }
+    } else {
+        PlayerUnitActionType at = targetWorker->moveToTargetAction(targetBase->position);
+        Command com(targetWorker->ID, at);
+        addCommand(com);
+        targetWorker->fix(at);
+    }
+}
+
+void QuickAI::createAttackerOnBaseCommand() {
+    vector<PlayerUnitType> types;
+    for (int i = 0; i < 10; i++) types.push_back(PlayerUnitType::Knight);
+    for (int i = 0; i < 50; i++) types.push_back(PlayerUnitType::Fighter);
+    for (int i = 0; i < 40; i++) types.push_back(PlayerUnitType::Assassin);
+    
+    map<int, PlayerUnit>::iterator uIte;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        PlayerUnit *base = &uIte->second;
+        if (base->position.second == MAX_FIELD_HEIGHT - 1 || base->position.first == MAX_FIELD_WIDTH - 1) {
+            
+            PlayerUnitType pType = types[rand() % 100];
+            if (!base->isCreatableAttacker(pType)) continue;
+            
+            PlayerUnitActionType at = CreateAttackerAction(pType);
+            Command com(base->ID, at);
+            addCommand(com);
+            base->fix(at);
+        }
+    }
+}
+
+// MARK: pattern 2
 void QuickAI::createBaseOnLineCommand() {
     vector<Position> line = createBaseOnLine();
     vector<Position>::iterator pIte;
@@ -737,6 +954,42 @@ void QuickAI::supplyMovableWorkerWithCastle(int need) {
         Command com(castle->ID, at);
         addCommand(com);
         castle->fix(at);
+    }
+}
+void QuickAI::supplyWorkerForSearchCommand(int need) {
+    map<int, PlayerUnit>::iterator uIte;
+    int searchWorkerCount = 0;
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        PlayerUnit *worker = &uIte->second;
+        int hashID = utl::getHashID(worker->position.first, worker->position.second);
+        if (field->resources.find(hashID) == field->resources.end()) {
+            searchWorkerCount++;
+        }
+    }
+    
+    Position target = Position(50, 50);
+    vector<pair<int, PlayerUnit *> > distToTarget; // <d, p>
+
+    int castleDist = utl::dist(player->castle.position, target);
+    distToTarget.push_back(make_pair(castleDist, &player->castle));
+    for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
+        int d = utl::dist(uIte->second.position, target);
+        distToTarget.push_back(make_pair(d, &uIte->second));
+    }
+    
+    sort(distToTarget.begin(), distToTarget.end());
+    
+    vector<pair<int, PlayerUnit *> >::iterator dIte;
+    for (dIte = distToTarget.begin(); dIte != distToTarget.end(); dIte++) {
+        if (!dIte->second->isCreatableWorker()) continue;
+        
+        if (need > searchWorkerCount) {
+            PlayerUnitActionType at = PlayerUnitActionType::CreateWorker;
+            Command com(dIte->second->ID, at);
+            addCommand(com);
+            dIte->second->fix(at);
+            need--;
+        }
     }
 }
 

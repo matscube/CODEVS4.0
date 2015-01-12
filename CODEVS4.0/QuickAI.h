@@ -53,7 +53,8 @@ public:
     vector<Position> searchLineToDown4();
     vector<Position> searchLineToDown5();
     vector<Position> searchLineAlly();
-    void searchUnkownFieldCommand();
+    void searchUnkownFieldSmallCommand();
+    void searchUnkownFieldMediumCommand();
 
     // pattern 2
     void createBaseOnRightLine();
@@ -61,6 +62,15 @@ public:
     void createBaseOnDownLine();
     void createAttackerOnDownLineCommand();
     void poolAttackerOnBaseCommand();
+
+    // pattern 3
+    void assignRightLineCommand();
+    void assignDownLineCommand();
+    int baseCountOnEnemyArea();
+    void createOneBaseOnEnemyAreaCommand();
+    void createOneMoreBaseOnEnemyAreaCommand();
+    void createAttackerOnBaseCommand();
+
     
     // pattern 1
     vector<Position> createBaseOnLine();
@@ -74,6 +84,7 @@ public:
     vector<Position> searchEnemyCastleLine5();
     void searchEnemyCastleCommand();
     
+    
     void attackCastleCommand();
 
     // MARK: Resource
@@ -82,6 +93,7 @@ public:
     
     // MARK: Worker
     void supplyMovableWorkerWithCastle(int need);
+    void supplyWorkerForSearchCommand(int need);
 
     
     void debug();
