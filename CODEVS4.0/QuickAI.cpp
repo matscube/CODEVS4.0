@@ -448,7 +448,7 @@ void QuickAI::poolAttackerOnBaseCommand() {
     sort(distToBase.begin(), distToBase.end());
     
     // lock attacker
-    int poolCount = 10;
+    int poolCount = 100;
     map<int, bool> isLockedBase; // <baseID, isLocked>
     map<int, int>::iterator aIte;
     for (aIte = attackerCount.begin(); aIte != attackerCount.end(); aIte++) {
@@ -817,7 +817,7 @@ void QuickAI::attackCastleCommand() {
         PlayerUnit *pUnit = uPIte->second;
         if (!pUnit->isMovable()) continue;
         
-        PlayerUnitActionType at = pUnit->moveToTargetAction(target);
+        PlayerUnitActionType at = pUnit->moveToTargetAction(target, true);
         Command com(pUnit->ID, at);
         addCommand(com);
         pUnit->fix(at);

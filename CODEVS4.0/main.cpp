@@ -92,7 +92,7 @@ int main(int argc, const char * argv[]) {
         ai.searchUnkownFieldMediumCommand();
         
         // pool attack
-        if (player.calcAttackerCount() < 10) {
+        if (player.calcAttackerCount() < 100) {
             ai.poolAttackerOnBaseCommand();
         } else {
             ai.attackCastleCommand();

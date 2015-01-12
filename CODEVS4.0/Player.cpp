@@ -153,7 +153,7 @@ PlayerUnit::PlayerUnit(int ID, Position position, PlayerUnitType type, Player *p
     status = PlayerUnitStatus::Idle;
 }
 
-PlayerUnitActionType PlayerUnit::moveToTargetAction(Position target) {
+PlayerUnitActionType PlayerUnit::moveToTargetAction(Position target, bool synchro) {
     int dx = target.first - position.first;
     int dy = target.second - position.second;
 
@@ -161,12 +161,23 @@ PlayerUnitActionType PlayerUnit::moveToTargetAction(Position target) {
         return PlayerUnitActionType::None;
     }
 
-    if (rand() % (abs(dx) + abs(dy)) < abs(dy)) {
-        if (dy > 0) return PlayerUnitActionType::MoveDown;
-        else return PlayerUnitActionType::MoveUp;
-    } else {
+    if (synchro) {
         if (dx > 0) return PlayerUnitActionType::MoveRight;
-        else return PlayerUnitActionType::MoveLeft;
+        else if (dx < 0) return PlayerUnitActionType::MoveLeft;
+        else if (dy > 0) return PlayerUnitActionType::MoveDown;
+        else if (dy < 0) return PlayerUnitActionType::MoveUp;
+        else {
+            cerr << "Error: pair of dx and dy is invalid" << endl;
+            return PlayerUnitActionType::None;
+        }
+    } else {
+        if (rand() % (abs(dx) + abs(dy)) < abs(dy)) {
+            if (dy > 0) return PlayerUnitActionType::MoveDown;
+            else return PlayerUnitActionType::MoveUp;
+        } else {
+            if (dx > 0) return PlayerUnitActionType::MoveRight;
+            else return PlayerUnitActionType::MoveLeft;
+        }
     }
 }
 

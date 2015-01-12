@@ -75,7 +75,7 @@ public:
     PlayerUnit(int ID, Position position, PlayerUnitType type, Player *player);
     void setHitPoint(int hitPoint);
     // TODO: use Position type;
-    PlayerUnitActionType moveToTargetAction(Position target);
+    PlayerUnitActionType moveToTargetAction(Position target, bool synchro = false);
     
     int getHashID();
     
