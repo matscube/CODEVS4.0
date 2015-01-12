@@ -41,6 +41,7 @@ int main(int argc, const char * argv[]) {
             field.resetWithStage();
             player.resetWithStage();
             iOManager.resetWithStage(game, field, player, enemy);
+            ai.resetWithStage();
         }
         iOManager.inputBody();
 
@@ -92,11 +93,12 @@ int main(int argc, const char * argv[]) {
         ai.searchUnkownFieldMediumCommand();
         
         // pool attack
-        if (player.calcAttackerCount() < 100) {
-            ai.poolAttackerOnBaseCommand();
+        if (ai.firstCannonReleased) {
+            ai.primaryCannonCommand();
         } else {
-            ai.attackCastleCommand();
+            ai.firstCannonCommand();
         }
+        ai.attackCastleCommand();
         
         /*
         if (game.currentTurn < 50) {

@@ -33,6 +33,7 @@ class QuickAI {
 public:
     QuickAI(Game &game, Field &field, Player &player, Player &enemy);
     void resetWithTurn();
+    void resetWithStage();
     vector<Command> getCommands();
     
     // MARK: Search----------------------
@@ -61,7 +62,6 @@ public:
     void createAttackerOnRightLineCommand();
     void createBaseOnDownLine();
     void createAttackerOnDownLineCommand();
-    void poolAttackerOnBaseCommand();
 
     // pattern 3
     void assignRightLineCommand();
@@ -70,6 +70,10 @@ public:
     void createOneBaseOnEnemyAreaCommand();
     void createOneMoreBaseOnEnemyAreaCommand();
     void createAttackerOnBaseCommand();
+    bool firstCannonReleased;
+    void firstCannonCommand();
+    void primaryCannonCommand();
+    bool poolAttackerOnBaseCommand(int need);
 
     
     // pattern 1

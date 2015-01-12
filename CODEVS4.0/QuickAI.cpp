@@ -13,9 +13,15 @@ QuickAI::QuickAI(Game &game, Field &field, Player &player, Player &enemy) {
     QuickAI::field = &field;
     QuickAI::player = &player;
     QuickAI::enemy = &enemy;
+    
+    resetWithStage();
 }
 
 void QuickAI::resetWithTurn() {
+    commands.clear();
+}
+void QuickAI::resetWithStage() {
+    firstCannonReleased = false;
     commands.clear();
 }
 
@@ -421,11 +427,11 @@ void QuickAI::createAttackerOnDownLineCommand() {
         }
     }
 }
-void QuickAI::poolAttackerOnBaseCommand() {
+bool QuickAI::poolAttackerOnBaseCommand(int need) {
     map<int, PlayerUnit *>::iterator uPIte;
     map<int, PlayerUnit>::iterator uIte;
     
-    vector<pair<int, pair<PlayerUnit *, PlayerUnit *> > > distToBase; // <dist, <base, attacke>>
+    vector<pair<PlayerUnit *, PlayerUnit *> > poolPair; // <dist, <base, attacke>>
     map<int, int> attackerCount; // <baseID, attackerCount>
     for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
         PlayerUnit *base = &uIte->second;
@@ -433,9 +439,10 @@ void QuickAI::poolAttackerOnBaseCommand() {
             PlayerUnit *attacker = uPIte->second;
             
             int d = utl::dist(attacker->position, base->position);
-            distToBase.push_back(make_pair(d, make_pair(base, attacker)));
             
             if (d == 0) {
+                poolPair.push_back(make_pair(base, attacker));
+
                 if (attackerCount.find(base->ID) == attackerCount.end()) {
                     attackerCount[base->ID] = 1;
                 } else {
@@ -445,39 +452,30 @@ void QuickAI::poolAttackerOnBaseCommand() {
         }
     }
     
-    sort(distToBase.begin(), distToBase.end());
-    
     // lock attacker
-    int poolCount = 100;
     map<int, bool> isLockedBase; // <baseID, isLocked>
     map<int, int>::iterator aIte;
     for (aIte = attackerCount.begin(); aIte != attackerCount.end(); aIte++) {
-        if (aIte->second < poolCount) {
+        if (aIte->second < need) {
             isLockedBase[aIte->first] = true;
         } else {
             isLockedBase[aIte->first] = false;
+            // TODO: fix cannon release
+            return true; // release
         }
     }
     
-    vector<pair<int, pair<PlayerUnit *, PlayerUnit *> > >::iterator dIte;
-    for (dIte = distToBase.begin(); dIte != distToBase.end(); dIte++) {
+    vector<pair<PlayerUnit *, PlayerUnit *> >::iterator pIte;
+    for (pIte = poolPair.begin(); pIte != poolPair.end(); pIte++) {
 
-        int baseID = dIte->second.first->ID;
+        int baseID = pIte->first->ID;
         if (isLockedBase[baseID]) {
-            
-            PlayerUnit *attacker = dIte->second.second;
+            PlayerUnit *attacker = pIte->second;
             if (!attacker->isMovable()) continue;
-
-            if (dIte->first == 0) {
-                attacker->fixOnlyPosition();
-            } else {
-                PlayerUnitActionType at = attacker->moveToTargetAction(dIte->second.first->position);
-                Command com(attacker->ID, at);
-                addCommand(com);
-                attacker->fix(at);
-            }
+            attacker->fixOnlyPosition();
         }
     }
+    return false; // pooling
 }
 
 // MARK: pattern 3
@@ -678,6 +676,15 @@ void QuickAI::createAttackerOnBaseCommand() {
             base->fix(at);
         }
     }
+}
+
+void QuickAI::firstCannonCommand() {
+    if (poolAttackerOnBaseCommand(18)) {
+        firstCannonReleased = true;
+    }
+}
+void QuickAI::primaryCannonCommand() {
+    poolAttackerOnBaseCommand(100);
 }
 
 // MARK: pattern 2
