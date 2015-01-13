@@ -93,11 +93,11 @@ int main(int argc, const char * argv[]) {
         ai.searchUnkownFieldMediumCommand();
         
         // pool attack
-        if (ai.firstCannonReleased) {
+/*        if (ai.firstCannonReleased) {
             ai.primaryCannonCommand();
         } else {
             ai.firstCannonCommand();
-        }
+        }*/
         ai.attackCastleCommand();
         
         /*

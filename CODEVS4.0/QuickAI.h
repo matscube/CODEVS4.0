@@ -57,13 +57,7 @@ public:
     void searchUnkownFieldSmallCommand();
     void searchUnkownFieldMediumCommand();
 
-    // pattern 2
-    void createBaseOnRightLine();
-    void createAttackerOnRightLineCommand();
-    void createBaseOnDownLine();
-    void createAttackerOnDownLineCommand();
-
-    // pattern 3
+    // MARK: Back Attack
     void assignRightLineCommand();
     void assignDownLineCommand();
     int baseCountOnEnemyArea();
@@ -74,13 +68,8 @@ public:
     void firstCannonCommand();
     void primaryCannonCommand();
     bool poolAttackerOnBaseCommand(int need);
-
     
-    // pattern 1
-    vector<Position> createBaseOnLine();
-    void createBaseOnLineCommand();
-    void createAttackerOnLineCommand();
-    
+    // MARK: Search Castle
     vector<Position> searchEnemyCastleLine1();
     vector<Position> searchEnemyCastleLine2();
     vector<Position> searchEnemyCastleLine3();
@@ -88,7 +77,7 @@ public:
     vector<Position> searchEnemyCastleLine5();
     void searchEnemyCastleCommand();
     
-    
+    // MARK: Attack Castle
     void attackCastleCommand();
 
     // MARK: Resource
