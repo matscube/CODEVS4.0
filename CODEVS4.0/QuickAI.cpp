@@ -490,7 +490,7 @@ void QuickAI::firstCannonCommand() {
     }
 }
 void QuickAI::primaryCannonCommand() {
-    poolAttackerOnBaseCommand(100);
+    poolAttackerOnBaseCommand(40);
 }
 vector<Position> QuickAI::searchEnemyCastleLine1() {
     vector<Position> line;

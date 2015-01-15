@@ -98,6 +98,7 @@ int main(int argc, const char * argv[]) {
         } else {
             ai.firstCannonCommand();
         }*/
+        ai.primaryCannonCommand();
         ai.attackCastleCommand();
         
         /*
