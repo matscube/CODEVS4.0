@@ -57,6 +57,19 @@ int main(int argc, const char * argv[]) {
 //        ai.createBaseOnLineCommand();
 //        ai.createAttackerOnLineCommand();
         
+        // defend
+        int defendBaseCount = ai.baseCountOnDefendingArea();
+        if (game.currentTurn > 100 && defendBaseCount == 0) {
+            ai.createBaseOnDefendingAreaCommand();
+            ai.setNecessaryResource(500);
+        } else {
+            ai.releaseNecessaryResource();
+        }
+        if (defendBaseCount) {
+            ai.createDefenderOnBaseCommand();
+            ai.denendCastleCommand(30);
+        }
+        
         // create base
         ai.assignRightLineCommand();
         ai.assignDownLineCommand();

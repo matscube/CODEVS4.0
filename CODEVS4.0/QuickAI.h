@@ -36,6 +36,10 @@ public:
     void resetWithStage();
     vector<Command> getCommands();
     
+    // MARK: Cost Manager
+    void setNecessaryResource(int n);
+    void releaseNecessaryResource();
+    
     // MARK: Search----------------------
     void searchNoVisitedAreaCommand(vector<Position> area, int assign, map<PlayerUnitType, bool> types);
     map<PlayerUnitType, bool> allTypes();
@@ -77,6 +81,15 @@ public:
     vector<Position> searchEnemyCastleLine5();
     void searchEnemyCastleCommand();
     
+    // MARK: Defend Castle
+    int baseCountOnDefendingArea();
+    bool isDefendingBase(PlayerUnit *pUnit);
+    void createBaseOnDefendingAreaCommand();
+    void createDefenderOnBaseCommand();
+    
+    int castleDefenderCount();
+    void denendCastleCommand(int assign);
+    
     // MARK: Attack Castle
     void attackCastleCommand();
 
@@ -88,6 +101,9 @@ public:
     void supplyMovableWorkerWithCastle(int need);
     void supplyWorkerForSearchCommand(int need);
 
+    // MARK: Attacker
+    vector<PlayerUnitType> attackerTypesPack(int knight, int fighter, int assasin);
+    
     
     void debug();
     
