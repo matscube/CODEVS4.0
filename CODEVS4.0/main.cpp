@@ -35,8 +35,6 @@ int main(int argc, const char * argv[]) {
     QuickAI ai = QuickAI(game, field, player, enemy);
 
     while (true) {
-//        cerr << game.currentTurn << endl;
-        
         if (game.isNextStage(iOManager.inputStage())) {
             field.resetWithStage();
             player.resetWithStage();
@@ -53,73 +51,6 @@ int main(int argc, const char * argv[]) {
         
         // Mark: AI Commands **********************************************************
         
-        
-//        ai.createBaseOnLineCommand();
-//        ai.createAttackerOnLineCommand();
-        
-        // defend
-        int defendBaseCount = ai.baseCountOnDefendingArea();
-        if (game.currentTurn > 100 && defendBaseCount == 0) {
-            ai.createBaseOnDefendingAreaCommand();
-            ai.setNecessaryResource(500);
-        } else {
-            ai.releaseNecessaryResource();
-        }
-        if (defendBaseCount) {
-            ai.createDefenderOnBaseCommand();
-            ai.denendCastleCommand(30);
-        }
-        
-        // create base
-        ai.assignRightLineCommand();
-        ai.assignDownLineCommand();
-        int baseCount = ai.baseCountOnEnemyArea();
-        if (baseCount == 0) {
-            ai.createOneBaseOnEnemyAreaCommand();
-        } else if (baseCount == 1) {
-            ai.createOneMoreBaseOnEnemyAreaCommand();
-        }
-        
-        // search castle by attacker
-        ai.createAttackerOnBaseCommand();
-        ai.searchEnemyCastleCommand();
-        
-        
-/*        if (game.currentTurn > 60) {
-            ai.createAttackerOnRightLineCommand();
-            ai.createAttackerOnDownLineCommand();
-            ai.createBaseOnRightLine();
-            ai.createBaseOnDownLine();
-
-            ai.searchEnemyCastleCommand();
-        }*/
-
-        // get resource
-        ai.createVillageOnResourceCommand();
-        ai.searchUnkownFieldSmallCommand();
-        ai.fixResourceCommand();
-        
-        // supply worker
-        if (game.currentTurn > 50) {
-            ai.supplyWorkerForSearchCommand(8);
-        }
-        ai.searchUnkownFieldMediumCommand();
-        
-        // pool attack
-/*        if (ai.firstCannonReleased) {
-            ai.primaryCannonCommand();
-        } else {
-            ai.firstCannonCommand();
-        }*/
-        ai.primaryCannonCommand();
-        ai.attackCastleCommand();
-        
-        /*
-        if (game.currentTurn < 50) {
-            ai.supplyMovableWorkerWithCastle(6);
-        } else {
-            ai.supplyMovableWorkerWithCastle(7);
-        }*/
 
         // Output AI Commands
         iOManager.output(ai.getCommands());
