@@ -52,17 +52,24 @@ int main(int argc, const char * argv[]) {
         
         // Mark: AI Commands **********************************************************
         
-        cerr << "Resource Getting: " << game.currentTurn << " " << ai.calcResourceGetting() << endl;
+        cerr << "T: " << game.currentTurn << " ResGet" << ai.calcResourceGetting() << " Res" << player.resourceCount << endl;
 
-        if (ai.defenderVillageCount() == 0) {
+        Position rPos(30, 20);
+        Position dPos(20, 30);
+        if (ai.defenderVillageCount(rPos) == 0 || ai.defenderVillageCount(dPos) == 0) {
 //            cerr << "Step 1: Defender Village" << endl;
-            ai.createDefenderVillageCommand(1, 100);
-            ai.searchUnkownFieldSmallCommand(4);
+            ai.createDefenderVillageCommand(rPos, 1, 100);
+            ai.createDefenderVillageCommand(dPos, 1, 100);
+//            ai.supplyFreeWorkerWithCastleCommand(30, 100);
+            ai.searchUnkownFieldSmallCommand(INF);
+            ai.getResourceCommand(INF);
+
+//            ai.searchUnkownFieldSmallCommand(4);
         } else if (ai.calcResourceGetting() < 30) {
 //            cerr << "Step 2: Resource Getting" << endl;
-            ai.supplyFreeWorkerCommand(30, 100);
+            ai.supplyFreeWorkerWithVillageCommand(30, 100);
+            ai.searchUnkownFieldSmallCommand(INF);
             ai.getResourceCommand(INF);
-            ai.searchUnkownFieldMediumCommand(INF);
         }
         
 //        ai.searchUnkownFieldMediumCommand(INF);

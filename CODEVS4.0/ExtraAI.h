@@ -41,9 +41,9 @@ public:
     void addCommandCreateWorker(PlayerUnit *pUnit);
     
     // MARK: Defend
-    Position defenderVillagePosition = Position(30, 30);
-    int defenderVillageCount();
-    int createDefenderVillageCommand(int assign, int prob);
+//    Position defenderVillagePosition = Position(30, 20);
+    int defenderVillageCount(Position position);
+    int createDefenderVillageCommand(Position position, int assign, int prob);
     
     
     // MARK: Search
@@ -71,7 +71,8 @@ public:
     
     // MARK: Resource
     int calcResourceGetting();
-    int supplyFreeWorkerCommand(int need, int prob);
+    int supplyFreeWorkerWithCastleCommand(int need, int prob);
+    int supplyFreeWorkerWithVillageCommand(int need, int prob);
     void getResourceCommand(int assign);
 
     

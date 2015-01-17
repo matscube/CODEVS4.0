@@ -53,20 +53,21 @@ void ExtraAI::addCommandCreateWorker(PlayerUnit *pUnit) {
 }
 
 // MARK: Defend -----------------------------------------------------
-int ExtraAI::defenderVillageCount() {
+int ExtraAI::defenderVillageCount(Position position) {
     int count = 0;
     map<int, PlayerUnit>::iterator uIte;
     for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
         PlayerUnit *village = &uIte->second;
-        if (utl::dist(defenderVillagePosition, village->position) == 0) count++;
+        if (utl::dist(position, village->position) == 0) count++;
     }
     return count;
     
 }
 
-int ExtraAI::createDefenderVillageCommand(int assign, int prob) {
+int ExtraAI::createDefenderVillageCommand(Position position, int assign, int prob) {
     int create = 0;
     if (rand() % 100 >= prob) return create;
+    if (defenderVillageCount(position)) return create;
 
     map<int, PlayerUnit>::iterator uIte;
     vector<pair<int, PlayerUnit *> > workerDists; // <dist, worker>
@@ -74,7 +75,7 @@ int ExtraAI::createDefenderVillageCommand(int assign, int prob) {
         PlayerUnit *worker = &uIte->second;
         if (!worker->isMovable()) continue;
         
-        int d = utl::dist(defenderVillagePosition, worker->position);
+        int d = utl::dist(position, worker->position);
         workerDists.push_back(make_pair(d, worker));
         
     }
@@ -97,7 +98,7 @@ int ExtraAI::createDefenderVillageCommand(int assign, int prob) {
                 worker->fixOnlyPosition();
             }
         } else {
-            addCommandMove(worker, defenderVillagePosition);
+            addCommandMove(worker, position);
         }
         currentAssign++;
     }
@@ -271,6 +272,8 @@ map<PlayerUnitType, bool> ExtraAI::attackerTypes() {
 
 void ExtraAI::searchUnkownFieldSmallCommand(int assign) {
     int currentAssign = 0;
+//    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight4(), 1, allTypes());
+//    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight5(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight1(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight2(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight3(), 1, allTypes());
@@ -320,7 +323,19 @@ int ExtraAI::calcResourceGetting() {
     return resourceGetting;
 }
 
-int ExtraAI::supplyFreeWorkerCommand(int need, int prob) {
+int ExtraAI::supplyFreeWorkerWithCastleCommand(int need, int prob) {
+    int workerCount = player->calcWorkerCount();
+    int create = 0;
+    if (rand() % 100 >= prob) return create;
+    
+    PlayerUnit *castle = &player->castle;
+    if (workerCount >= need) return create;
+    if (!castle->isCreatableWorker()) return create;
+    addCommandCreateWorker(castle);
+
+    return create;
+}
+int ExtraAI::supplyFreeWorkerWithVillageCommand(int need, int prob) {
     int workerCount = player->calcWorkerCount();
     int create = 0;
     if (rand() % 100 >= prob) return create;
