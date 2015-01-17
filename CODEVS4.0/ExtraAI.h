@@ -38,14 +38,15 @@ public:
     // MARK: Basic Command
     void addCommandMove(PlayerUnit *pUnit, Position target);
     void addCommandCreateVillage(PlayerUnit *pUnit);
+    void addCommandCreateWorker(PlayerUnit *pUnit);
     
     // MARK: Defend
-    Position defenderVillagePosition = Position(40, 40);
+    Position defenderVillagePosition = Position(30, 30);
     int defenderVillageCount();
     int createDefenderVillageCommand(int assign, int prob);
     
     
-    // MARK: Search----------------------
+    // MARK: Search
     void searchNoVisitedAreaCommand(vector<Position> area, int assign, map<PlayerUnitType, bool> types);
     map<PlayerUnitType, bool> allTypes();
     map<PlayerUnitType, bool> workerTypes();
@@ -68,6 +69,11 @@ public:
     // MARK: Attacker
 //    vector<PlayerUnitType> attackerTypesPack(int knight, int fighter, int assasin);
     
+    // MARK: Resource
+    int calcResourceGetting();
+    int supplyFreeWorkerCommand(int need, int prob);
+    void getResourceCommand(int assign);
+
     
     // MARK: Debug
     void debug();

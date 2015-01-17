@@ -45,6 +45,12 @@ void ExtraAI::addCommandCreateVillage(PlayerUnit *pUnit) {
     addCommand(com);
     pUnit->fix(at);
 }
+void ExtraAI::addCommandCreateWorker(PlayerUnit *pUnit) {
+    PlayerUnitActionType at = PlayerUnitActionType::CreateWorker;
+    Command com(pUnit->ID, at);
+    addCommand(com);
+    pUnit->fix(at);
+}
 
 // MARK: Defend -----------------------------------------------------
 int ExtraAI::defenderVillageCount() {
@@ -78,6 +84,8 @@ int ExtraAI::createDefenderVillageCommand(int assign, int prob) {
     int currentAssign = 0;
     vector<pair<int, PlayerUnit *> >::iterator wIte;
     for (wIte = workerDists.begin(); wIte != workerDists.end(); wIte++) {
+        if (currentAssign >= assign) break;
+
         PlayerUnit *worker = wIte->second;
         int d = wIte->first;
         
@@ -91,8 +99,7 @@ int ExtraAI::createDefenderVillageCommand(int assign, int prob) {
         } else {
             addCommandMove(worker, defenderVillagePosition);
         }
-        
-        if (++currentAssign >= assign) break;
+        currentAssign++;
     }
     
     return create;
@@ -219,6 +226,8 @@ void ExtraAI::searchNoVisitedAreaCommand(vector<Position> area, int assign, map<
     int currentAssign = 0;
     vector<pair<int, pair<int, Position> > >::iterator dIte;
     for (dIte = dToLine.begin(); dIte != dToLine.end(); dIte++) {
+        if (currentAssign >= assign) break;
+
         PlayerUnit *pUnit = player->units[dIte->second.first];
         Position pos = dIte->second.second;
         
@@ -226,6 +235,7 @@ void ExtraAI::searchNoVisitedAreaCommand(vector<Position> area, int assign, map<
         if (field->willBeVisited[pos.first][pos.second]) continue;
         
         addCommandMove(pUnit, pos);
+        currentAssign++;
         
         for (viewRangeIte = viewRange.begin(); viewRangeIte != viewRange.end(); viewRangeIte++) {
             int x = pos.first + viewRangeIte->first;
@@ -233,8 +243,6 @@ void ExtraAI::searchNoVisitedAreaCommand(vector<Position> area, int assign, map<
             if (isValidIndex(Position(x, y)))
                 field->willBeVisited[x][y] = true;
         }
-        
-        if (++currentAssign >= assign) break;
     }
 }
 map<PlayerUnitType, bool> ExtraAI::allTypes() {
@@ -264,12 +272,12 @@ map<PlayerUnitType, bool> ExtraAI::attackerTypes() {
 void ExtraAI::searchUnkownFieldSmallCommand(int assign) {
     int currentAssign = 0;
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight1(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight2(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight3(), 1, allTypes());
-    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight5(), 1, allTypes());
     
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown1(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown2(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown3(), 1, allTypes());
-    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown5(), 1, allTypes());
     
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly(), 1, allTypes());
 }
@@ -288,6 +296,88 @@ void ExtraAI::searchUnkownFieldMediumCommand(int assign) {
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown5(), 1, allTypes());
     
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly(), 1, allTypes());
+}
+
+// MARK: Resource --------------------------------------------------------
+int ExtraAI::calcResourceGetting() {
+    int resourceGetting = 10;
+    map<int, int> workerCount; // <hashID, workerCount>
+    map<int, PlayerUnit>::iterator uIte;
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        int hashID = utl::getHashID(uIte->second.position.first, uIte->second.position.second);
+        if (field->resources.find(hashID) != field->resources.end()) {
+            if (workerCount.find(hashID) == workerCount.end()) {
+                resourceGetting++;
+                workerCount[hashID] = 1;
+            } else if (workerCount[hashID] < 5) {
+                resourceGetting++;
+                workerCount[hashID]++;
+            } else {
+                // no count
+            }
+        }
+    }
+    return resourceGetting;
+}
+
+int ExtraAI::supplyFreeWorkerCommand(int need, int prob) {
+    int workerCount = player->calcWorkerCount();
+    int create = 0;
+    if (rand() % 100 >= prob) return create;
+    
+    map<int, PlayerUnit>::iterator uIte;
+    for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
+        PlayerUnit *village = &uIte->second;
+        if (workerCount >= need) break;
+        if (!village->isCreatableWorker()) continue;
+        addCommandCreateWorker(village);
+        need--;
+        create++;
+    }
+    return create;
+}
+void ExtraAI::getResourceCommand(int assign) {
+    // calc worker count on resource
+    map<int, PlayerUnit>::iterator uIte;
+    map<int, FieldUnit>::iterator fIte;
+    vector<pair<int, pair<PlayerUnit *, Position> > > workerDists; // <d, <worker, target> >
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        PlayerUnit *worker = &uIte->second;
+        for (fIte = field->resources.begin(); fIte != field->resources.end(); fIte++) {
+            Position resPos = fIte->second.position;
+            int d = utl::dist(worker->position, resPos);
+            workerDists.push_back(make_pair(d, make_pair(worker, resPos)));
+        }
+    }
+    
+    sort(workerDists.begin(), workerDists.end());
+
+    int currentAssign = 0;
+    int workerCount[MAX_FIELD_CELL_COUNT] = {0}; // <hashID, worker cnt>
+    vector<pair<int, pair<PlayerUnit *, Position> > >::iterator wIte;
+    for (wIte = workerDists.begin(); wIte != workerDists.end(); wIte++) {
+        if (currentAssign >= assign) break;
+
+        int d = wIte->first;
+        PlayerUnit *worker = wIte->second.first;
+        Position target = wIte->second.second;
+        int hashID = utl::getHashID(target.first, target.second);
+        
+        if (workerCount[hashID] >= MAX_GETTING_RESOURCE) continue;
+        
+        if (d == 0) {
+            if (!worker->isMovable()) {
+                // no command
+            } else {
+                worker->fixOnlyPosition();
+            }
+        } else {
+            if (!worker->isMovable()) continue;
+            addCommandMove(worker, target);
+        }
+        workerCount[hashID]++;
+        currentAssign++;
+    }
 }
 
 // MARK: Debug --------------------------------------------------------
