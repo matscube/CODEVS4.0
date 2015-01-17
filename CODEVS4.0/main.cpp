@@ -15,6 +15,7 @@
 #include "Game.h"
 #include "AI.h"
 #include "QuickAI.h"
+#include "ExtraAI.h"
 #include "Library.h"
 
 using namespace std;
@@ -32,7 +33,7 @@ int main(int argc, const char * argv[]) {
     
     IOManager iOManager(game, field, player, enemy);
 
-    QuickAI ai = QuickAI(game, field, player, enemy);
+    ExtraAI ai = ExtraAI(game, field, player, enemy);
 
     while (true) {
         if (game.isNextStage(iOManager.inputStage())) {
@@ -50,6 +51,13 @@ int main(int argc, const char * argv[]) {
         ai.resetWithTurn();
         
         // Mark: AI Commands **********************************************************
+        
+        if (ai.defenderVillageCount() == 0) {
+            ai.createDefenderVillageCommand(1, 100);
+            ai.searchUnkownFieldSmallCommand(4);
+        }
+        
+        ai.searchUnkownFieldMediumCommand(INF);
         
 
         // Output AI Commands
