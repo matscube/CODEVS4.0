@@ -56,6 +56,7 @@ int main(int argc, const char * argv[]) {
 
 //        Position defendBasePos(30, 30);
         Position defendBasePos = player.castle.position;
+        Position rightBasePos = Position(99, 30);
         if (ai.calcResourceGetting() < 30) {
             ai.createVillageOnResourceCommand(INF, 100);
             ai.searchUnkownFieldSmallCommand(INF);
@@ -63,9 +64,17 @@ int main(int argc, const char * argv[]) {
         } else if (ai.defenderBaseCount(defendBasePos) == 0) {
             ai.createDefenderBaseCommand(defendBasePos, 1, 100);
             ai.searchUnkownFieldMediumCommand(INF);
-        } else {
-            ai.createCastleDefenderCommand(defendBasePos, 1, 70);
+        } else if (ai.defenderBaseCount(rightBasePos) == 0) {
+            ai.createCastleDefenderCommand(defendBasePos, 1, 50);
             ai.defendCastleCommand(30);
+
+            ai.createDefenderBaseCommand(rightBasePos, 1, 50);
+            ai.searchUnkownFieldMediumCommand(INF);
+        } else {
+            ai.createCastleDefenderCommand(defendBasePos, 1, 50);
+            ai.defendCastleCommand(30);
+
+            ai.createCastleDefenderCommand(rightBasePos, 1, 20);
             
             ai.createVillageOnResourceCommand(INF, 30);
             ai.searchUnkownFieldAllCommand(INF);
