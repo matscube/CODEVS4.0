@@ -45,6 +45,12 @@ void ExtraAI::addCommandCreateVillage(PlayerUnit *pUnit) {
     addCommand(com);
     pUnit->fix(at);
 }
+void ExtraAI::addCommandCreateBase(PlayerUnit *pUnit) {
+    PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+    Command com(pUnit->ID, at);
+    addCommand(com);
+    pUnit->fix(at);
+}
 void ExtraAI::addCommandCreateWorker(PlayerUnit *pUnit) {
     PlayerUnitActionType at = PlayerUnitActionType::CreateWorker;
     Command com(pUnit->ID, at);
@@ -53,21 +59,21 @@ void ExtraAI::addCommandCreateWorker(PlayerUnit *pUnit) {
 }
 
 // MARK: Defend -----------------------------------------------------
-int ExtraAI::defenderVillageCount(Position position) {
+int ExtraAI::defenderBaseCount(Position position) {
     int count = 0;
     map<int, PlayerUnit>::iterator uIte;
-    for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
-        PlayerUnit *village = &uIte->second;
-        if (utl::dist(position, village->position) == 0) count++;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        PlayerUnit *base = &uIte->second;
+        if (utl::dist(position, base->position) == 0) count++;
     }
     return count;
     
 }
 
-int ExtraAI::createDefenderVillageCommand(Position position, int assign, int prob) {
+int ExtraAI::createDefenderBaseCommand(Position position, int assign, int prob) {
     int create = 0;
     if (rand() % 100 >= prob) return create;
-    if (defenderVillageCount(position)) return create;
+    if (defenderBaseCount(position)) return create;
 
     map<int, PlayerUnit>::iterator uIte;
     vector<pair<int, PlayerUnit *> > workerDists; // <dist, worker>
@@ -91,8 +97,8 @@ int ExtraAI::createDefenderVillageCommand(Position position, int assign, int pro
         int d = wIte->first;
         
         if (d == 0) {
-            if (worker->isCreatableVillage()) {
-                addCommandCreateVillage(worker);
+            if (worker->isCreatableBase()) {
+                addCommandCreateBase(worker);
                 create++;
             } else {
                 worker->fixOnlyPosition();
@@ -272,8 +278,6 @@ map<PlayerUnitType, bool> ExtraAI::attackerTypes() {
 
 void ExtraAI::searchUnkownFieldSmallCommand(int assign) {
     int currentAssign = 0;
-//    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight4(), 1, allTypes());
-//    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight5(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight1(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight2(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight3(), 1, allTypes());
@@ -323,18 +327,115 @@ int ExtraAI::calcResourceGetting() {
     return resourceGetting;
 }
 
-int ExtraAI::supplyFreeWorkerWithCastleCommand(int need, int prob) {
-    int workerCount = player->calcWorkerCount();
+int ExtraAI::createVillageOnResourceCommand(int assign, int prob) {
     int create = 0;
     if (rand() % 100 >= prob) return create;
-    
-    PlayerUnit *castle = &player->castle;
-    if (workerCount >= need) return create;
-    if (!castle->isCreatableWorker()) return create;
-    addCommandCreateWorker(castle);
 
+    map<int, PlayerUnit>::iterator uIte;
+    map<int, bool> isVillage; // <hashID, exist>
+    for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
+        int hashID = uIte->second.getHashID();
+        isVillage[hashID] = true;
+    }
+    
+    // no village resource, assign worker
+    map<int, FieldUnit>::iterator resIte;
+    vector<pair<int, pair<int, int> > > dToRes; // <dist, <unitID, resID>>
+    for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
+        if (isVillage.find(resIte->second.hashID) != isVillage.end()) continue; // resource has village
+        
+        for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+            int d = utl::dist(uIte->second.position, resIte->second.position);
+            dToRes.push_back(make_pair(d, make_pair(uIte->second.ID, resIte->second.hashID)));
+        }
+    }
+    
+    sort(dToRes.begin(), dToRes.end());
+    
+    int currentAssign = 0;
+    vector<pair<int, pair<int, int> > >::iterator dIte;
+    map<int, bool> resWillHaveVillage; // <resID, villageOK>
+    for (dIte = dToRes.begin(); dIte != dToRes.end(); dIte++) {
+        if (currentAssign >= assign) break;
+        PlayerUnit *pUnit = &player->workers[dIte->second.first];
+        FieldUnit *res = &field->resources[dIte->second.second];
+        
+        if (resWillHaveVillage.find(res->hashID) != resWillHaveVillage.end()) continue;
+        
+        if (dIte->first == 0) {
+            if (!pUnit->isCreatableVillage()) {
+                pUnit->fixOnlyPosition(); // wait
+                resWillHaveVillage[res->hashID] = true;
+                continue;
+            }
+            // create village
+            addCommandCreateVillage(pUnit);
+            create++;
+            resWillHaveVillage[res->hashID] = true;
+        } else {
+            if (!pUnit->isMovable()) continue;
+            // move to village
+            addCommandMove(pUnit, res->position);
+            resWillHaveVillage[res->hashID] = true;
+        }
+        currentAssign++;
+    }
     return create;
 }
+
+int ExtraAI::getResourceCommand(int prob) {
+    int create = 0;
+    if (rand() % 100 >= prob) return create;
+
+    // calc worker count on resource
+    map<int, int> workerCount; // <hashID, worker cnt>
+    map<int, PlayerUnit>::iterator uIte;
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        int hashID = uIte->second.getHashID();
+        if (workerCount.find(hashID) == workerCount.end()) {
+            workerCount[hashID] = 1;
+        } else {
+            workerCount[hashID]++;
+        }
+    }
+    
+    // create worker on village/resource
+    map<int, FieldUnit>::iterator resIte;
+    for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
+        int hashID = uIte->second.getHashID();
+        int count = 0;
+        if (workerCount.find(hashID) != workerCount.end()) {
+            count = workerCount[hashID];
+        }
+        
+        if (count < MAX_GETTING_RESOURCE) {
+            if (!uIte->second.isCreatableWorker()) continue;
+            addCommandCreateWorker(&uIte->second);
+            create++;
+        }
+    }
+    
+    // fix worker on vilalge/resource
+    map<int, int> fixedWorkerCount; // <res hashID, worker cnt>
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        int hashID = uIte->second.getHashID();
+        if (field->resources.find(hashID) != field->resources.end()) {
+            
+            if (fixedWorkerCount.find(hashID) == fixedWorkerCount.end()) {
+                fixedWorkerCount[hashID] = 1;
+                uIte->second.fixOnlyPosition();
+            } else {
+                if (fixedWorkerCount[hashID] < MAX_GETTING_RESOURCE) {
+                    fixedWorkerCount[hashID]++;
+                    uIte->second.fixOnlyPosition();
+                }
+            }
+        }
+    }
+    return create;
+}
+
+// MARK: temp --------------------------------------------------------
 int ExtraAI::supplyFreeWorkerWithVillageCommand(int need, int prob) {
     int workerCount = player->calcWorkerCount();
     int create = 0;
@@ -351,49 +452,7 @@ int ExtraAI::supplyFreeWorkerWithVillageCommand(int need, int prob) {
     }
     return create;
 }
-void ExtraAI::getResourceCommand(int assign) {
-    // calc worker count on resource
-    map<int, PlayerUnit>::iterator uIte;
-    map<int, FieldUnit>::iterator fIte;
-    vector<pair<int, pair<PlayerUnit *, Position> > > workerDists; // <d, <worker, target> >
-    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
-        PlayerUnit *worker = &uIte->second;
-        for (fIte = field->resources.begin(); fIte != field->resources.end(); fIte++) {
-            Position resPos = fIte->second.position;
-            int d = utl::dist(worker->position, resPos);
-            workerDists.push_back(make_pair(d, make_pair(worker, resPos)));
-        }
-    }
-    
-    sort(workerDists.begin(), workerDists.end());
 
-    int currentAssign = 0;
-    int workerCount[MAX_FIELD_CELL_COUNT] = {0}; // <hashID, worker cnt>
-    vector<pair<int, pair<PlayerUnit *, Position> > >::iterator wIte;
-    for (wIte = workerDists.begin(); wIte != workerDists.end(); wIte++) {
-        if (currentAssign >= assign) break;
-
-        int d = wIte->first;
-        PlayerUnit *worker = wIte->second.first;
-        Position target = wIte->second.second;
-        int hashID = utl::getHashID(target.first, target.second);
-        
-        if (workerCount[hashID] >= MAX_GETTING_RESOURCE) continue;
-        
-        if (d == 0) {
-            if (!worker->isMovable()) {
-                // no command
-            } else {
-                worker->fixOnlyPosition();
-            }
-        } else {
-            if (!worker->isMovable()) continue;
-            addCommandMove(worker, target);
-        }
-        workerCount[hashID]++;
-        currentAssign++;
-    }
-}
 
 // MARK: Debug --------------------------------------------------------
 void ExtraAI::debug() {

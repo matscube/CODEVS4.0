@@ -38,12 +38,12 @@ public:
     // MARK: Basic Command
     void addCommandMove(PlayerUnit *pUnit, Position target);
     void addCommandCreateVillage(PlayerUnit *pUnit);
+    void addCommandCreateBase(PlayerUnit *pUnit);
     void addCommandCreateWorker(PlayerUnit *pUnit);
     
     // MARK: Defend
-//    Position defenderVillagePosition = Position(30, 20);
-    int defenderVillageCount(Position position);
-    int createDefenderVillageCommand(Position position, int assign, int prob);
+    int defenderBaseCount(Position position);
+    int createDefenderBaseCommand(Position position, int assign, int prob);
     
     
     // MARK: Search
@@ -71,10 +71,11 @@ public:
     
     // MARK: Resource
     int calcResourceGetting();
-    int supplyFreeWorkerWithCastleCommand(int need, int prob);
-    int supplyFreeWorkerWithVillageCommand(int need, int prob);
-    void getResourceCommand(int assign);
+    int createVillageOnResourceCommand(int assign, int prob);
+    int getResourceCommand(int prob);
 
+    // MARK: temp
+    int supplyFreeWorkerWithVillageCommand(int need, int prob);
     
     // MARK: Debug
     void debug();
