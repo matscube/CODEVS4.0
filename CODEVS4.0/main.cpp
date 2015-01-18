@@ -54,10 +54,9 @@ int main(int argc, const char * argv[]) {
         
         cerr << "T: " << game.currentTurn << " ResGet" << ai.calcResourceGetting() << " Res" << player.resourceCount << endl;
 
-        Position defendBasePos(30, 30);
+//        Position defendBasePos(30, 30);
+        Position defendBasePos = player.castle.position;
         if (ai.calcResourceGetting() < 30) {
-//            cerr << "Step 2: Resource Getting" << endl;
-//            ai.supplyFreeWorkerWithVillageCommand(30, 100);
             ai.createVillageOnResourceCommand(INF, 100);
             ai.searchUnkownFieldSmallCommand(INF);
             ai.getResourceCommand(INF);
@@ -65,7 +64,12 @@ int main(int argc, const char * argv[]) {
             ai.createDefenderBaseCommand(defendBasePos, 1, 100);
             ai.searchUnkownFieldMediumCommand(INF);
         } else {
+            ai.createCastleDefenderCommand(defendBasePos, 1, 70);
+            ai.defendCastleCommand(30);
             
+            ai.createVillageOnResourceCommand(INF, 30);
+            ai.searchUnkownFieldAllCommand(INF);
+            ai.getResourceCommand(INF);
         }
         
 //        ai.searchUnkownFieldMediumCommand(INF);

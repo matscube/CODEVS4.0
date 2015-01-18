@@ -57,6 +57,12 @@ void ExtraAI::addCommandCreateWorker(PlayerUnit *pUnit) {
     addCommand(com);
     pUnit->fix(at);
 }
+void ExtraAI::addCommandCreateAttacker(PlayerUnit *pUnit, PlayerUnitType unitType) {
+    PlayerUnitActionType at = CreateAttackerAction(unitType);
+    Command com(pUnit->ID, at);
+    addCommand(com);
+    pUnit->fix(at);
+}
 
 // MARK: Defend -----------------------------------------------------
 int ExtraAI::defenderBaseCount(Position position) {
@@ -111,6 +117,61 @@ int ExtraAI::createDefenderBaseCommand(Position position, int assign, int prob) 
     
     return create;
 }
+int ExtraAI::createCastleDefenderCommand(Position position, int assign, int prob) {
+    int create = 0;
+    if (rand() % 100 >= prob) return create;
+    
+    vector<PlayerUnitType> attackerTypes = attackerTypesPack(0, 60, 40);
+    
+    int currentAssign = 0;
+    map<int, PlayerUnit>::iterator uIte;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        if (currentAssign >= assign) break;
+        
+        PlayerUnit *base = &uIte->second;
+        if (utl::dist(base->position, position) != 0) continue;
+
+        PlayerUnitType type = attackerTypes[rand() % 100];
+        if (!base->isCreatableAttacker(type)) continue;
+        addCommandCreateAttacker(base, type);
+        create++;
+        currentAssign++;
+    }
+    
+    return create;
+}
+
+void ExtraAI::defendCastleCommand(int assign) {
+    Position target = player->castle.position;
+    map<int, PlayerUnit *>::iterator uIte;
+    vector<pair<int, PlayerUnit *> > attackerDists; // <d, attaker>
+    for (uIte = player->attackers.begin(); uIte != player->attackers.end(); uIte++) {
+        PlayerUnit *attacker = uIte->second;
+        int d = utl::dist(attacker->position, target);
+
+        attackerDists.push_back(make_pair(d, attacker));
+    }
+    
+    sort(attackerDists.begin(), attackerDists.end());
+    
+    int currentAssign = 0;
+    vector<pair<int, PlayerUnit *> >::iterator aIte;
+    for (aIte = attackerDists.begin(); aIte != attackerDists.end(); aIte++) {
+        if (currentAssign >= assign) break;
+        int d = aIte->first;
+        PlayerUnit *attacker = aIte->second;
+        
+        if (d == 0) {
+            if (!attacker->isMovable()) continue;
+            attacker->fixOnlyPosition();
+            currentAssign++;
+        } else {
+            if (!attacker->isMovable()) continue;
+            addCommandMove(attacker, target);
+            currentAssign++;
+        }
+    }
+}
 
 // MARK: Search -------------------------------------------------------
 vector<Position> ExtraAI::searchLineToRight1() {
@@ -149,6 +210,46 @@ vector<Position> ExtraAI::searchLineToRight5() {
     vector<Position> line;
     for (int x = 40; x < MAX_FIELD_WIDTH; x++) {
         Position p(x, 40);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineToRight6() {
+    vector<Position> line;
+    for (int x = 45; x < MAX_FIELD_WIDTH; x++) {
+        Position p(x, 49);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineToRight7() {
+    vector<Position> line;
+    for (int x = 54; x < MAX_FIELD_WIDTH; x++) {
+        Position p(x, 58);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineToRight8() {
+    vector<Position> line;
+    for (int x = 63; x < MAX_FIELD_WIDTH; x++) {
+        Position p(x, 67);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineToRight9() {
+    vector<Position> line;
+    for (int x = 72; x < MAX_FIELD_WIDTH; x++) {
+        Position p(x, 76);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineToRight10() {
+    vector<Position> line;
+    for (int x = 81; x < MAX_FIELD_WIDTH; x++) {
+        Position p(x, 85);
         line.push_back(p);
     }
     return line;
@@ -193,10 +294,75 @@ vector<Position> ExtraAI::searchLineToDown5() {
     }
     return line;
 }
-vector<Position> ExtraAI::searchLineAlly() {
+vector<Position> ExtraAI::searchLineToDown6() {
+    vector<Position> line;
+    for (int y = 45; y < MAX_FIELD_HEIGHT; y++) {
+        Position p(49, y);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineToDown7() {
+    vector<Position> line;
+    for (int y = 54; y < MAX_FIELD_HEIGHT; y++) {
+        Position p(58, y);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineToDown8() {
+    vector<Position> line;
+    for (int y = 63; y < MAX_FIELD_HEIGHT; y++) {
+        Position p(67, y);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineToDown9() {
+    vector<Position> line;
+    for (int y = 72; y < MAX_FIELD_HEIGHT; y++) {
+        Position p(76, y);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineToDown10() {
+    vector<Position> line;
+    for (int y = 81; y < MAX_FIELD_HEIGHT; y++) {
+        Position p(85, y);
+        line.push_back(p);
+    }
+    return line;
+}
+
+vector<Position> ExtraAI::searchLineAlly1() {
     vector<Position> line;
     for (int x = 0; x < 40; x++) {
         Position p(x, 4);
+        line.push_back(p);
+    }
+    for (int y = 9; y < 40; y++) {
+        Position p(4, y);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchLineAlly2() {
+    vector<Position> line;
+    for (int x = 0; x < 40; x++) {
+        Position p(x, 4);
+        line.push_back(p);
+    }
+    for (int x = 10; x < 40; x++) {
+        Position p(x, 13);
+        line.push_back(p);
+    }
+    for (int x = 10; x < 40; x++) {
+        Position p(x, 22);
+        line.push_back(p);
+    }
+    for (int x = 10; x < 40; x++) {
+        Position p(x, 31);
         line.push_back(p);
     }
     for (int y = 9; y < 40; y++) {
@@ -286,7 +452,7 @@ void ExtraAI::searchUnkownFieldSmallCommand(int assign) {
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown2(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown3(), 1, allTypes());
     
-    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly1(), 1, allTypes());
 }
 void ExtraAI::searchUnkownFieldMediumCommand(int assign) {
     int currentAssign = 0;
@@ -302,8 +468,46 @@ void ExtraAI::searchUnkownFieldMediumCommand(int assign) {
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown4(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown5(), 1, allTypes());
     
-    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly1(), 1, allTypes());
 }
+void ExtraAI::searchUnkownFieldAllCommand(int assign) {
+    int currentAssign = 0;
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight1(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight2(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight3(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight4(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight5(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight6(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight7(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight8(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight9(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight10(), 1, allTypes());
+    
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown1(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown2(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown3(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown4(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown5(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown6(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown7(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown8(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown9(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown10(), 1, allTypes());
+    
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly1(), 1, allTypes());
+//    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly2(), 1, allTypes());
+}
+
+// MARK: Attacker --------------------------------------------------------
+vector<PlayerUnitType> ExtraAI::attackerTypesPack(int knight, int fighter, int assasin) {
+    vector<PlayerUnitType> types;
+    for (int i = 0; i < knight; i++) types.push_back(PlayerUnitType::Knight);
+    for (int i = 0; i < fighter; i++) types.push_back(PlayerUnitType::Fighter);
+    for (int i = 0; i < assasin; i++) types.push_back(PlayerUnitType::Assassin);
+    return types;
+}
+
+
 
 // MARK: Resource --------------------------------------------------------
 int ExtraAI::calcResourceGetting() {
@@ -329,7 +533,6 @@ int ExtraAI::calcResourceGetting() {
 
 int ExtraAI::createVillageOnResourceCommand(int assign, int prob) {
     int create = 0;
-    if (rand() % 100 >= prob) return create;
 
     map<int, PlayerUnit>::iterator uIte;
     map<int, bool> isVillage; // <hashID, exist>
@@ -369,8 +572,12 @@ int ExtraAI::createVillageOnResourceCommand(int assign, int prob) {
                 continue;
             }
             // create village
-            addCommandCreateVillage(pUnit);
-            create++;
+            if (rand() % 100 < prob) {
+                addCommandCreateVillage(pUnit);
+                create++;
+            } else {
+                pUnit->fixOnlyPosition();
+            }
             resWillHaveVillage[res->hashID] = true;
         } else {
             if (!pUnit->isMovable()) continue;

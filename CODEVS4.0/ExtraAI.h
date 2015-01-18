@@ -40,10 +40,14 @@ public:
     void addCommandCreateVillage(PlayerUnit *pUnit);
     void addCommandCreateBase(PlayerUnit *pUnit);
     void addCommandCreateWorker(PlayerUnit *pUnit);
+    void addCommandCreateAttacker(PlayerUnit *pUnit, PlayerUnitType unitType);
+//    void moveCommand(Position target, vector<PlayerUnitType> types, int assign)
     
     // MARK: Defend
     int defenderBaseCount(Position position);
     int createDefenderBaseCommand(Position position, int assign, int prob);
+    int createCastleDefenderCommand(Position position, int assign, int prob);
+    void defendCastleCommand(int assign); // moveCommand
     
     
     // MARK: Search
@@ -56,18 +60,30 @@ public:
     vector<Position> searchLineToRight3();
     vector<Position> searchLineToRight4();
     vector<Position> searchLineToRight5();
+    vector<Position> searchLineToRight6();
+    vector<Position> searchLineToRight7();
+    vector<Position> searchLineToRight8();
+    vector<Position> searchLineToRight9();
+    vector<Position> searchLineToRight10();
     vector<Position> searchLineToDown1();
     vector<Position> searchLineToDown2();
     vector<Position> searchLineToDown3();
     vector<Position> searchLineToDown4();
     vector<Position> searchLineToDown5();
-    vector<Position> searchLineAlly();
+    vector<Position> searchLineToDown6();
+    vector<Position> searchLineToDown7();
+    vector<Position> searchLineToDown8();
+    vector<Position> searchLineToDown9();
+    vector<Position> searchLineToDown10();
+    vector<Position> searchLineAlly1();
+    vector<Position> searchLineAlly2();
     void searchUnkownFieldSmallCommand(int assign);
     void searchUnkownFieldMediumCommand(int assign);
+    void searchUnkownFieldAllCommand(int assign);
     
     
     // MARK: Attacker
-//    vector<PlayerUnitType> attackerTypesPack(int knight, int fighter, int assasin);
+    vector<PlayerUnitType> attackerTypesPack(int knight, int fighter, int assasin);
     
     // MARK: Resource
     int calcResourceGetting();
