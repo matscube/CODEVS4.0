@@ -118,7 +118,7 @@ void IOManager::inputBody() {
         int resourcePosY = nextInt();
         int resourcePosX = nextInt();
 
-        FieldUnit unit = FieldUnit(Position(resourcePosX, resourcePosY), FieldUnitType::Resource);
+        FieldUnit unit = FieldUnit(Position(resourcePosX, resourcePosY));
         field->updateStatusWithFieldUnit(unit);
     }
     

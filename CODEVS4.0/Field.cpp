@@ -51,9 +51,8 @@ int Field::calcVisited() {
 }
 
 FieldUnit::FieldUnit() {}
-FieldUnit::FieldUnit(Position position, FieldUnitType type) {
+FieldUnit::FieldUnit(Position position) {
     FieldUnit::position = position;
-    FieldUnit::type = type;
     FieldUnit::occupancy = 0;
     FieldUnit::hashID = getHashID(position);
 }
@@ -104,10 +103,8 @@ void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
 }
 
 void Field::updateStatusWithFieldUnit(FieldUnit fieldUnit) {
-    if (fieldUnit.type == FieldUnitType::Resource) {
-        if (resources.find(fieldUnit.hashID) == resources.end()) {
-            resources[fieldUnit.hashID] = fieldUnit;
-        }
+    if (resources.find(fieldUnit.hashID) == resources.end()) {
+        resources[fieldUnit.hashID] = fieldUnit;
     }
 }
 

@@ -29,18 +29,13 @@ typedef pair<int, int> Position;
 
 bool isValidIndex(Position p);
 
-enum class FieldUnitType {
-    Resource,
-};
-
 class FieldUnit {
 public:
     Position position;
     int hashID;
     int occupancy;
-    FieldUnitType type;
     FieldUnit();
-    FieldUnit(Position position, FieldUnitType type);
+    FieldUnit(Position position);
     static int getHashID(Position position);
 };
 
