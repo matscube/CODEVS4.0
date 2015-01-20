@@ -34,6 +34,13 @@ void QuickAI::addCommand(Command newCommand) {
 void QuickAI::addCommands(vector<Command> newCommands) {
     commands.insert(commands.end(), newCommands.begin(), newCommands.end());
 }
+// MARK: Cost Manager
+void QuickAI::setNecessaryResource(int n) {
+    player->necessaryResourceCount = n;
+}
+void QuickAI::releaseNecessaryResource() {
+    player->necessaryResourceCount = 0;
+}
 
 // MARK: Search-----------------------
 
@@ -284,7 +291,7 @@ bool QuickAI::poolAttackerOnBaseCommand(int need) {
     return false; // pooling
 }
 
-// MARK: pattern 3
+// MARK: Back Attack
 void QuickAI::assignRightLineCommand() {
     map<int, PlayerUnit>::iterator uIte;
     PlayerUnit *pUnit = nullptr;
@@ -463,10 +470,7 @@ void QuickAI::createOneMoreBaseOnEnemyAreaCommand() {
 }
 
 void QuickAI::createAttackerOnBaseCommand() {
-    vector<PlayerUnitType> types;
-    for (int i = 0; i < 10; i++) types.push_back(PlayerUnitType::Knight);
-    for (int i = 0; i < 50; i++) types.push_back(PlayerUnitType::Fighter);
-    for (int i = 0; i < 40; i++) types.push_back(PlayerUnitType::Assassin);
+    vector<PlayerUnitType> types = attackerTypesPack(10, 50, 40);
     
     map<int, PlayerUnit>::iterator uIte;
     for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
@@ -490,8 +494,10 @@ void QuickAI::firstCannonCommand() {
     }
 }
 void QuickAI::primaryCannonCommand() {
-    poolAttackerOnBaseCommand(100);
+    poolAttackerOnBaseCommand(40);
 }
+
+// MARK: Search Castle
 vector<Position> QuickAI::searchEnemyCastleLine1() {
     vector<Position> line;
     for (int y = 59; y < MAX_FIELD_HEIGHT; y++) {
@@ -542,6 +548,131 @@ void QuickAI::searchEnemyCastleCommand() {
     searchNoVisitedAreaCommand(searchEnemyCastleLine5(), 1, assasinType);
 }
 
+// MARK: Defend Castle
+int QuickAI::baseCountOnDefendingArea() {
+    int count = 0;
+    map<int, PlayerUnit>::iterator uIte;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        int x = uIte->second.position.first;
+        int y = uIte->second.position.second;
+        if (x < 40 && y < 40) count++;
+    }
+    return count;
+}
+bool QuickAI::isDefendingBase(PlayerUnit *pUnit) {
+    if (pUnit->type != PlayerUnitType::Base) return false;
+    int x = pUnit->position.first;
+    int y = pUnit->position.second;
+    if (x < 40 && y < 40) return true;
+    else return false;
+}
+void QuickAI::createBaseOnDefendingAreaCommand() {
+    Position target = Position(20, 20);
+    map<int, PlayerUnit>::iterator uIte;
+    vector<pair<int, PlayerUnit *> > workers; // <dist, worker>
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        PlayerUnit *worker = &uIte->second;
+        int d = utl::dist(worker->position, target);
+        workers.push_back(make_pair(d, worker));
+    }
+    
+    sort(workers.begin(), workers.end());
+    
+    vector<pair<int, PlayerUnit *> >::iterator wIte;
+    for (wIte = workers.begin(); wIte != workers.end(); wIte++) {
+        int d = wIte->first;
+        PlayerUnit *worker = wIte->second;
+        if (d == 0) {
+            if (!worker->isMovable()) continue;
+            else if (!worker->isCreatableBase()) {
+                worker->fixOnlyPosition();
+                break;
+            }
+            PlayerUnitActionType at = PlayerUnitActionType::CreateBase;
+            Command com(worker->ID, at);
+            addCommand(com);
+            worker->fix(at);
+            break;
+        } else {
+            if (!worker->isMovable()) continue;
+            PlayerUnitActionType at = worker->moveToTargetAction(target);
+            Command com(worker->ID, at);
+            addCommand(com);
+            worker->fix(at);
+            break;
+        }
+    }
+}
+void QuickAI::createDefenderOnBaseCommand() {
+    vector<PlayerUnitType> types = attackerTypesPack(20, 50, 30);
+    map<int, PlayerUnit>::iterator uIte;
+    for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
+        PlayerUnit *base = &uIte->second;
+        if (!isDefendingBase(base)) continue;
+        
+        PlayerUnitType ut = types[rand() % 100];
+        if (!base->isCreatableAttacker(ut)) continue;
+        PlayerUnitActionType at = CreateAttackerAction(ut);
+        Command com(base->ID, at);
+        addCommand(com);
+        base->fix(at);
+    }
+}
+
+int QuickAI::castleDefenderCount() {
+    int count = 0;
+    PlayerUnit *castle = &player->castle;
+    map<int, PlayerUnit *>::iterator uPIte;
+    for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
+        PlayerUnit *attacker = uPIte->second;
+        int d = utl::dist(attacker->position, castle->position);
+        if (d <= 2) count++;
+    }
+    return count;
+}
+
+void QuickAI::denendCastleCommand(int assign) {
+    PlayerUnit *castle = &player->castle;
+    vector<Position> targets;
+    targets.push_back(castle->position);
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            int x = castle->position.first + dx;
+            int y = castle->position.second + dy;
+            x = max(0, min(x, MAX_FIELD_WIDTH - 1));
+            y = max(0, min(y, MAX_FIELD_HEIGHT - 1));
+            targets.push_back(Position(x, y));
+        }
+    }
+    int targetCount = (int)targets.size();
+    
+    map<int, PlayerUnit *>::iterator uPIte;
+    vector<pair<int, pair<PlayerUnit *, Position> > > attackers; // <dist, <attacker, target> >
+    for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
+        PlayerUnit *attacker = uPIte->second;
+        Position target = targets[rand() % targetCount];
+        int d = utl::dist(attacker->position, target);
+        attackers.push_back(make_pair(d, make_pair(attacker, target)));
+    }
+    
+    sort(attackers.begin(), attackers.end());
+    
+    int currentCount = 0;
+    vector<pair<int, pair<PlayerUnit *, Position> > >::iterator aIte;
+    for (aIte = attackers.begin(); aIte != attackers.end(); aIte++) {
+        PlayerUnit *attacker = aIte->second.first;
+        Position target = aIte->second.second;
+        if (!attacker->isMovable()) continue;
+        PlayerUnitActionType at = attacker->moveToTargetAction(target);
+        Command com(attacker->ID, at);
+        addCommand(com);
+        attacker->fix(at);
+        
+        if (++currentCount >= assign) break;
+    }
+}
+
+// MARK: Attack Castle
 void QuickAI::attackCastleCommand() {
     Position target = enemy->castle.position;
 
@@ -725,6 +856,14 @@ void QuickAI::supplyWorkerForSearchCommand(int need) {
             need--;
         }
     }
+}
+
+vector<PlayerUnitType> QuickAI::attackerTypesPack(int knight, int fighter, int assasin) {
+    vector<PlayerUnitType> types;
+    for (int i = 0; i < knight; i++) types.push_back(PlayerUnitType::Knight);
+    for (int i = 0; i < fighter; i++) types.push_back(PlayerUnitType::Fighter);
+    for (int i = 0; i < assasin; i++) types.push_back(PlayerUnitType::Assassin);
+    return types;
 }
 
 void QuickAI::debug() {

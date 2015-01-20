@@ -15,6 +15,7 @@
 #include "Game.h"
 #include "AI.h"
 #include "QuickAI.h"
+#include "ExtraAI.h"
 #include "Library.h"
 
 using namespace std;
@@ -32,11 +33,9 @@ int main(int argc, const char * argv[]) {
     
     IOManager iOManager(game, field, player, enemy);
 
-    QuickAI ai = QuickAI(game, field, player, enemy);
+    ExtraAI ai = ExtraAI(game, field, player, enemy);
 
     while (true) {
-//        cerr << game.currentTurn << endl;
-        
         if (game.isNextStage(iOManager.inputStage())) {
             field.resetWithStage();
             player.resetWithStage();
@@ -53,59 +52,37 @@ int main(int argc, const char * argv[]) {
         
         // Mark: AI Commands **********************************************************
         
-        
-//        ai.createBaseOnLineCommand();
-//        ai.createAttackerOnLineCommand();
-        
-        // create base
-        ai.assignRightLineCommand();
-        ai.assignDownLineCommand();
-        int baseCount = ai.baseCountOnEnemyArea();
-        if (baseCount == 0) {
-            ai.createOneBaseOnEnemyAreaCommand();
-        } else if (baseCount == 1) {
-            ai.createOneMoreBaseOnEnemyAreaCommand();
+        cerr << "T: " << game.currentTurn << " ResGet" << ai.calcResourceGetting() << " Res" << player.resourceCount << endl;
+
+//        Position defendBasePos(30, 30);
+        Position defendBasePos = player.castle.position;
+        Position rightBasePos = Position(99, 30);
+        if (ai.calcResourceGetting() < 30) {
+            ai.createVillageOnResourceCommand(INF, 100);
+            ai.searchUnkownFieldSmallCommand(INF);
+            ai.getResourceCommand(INF);
+        } else if (ai.defenderBaseCount(defendBasePos) == 0) {
+            ai.createDefenderBaseCommand(defendBasePos, 1, 100);
+            ai.searchUnkownFieldMediumCommand(INF);
+        } else if (ai.defenderBaseCount(rightBasePos) == 0) {
+            ai.createCastleDefenderCommand(defendBasePos, 1, 50);
+            ai.defendCastleCommand(30);
+
+            ai.createDefenderBaseCommand(rightBasePos, 1, 50);
+            ai.searchUnkownFieldMediumCommand(INF);
+        } else {
+            ai.createCastleDefenderCommand(defendBasePos, 1, 50);
+            ai.defendCastleCommand(30);
+
+            ai.createCastleDefenderCommand(rightBasePos, 1, 20);
+            
+            ai.createVillageOnResourceCommand(INF, 30);
+            ai.searchUnkownFieldAllCommand(INF);
+            ai.getResourceCommand(INF);
         }
         
-        // search castle by attacker
-        ai.createAttackerOnBaseCommand();
-        ai.searchEnemyCastleCommand();
+//        ai.searchUnkownFieldMediumCommand(INF);
         
-        
-/*        if (game.currentTurn > 60) {
-            ai.createAttackerOnRightLineCommand();
-            ai.createAttackerOnDownLineCommand();
-            ai.createBaseOnRightLine();
-            ai.createBaseOnDownLine();
-
-            ai.searchEnemyCastleCommand();
-        }*/
-
-        // get resource
-        ai.createVillageOnResourceCommand();
-        ai.searchUnkownFieldSmallCommand();
-        ai.fixResourceCommand();
-        
-        // supply worker
-        if (game.currentTurn > 50) {
-            ai.supplyWorkerForSearchCommand(8);
-        }
-        ai.searchUnkownFieldMediumCommand();
-        
-        // pool attack
-/*        if (ai.firstCannonReleased) {
-            ai.primaryCannonCommand();
-        } else {
-            ai.firstCannonCommand();
-        }*/
-        ai.attackCastleCommand();
-        
-        /*
-        if (game.currentTurn < 50) {
-            ai.supplyMovableWorkerWithCastle(6);
-        } else {
-            ai.supplyMovableWorkerWithCastle(7);
-        }*/
 
         // Output AI Commands
         iOManager.output(ai.getCommands());

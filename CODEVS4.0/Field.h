@@ -65,24 +65,28 @@ public:
     void resetWithStage();
 
     // TODO: status unuesd?
+    // MARK: Visited Status
     FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
-    int calcVisited();
     map<int, Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
 //    vector<Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
 
+    // MARK: Resource status
     map<int, FieldUnit> resources;
     int allyWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     int reservedWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    
 
     void resetStatusWithTurn();
     void updateStatusWithAllyUnit(PlayerUnit playerUnit);
     void updateStatusWithFieldUnit(FieldUnit fieldUnit);
     void updateWithPlayerUnit(PlayerUnit *playerUnit);
     
+    // MARK: count
+    int calcVisited();
 };
 
 #endif /* defined(__CODEVS4_0__Field__) */
