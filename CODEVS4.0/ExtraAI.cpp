@@ -641,6 +641,19 @@ int ExtraAI::getResourceCommand(int prob) {
     }
     return create;
 }
+void ExtraAI::defendResourceCommand(int assign) {
+    
+    
+    vector<pair<int, pair<PlayerUnit *, Position> > > attackerDists; // <d, <unit, pos> >
+    map<int, PlayerUnit *>::iterator uPIte;
+    map<int, FieldUnit>::iterator fIte;
+    for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
+        
+        for (fIte = field->resources.begin(); fIte != field->resources.end(); fIte++) {
+            
+        }
+    }
+}
 
 // MARK: temp --------------------------------------------------------
 int ExtraAI::supplyFreeWorkerWithVillageCommand(int need, int prob) {

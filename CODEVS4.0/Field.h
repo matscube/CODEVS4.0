@@ -35,7 +35,6 @@ enum class FieldUnitType {
 
 class FieldUnit {
 public:
-//    int x, y;
     Position position;
     int hashID;
     int occupancy;
@@ -45,34 +44,20 @@ public:
     static int getHashID(Position position);
 };
 
-enum class FieldStatus {
-    Unknown,
-    Visited,
-    Resource,
-    AllyCastle,
-    EnemyCastle,
-};
-string FieldStatusName(FieldStatus s);
-
 class Field {
     ofstream ofs;
 public:
-//    bool isViewdEnemyCastle;
-//    Position allyCastlePosition;
-//    Position enemyCastlePosition;
 
     Field();
     void resetWithStage();
 
     // TODO: status unuesd?
     // MARK: Visited Status
-    FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     map<int, Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
-//    vector<Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
 
     // MARK: Resource status
     map<int, FieldUnit> resources;

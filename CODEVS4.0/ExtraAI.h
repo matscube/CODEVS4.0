@@ -89,6 +89,7 @@ public:
     int calcResourceGetting();
     int createVillageOnResourceCommand(int assign, int prob);
     int getResourceCommand(int prob);
+    void defendResourceCommand(int assign);
 
     // MARK: temp
     int supplyFreeWorkerWithVillageCommand(int need, int prob);
