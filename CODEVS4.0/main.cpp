@@ -53,14 +53,15 @@ int main(int argc, const char * argv[]) {
         // Mark: AI Commands **********************************************************
         
         cerr << "T: " << game.currentTurn << " ResGet" << ai.calcResourceGetting() << " Res" << player.resourceCount << endl;
+        field.debugStatusInfo();
 
 //        Position defendBasePos(30, 30);
         Position defendBasePos = player.castle.position;
         Position rightBasePos = Position(99, 30);
         if (ai.calcResourceGetting() < 30) {
             ai.createVillageOnResourceCommand(INF, 100);
-            ai.searchUnkownFieldSmallCommand(INF);
             ai.getResourceCommand(INF);
+            ai.searchUnkownFieldSmallCommand(INF);
         } else if (ai.defenderBaseCount(defendBasePos) == 0) {
             ai.createDefenderBaseCommand(defendBasePos, 1, 100);
             ai.searchUnkownFieldMediumCommand(INF);

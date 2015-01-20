@@ -31,6 +31,7 @@ bool isValidIndex(Position p);
 
 enum class ResourceUnitStatus {
     Default,
+    Ally,
     Enemy,
 };
 class ResourceUnit {
@@ -55,16 +56,27 @@ public:
     bool willBeViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    
+    // MARK: ally info
+    int allyWorkerCount[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+
+    // MARK: enemy info
+    int enemyWorkerCount[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     map<int, Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
 
     // MARK: Resource status
     map<int, ResourceUnit> resources;
-    
     void updateWithResourceUnit(ResourceUnit resourceUnit);
+    void updateResourceStatus();
+
     void updateWithPlayerUnit(PlayerUnit *playerUnit);
-    
+
     // MARK: count
     int calcVisited();
+
+    // MARK: debug
+    void debugStatusInfo();
+
 };
 
 #endif /* defined(__CODEVS4_0__Field__) */

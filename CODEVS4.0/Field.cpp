@@ -23,26 +23,25 @@ void Field::resetWithStage() {
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
         for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
             isViewed[x][y] = false;
-            willBeViewed[x][y] = false;
             isVisited[x][y] = false;
-            willBeVisited[x][y] = false;
         }
     }
-    ofs = ofstream("/Users/matscube/field.txt");
+    ofs = ofstream("/Users/matscube/Desktop/field_debug.txt");
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
         for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
             isViewed[x][y] = false;
-            willBeViewed[x][y] = false;
             isVisited[x][y] = false;
-            willBeVisited[x][y] = false;
         }
     }
     resources.clear();
+    resetWithTurn();
 }
 
 void Field::resetWithTurn() {
     memcpy(willBeVisited, isVisited, sizeof(isVisited));
     memcpy(willBeViewed, isViewed, sizeof(isViewed));
+    memset(enemyWorkerCount, 0, sizeof(enemyWorkerCount));
+    memset(allyWorkerCount, 0, sizeof(allyWorkerCount));
 }
 
 int Field::calcVisited() {
@@ -87,17 +86,60 @@ void Field::updateWithResourceUnit(ResourceUnit resourceUnit) {
     }
 }
 
-void Field::updateWithPlayerUnit(PlayerUnit *playerUnit) {
-    Position cPos = playerUnit->position;
-    if (isValidIndex(cPos)) isVisited[cPos.first][cPos.second] = true;
-
-    int viewRange = PlayerUnit::viewRange(playerUnit->type);
-    for (int x = cPos.first - viewRange; x <= cPos.first + viewRange; x++) {
-        for (int y = cPos.second - viewRange; y <= cPos.second + viewRange; y++) {
-            if (!isValidIndex(Position(x, y))) continue;
-            if (utl::dist(cPos, Position(x, y)) > viewRange) continue;
-            isViewed[x][y] = true;
-            // set value on willBeVisited by resetWithTurn
+void Field::updateResourceStatus() {
+    map<int, ResourceUnit>::iterator rIte;
+    for (rIte = resources.begin(); rIte != resources.end(); rIte++) {
+        ResourceUnit *res = &rIte->second;
+        if (enemyWorkerCount[res->position.first][res->position.second]) {
+            res->status = ResourceUnitStatus::Enemy;
+        } else if (allyWorkerCount[res->position.first][res->position.second]) {
+            res->status = ResourceUnitStatus::Ally;
+        } else {
+            if (res->status == ResourceUnitStatus::Ally) {
+                res->status = ResourceUnitStatus::Enemy;
+            } else {
+                // no operation
+            }
         }
     }
+    // TODO: ally worker -> no worker, then default status, but enemy status now. fix me
+}
+
+void Field::updateWithPlayerUnit(PlayerUnit *playerUnit) {
+    if (playerUnit->player->type == PlayerType::Ally) {
+        Position cPos = playerUnit->position;
+        if (isValidIndex(cPos)) isVisited[cPos.first][cPos.second] = true;
+
+        int viewRange = PlayerUnit::viewRange(playerUnit->type);
+        for (int x = cPos.first - viewRange; x <= cPos.first + viewRange; x++) {
+            for (int y = cPos.second - viewRange; y <= cPos.second + viewRange; y++) {
+                if (!isValidIndex(Position(x, y))) continue;
+                if (utl::dist(cPos, Position(x, y)) > viewRange) continue;
+                isViewed[x][y] = true;
+                // set value on willBeVisited by resetWithTurn
+            }
+        }
+        
+        if (playerUnit->type == PlayerUnitType::Worker) {
+            allyWorkerCount[playerUnit->position.first][playerUnit->position.second]++;
+        }
+    } else if (playerUnit->player->type == PlayerType::Enemy) {
+        if (playerUnit->type == PlayerUnitType::Worker) {
+            enemyWorkerCount[playerUnit->position.first][playerUnit->position.second]++;
+        }
+    }
+}
+
+void Field::debugStatusInfo() {
+    int defaultCount = 0;
+    int allyCount = 0;
+    int enemyCount = 0;
+    map<int, ResourceUnit>::iterator rIte;
+    for (rIte = resources.begin(); rIte != resources.end(); rIte++) {
+        if (rIte->second.status == ResourceUnitStatus::Default) defaultCount++;
+        if (rIte->second.status == ResourceUnitStatus::Ally) allyCount++;
+        if (rIte->second.status == ResourceUnitStatus::Enemy) enemyCount++;
+    }
+    
+    cerr << "ResourceStatus: def " << defaultCount << ", ally " << allyCount << ", enemy " << enemyCount << endl;
 }

@@ -108,6 +108,7 @@ void IOManager::inputBody() {
         PlayerUnit unit = PlayerUnit(unitID, Position(unitPosX, unitPosY), PlayerUnitType(unitType), enemy);
         unit.setHitPoint(unitHP);
         
+        field->updateWithPlayerUnit(&unit);
         enemy->updateUnit(unit);
     }
     
@@ -120,6 +121,8 @@ void IOManager::inputBody() {
         ResourceUnit unit = ResourceUnit(Position(resourcePosX, resourcePosY));
         field->updateWithResourceUnit(unit);
     }
+    
+    field->updateResourceStatus();
     
     finishInput();
 }
