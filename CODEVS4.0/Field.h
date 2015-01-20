@@ -29,64 +29,54 @@ typedef pair<int, int> Position;
 
 bool isValidIndex(Position p);
 
-enum class FieldUnitType {
-    Resource,
+enum class ResourceUnitStatus {
+    Default,
+    Ally,
+    Enemy,
 };
-
-class FieldUnit {
+class ResourceUnit {
 public:
-//    int x, y;
     Position position;
     int hashID;
-    int occupancy;
-    FieldUnitType type;
-    FieldUnit();
-    FieldUnit(Position position, FieldUnitType type);
-    static int getHashID(Position position);
+    ResourceUnitStatus status;
+    ResourceUnit();
+    ResourceUnit(Position position);
 };
-
-enum class FieldStatus {
-    Unknown,
-    Visited,
-    Resource,
-    AllyCastle,
-    EnemyCastle,
-};
-string FieldStatusName(FieldStatus s);
 
 class Field {
     ofstream ofs;
 public:
-//    bool isViewdEnemyCastle;
-//    Position allyCastlePosition;
-//    Position enemyCastlePosition;
 
     Field();
     void resetWithStage();
+    void resetWithTurn();
 
-    // TODO: status unuesd?
-    // MARK: Visited Status
-    FieldStatus status[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    // MARK: Visited and Viewd Status
     bool isViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    
+    // MARK: ally info
+    int allyWorkerCount[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+
+    // MARK: enemy info
+    int enemyWorkerCount[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     map<int, Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
-//    vector<Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
 
     // MARK: Resource status
-    map<int, FieldUnit> resources;
-    int allyWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
-    int reservedWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
-    
+    map<int, ResourceUnit> resources;
+    void updateWithResourceUnit(ResourceUnit resourceUnit);
+    void updateResourceStatus();
 
-    void resetStatusWithTurn();
-    void updateStatusWithAllyUnit(PlayerUnit playerUnit);
-    void updateStatusWithFieldUnit(FieldUnit fieldUnit);
     void updateWithPlayerUnit(PlayerUnit *playerUnit);
-    
+
     // MARK: count
     int calcVisited();
+
+    // MARK: debug
+    void debugStatusInfo();
+
 };
 
 #endif /* defined(__CODEVS4_0__Field__) */

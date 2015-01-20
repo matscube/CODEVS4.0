@@ -45,16 +45,17 @@ public:
     
     // MARK: Defend
     int defenderBaseCount(Position position);
-    int createDefenderBaseCommand(Position position, int assign, int prob);
+    int createDefenderBaseCommand(Position position, int prob);
     int createCastleDefenderCommand(Position position, int assign, int prob);
     void defendCastleCommand(int assign); // moveCommand
     
-    
-    // MARK: Search
-    void searchNoVisitedAreaCommand(vector<Position> area, int assign, map<PlayerUnitType, bool> types);
+    // MARK: Utility
     map<PlayerUnitType, bool> allTypes();
     map<PlayerUnitType, bool> workerTypes();
     map<PlayerUnitType, bool> attackerTypes();
+
+    // MARK: Search
+    void searchNoVisitedAreaCommand(vector<Position> area, int assign, map<PlayerUnitType, bool> types);
     vector<Position> searchLineToRight1();
     vector<Position> searchLineToRight2();
     vector<Position> searchLineToRight3();
@@ -89,6 +90,7 @@ public:
     int calcResourceGetting();
     int createVillageOnResourceCommand(int assign, int prob);
     int getResourceCommand(int prob);
+    void defendResourceCommand(int assign);
 
     // MARK: temp
     int supplyFreeWorkerWithVillageCommand(int need, int prob);

@@ -15,45 +15,33 @@ bool isValidIndex(Position p) {
     return true;
 }
 
-string FieldStatusName(FieldStatus s) {
-    switch (s) {
-        case FieldStatus::Unknown: return "Unknown";
-        case FieldStatus::Visited: return "Visited";
-        case FieldStatus::Resource: return "Resource";
-        case FieldStatus::AllyCastle: return "AllyCastle";
-        case FieldStatus::EnemyCastle: return "EnemyCastle";
-    }
-    return "Unknown FieldStatus type";
-}
-
 Field::Field() {
     resetWithStage();
 }
 
 void Field::resetWithStage() {
-//    isViewdEnemyCastle = false;
-//    enemyCastlePosition = Position(-1, -1);
-//    allyCastlePosition = Position(-1, -1);
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
         for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
-            status[x][y] = FieldStatus::Unknown;
             isViewed[x][y] = false;
-            willBeViewed[x][y] = false;
             isVisited[x][y] = false;
-            willBeVisited[x][y] = false;
         }
     }
-    ofs = ofstream("/Users/matscube/field.txt");
+    ofs = ofstream("/Users/matscube/Desktop/field_debug.txt");
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
         for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
-            status[x][y] = FieldStatus::Unknown;
             isViewed[x][y] = false;
-            willBeViewed[x][y] = false;
             isVisited[x][y] = false;
-            willBeVisited[x][y] = false;
         }
     }
     resources.clear();
+    resetWithTurn();
+}
+
+void Field::resetWithTurn() {
+    memcpy(willBeVisited, isVisited, sizeof(isVisited));
+    memcpy(willBeViewed, isViewed, sizeof(isViewed));
+    memset(enemyWorkerCount, 0, sizeof(enemyWorkerCount));
+    memset(allyWorkerCount, 0, sizeof(allyWorkerCount));
 }
 
 int Field::calcVisited() {
@@ -66,18 +54,15 @@ int Field::calcVisited() {
     return cnt;
 }
 
-FieldUnit::FieldUnit() {}
-FieldUnit::FieldUnit(Position position, FieldUnitType type) {
-    FieldUnit::position = position;
-    FieldUnit::type = type;
-    FieldUnit::occupancy = 0;
-    FieldUnit::hashID = getHashID(position);
+ResourceUnit::ResourceUnit() {}
+ResourceUnit::ResourceUnit(Position position) {
+    ResourceUnit::position = position;
+    ResourceUnit::hashID = utl::getHashID(position);
+    ResourceUnit::status = ResourceUnitStatus::Default;
 }
 
 map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
-//vector<Position> Field::enemyCastlePositions(PlayerType pType) {
     map<int, Position> res;
-//    vector<Position> res;
     for (int dx = 0; dx <= 40; dx++) {
         for (int dy = 0; dy <= 40 - dx; dy++) {
             Position pos;
@@ -86,73 +71,75 @@ map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
             } else {
                 pos = Position(dx, dy);
             }
-            int hashID = utl::getHashID(pos.first, pos.second);
+            int hashID = utl::getHashID(pos);
             res[hashID] = pos;
-//            res.push_back(pos);
         }
     }
     return res;
 }
 
 
-void Field::resetStatusWithTurn() {
-    memset(allyWorkers, 0, sizeof(allyWorkers));
-    memset(reservedWorkers, 0, sizeof(reservedWorkers));
-    memcpy(willBeVisited, isVisited, sizeof(isVisited));
-    memcpy(willBeViewed, isViewed, sizeof(isViewed));
-    map<int, FieldUnit>::iterator resIte = resources.begin();
-    for (; resIte != resources.end(); resIte++) {
-        resIte->second.occupancy = 0;
+
+void Field::updateWithResourceUnit(ResourceUnit resourceUnit) {
+    if (resources.find(resourceUnit.hashID) == resources.end()) {
+        resources[resourceUnit.hashID] = resourceUnit;
     }
 }
 
-void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
-    Position cPos = allyUnit.position;
-    
-    // Update FieldStatus
-    int viewRange = PlayerUnit::viewRange(allyUnit.type);
-    for (int x = cPos.first - viewRange; x <= cPos.first + viewRange; x++) {
-        for (int y = cPos.second - viewRange; y <= cPos.second + viewRange; y++) {
-            if (!isValidIndex(Position(x, y))) continue;
-            if (utl::dist(cPos, Position(x, y)) > viewRange) continue;
-            if (status[x][y] != FieldStatus::Unknown) continue;
-            
-            status[x][y] = FieldStatus::Visited;
+void Field::updateResourceStatus() {
+    map<int, ResourceUnit>::iterator rIte;
+    for (rIte = resources.begin(); rIte != resources.end(); rIte++) {
+        ResourceUnit *res = &rIte->second;
+        if (enemyWorkerCount[res->position.first][res->position.second]) {
+            res->status = ResourceUnitStatus::Enemy;
+        } else if (allyWorkerCount[res->position.first][res->position.second]) {
+            res->status = ResourceUnitStatus::Ally;
+        } else {
+            if (res->status == ResourceUnitStatus::Ally) {
+                res->status = ResourceUnitStatus::Enemy;
+            } else {
+                // no operation
+            }
         }
     }
-    
-    // Update Resource Occupancy
-    allyWorkers[cPos.first][cPos.second]++;
-    
-//    if (allyUnit.type == PlayerUnitType::Castle) {
-//        allyCastlePosition = Position(allyUnit.x, allyUnit.y);
-//    }
-}
-
-void Field::updateStatusWithFieldUnit(FieldUnit fieldUnit) {
-    if (fieldUnit.type == FieldUnitType::Resource) {
-        status[fieldUnit.position.first][fieldUnit.position.second] = FieldStatus::Resource;
-        if (resources.find(fieldUnit.hashID) == resources.end()) {
-            resources[fieldUnit.hashID] = fieldUnit;
-        }
-    }
+    // TODO: ally worker -> no worker, then default status, but enemy status now. fix me
 }
 
 void Field::updateWithPlayerUnit(PlayerUnit *playerUnit) {
-    Position cPos = playerUnit->position;
-    if (isValidIndex(cPos)) isVisited[cPos.first][cPos.second] = true;
+    if (playerUnit->player->type == PlayerType::Ally) {
+        Position cPos = playerUnit->position;
+        if (isValidIndex(cPos)) isVisited[cPos.first][cPos.second] = true;
 
-    int viewRange = PlayerUnit::viewRange(playerUnit->type);
-    for (int x = cPos.first - viewRange; x <= cPos.first + viewRange; x++) {
-        for (int y = cPos.second - viewRange; y <= cPos.second + viewRange; y++) {
-            if (!isValidIndex(Position(x, y))) continue;
-            if (utl::dist(cPos, Position(x, y)) > viewRange) continue;
-            isViewed[x][y] = true;
-            // set value on willBeVisited by resetWithTurn
+        int viewRange = PlayerUnit::viewRange(playerUnit->type);
+        for (int x = cPos.first - viewRange; x <= cPos.first + viewRange; x++) {
+            for (int y = cPos.second - viewRange; y <= cPos.second + viewRange; y++) {
+                if (!isValidIndex(Position(x, y))) continue;
+                if (utl::dist(cPos, Position(x, y)) > viewRange) continue;
+                isViewed[x][y] = true;
+                // set value on willBeVisited by resetWithTurn
+            }
+        }
+        
+        if (playerUnit->type == PlayerUnitType::Worker) {
+            allyWorkerCount[playerUnit->position.first][playerUnit->position.second]++;
+        }
+    } else if (playerUnit->player->type == PlayerType::Enemy) {
+        if (playerUnit->type == PlayerUnitType::Worker) {
+            enemyWorkerCount[playerUnit->position.first][playerUnit->position.second]++;
         }
     }
 }
 
-int FieldUnit::getHashID(Position position) {
-    return position.second * MAX_FIELD_WIDTH + position.first;
+void Field::debugStatusInfo() {
+    int defaultCount = 0;
+    int allyCount = 0;
+    int enemyCount = 0;
+    map<int, ResourceUnit>::iterator rIte;
+    for (rIte = resources.begin(); rIte != resources.end(); rIte++) {
+        if (rIte->second.status == ResourceUnitStatus::Default) defaultCount++;
+        if (rIte->second.status == ResourceUnitStatus::Ally) allyCount++;
+        if (rIte->second.status == ResourceUnitStatus::Enemy) enemyCount++;
+    }
+    
+    cerr << "ResourceStatus: def " << defaultCount << ", ally " << allyCount << ", enemy " << enemyCount << endl;
 }

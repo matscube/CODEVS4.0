@@ -122,7 +122,7 @@ vector<Command> AI::createAttakerCommand(int assign) {
 vector<Command> AI::getResourceCommand(int assign) {
     vector<Command> commands;
     /*
-    map<int, FieldUnit>::iterator resIte;
+    map<int, ResourceUnit>::iterator resIte;
     map<int, PlayerUnit>::iterator pUnitIte;
     vector<pair<int, pair<int, int> > > dists; // (dist, (resID, unitID))
     for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
@@ -141,7 +141,7 @@ vector<Command> AI::getResourceCommand(int assign) {
         int unitID = dists[i].second.second;
         int resID = dists[i].second.first;
         PlayerUnit *pUnit = &player->units[unitID];
-        FieldUnit *res = &field->resources[resID];
+        ResourceUnit *res = &field->resources[resID];
 
         if (res->occupancy >= MAX_GETTING_RESOURCE) continue;
         if (!pUnit->isMovable()) continue;
@@ -167,7 +167,7 @@ vector<Command> AI::getResourceCommand(int assign) {
 vector<Command> AI::getMinimumResourceCommand(int assign) {
     vector<Command> commands;
     /*
-    map<int, FieldUnit>::iterator resIte;
+    map<int, ResourceUnit>::iterator resIte;
     map<int, PlayerUnit>::iterator pUnitIte;
     vector<pair<int, pair<int, int> > > dists; // (dist, (resID, unitID))
     for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
@@ -186,7 +186,7 @@ vector<Command> AI::getMinimumResourceCommand(int assign) {
         int unitID = dists[i].second.second;
         int resID = dists[i].second.first;
         PlayerUnit *pUnit = &player->units[unitID];
-        FieldUnit *res = &field->resources[resID];
+        ResourceUnit *res = &field->resources[resID];
         
         if (res->occupancy >= 1) continue;
         if (!pUnit->isMovable()) continue;
@@ -217,7 +217,7 @@ vector<Command> AI::createVillageOnResource(int assign) {
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (pUnitIte->second.type == PlayerUnitType::Village) {
-            int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+            int hashID = ResourceUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
             if (villageCount.find(hashID) != villageCount.end()) {
                 villageCount[hashID]++;
             } else {
@@ -228,7 +228,7 @@ vector<Command> AI::createVillageOnResource(int assign) {
     
     int curAssign = 0;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
-        int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+        int hashID = ResourceUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
         if (field->resources.find(hashID) != field->resources.end()) {
             if (!pUnitIte->second.isCreatableVillage()) continue;
             if (villageCount.find(hashID) == villageCount.end()) {
@@ -253,7 +253,7 @@ vector<Command> AI::createWorkerOnResource(int assign) {
     map<int, PlayerUnit>::iterator pUnitIte;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
         if (pUnitIte->second.type == PlayerUnitType::Worker) {
-            int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+            int hashID = ResourceUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
             if (workerCount.find(hashID) != workerCount.end()) {
                 workerCount[hashID]++;
             } else {
@@ -264,7 +264,7 @@ vector<Command> AI::createWorkerOnResource(int assign) {
 
     int curAssign = 0;
     for (pUnitIte = player->units.begin(); pUnitIte != player->units.end(); pUnitIte++) {
-        int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+        int hashID = ResourceUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
         if (field->resources.find(hashID) != field->resources.end()) {
             if (!pUnitIte->second.isCreatableWorker()) continue;
             
@@ -309,7 +309,7 @@ Position AI::basePointNearestToEnemy() {
 
         if (pUnitIte->second.type != PlayerUnitType::Village) continue;
 
-        int hashID = FieldUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
+        int hashID = ResourceUnit::getHashID(pUnitIte->second.x, pUnitIte->second.y);
         if (field->resources.find(hashID) == field->resources.end()) continue;
 
         int d = dist(pUnitIte->second.x, pUnitIte->second.y, target.first, target.second);
@@ -875,7 +875,7 @@ vector<Position> AI::fieldCenterArea() {
     for (int x = 40; x <= 60; x++) {
         for (int y = 40; y <= 60; y++) {
             if (field->isVisited[x][y]) {
-                int hashID = utl::getHashID(x, y);
+                int hashID = utl::getHashID(Position(x, y));
                 if (field->resources.find(hashID) == field->resources.end()) {
                     positions.push_back(Position(x, y));
                 }
@@ -1031,8 +1031,8 @@ void AI::debug() {
 
 #if 0
     // Field
-    cerr << "-----begin FieldUnit debug-----" << endl;
-    map<int, FieldUnit> resources = field->resources;
+    cerr << "-----begin ResourceUnit debug-----" << endl;
+    map<int, ResourceUnit> resources = field->resources;
     cerr << "Visible Resource count: " << resources.size() << endl;
     cerr << "-----end debug-----" << endl;
 #endif
@@ -1058,7 +1058,7 @@ void AI::debug() {
     
 #if 0
     fieldOfs << "Field********" << endl;
-    map<int, FieldUnit>::iterator fUIte = field->resources.begin();
+    map<int, ResourceUnit>::iterator fUIte = field->resources.begin();
     for (; fUIte != field->resources.end(); fUIte++) {
         fieldOfs << fUIte->first << " " << fUIte->second.hashID << " " << fUIte->second.x << " " << fUIte->second.y << endl;
     }

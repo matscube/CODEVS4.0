@@ -13,8 +13,8 @@ int utl::dist(Position pos1, Position pos2) {
     return abs(pos1.first - pos2.first) + abs(pos1.second - pos2.second);
 }
 
-int utl::getHashID(int x, int y) {
-    return y * MAX_FIELD_WIDTH + x;
+int utl::getHashID(Position pos) {
+    return pos.second * MAX_FIELD_WIDTH + pos.first;
 }
 
 bool utl::isValidUnitID(int ID) {

@@ -80,7 +80,7 @@ void IOManager::inputBody() {
     // Input PlayerUnit Information
     player->resetWithTurn();
     enemy->resetWithTurn();
-    field->resetStatusWithTurn();
+    field->resetWithTurn();
     int playerUnitCount = nextInt();
     for (int i = 0; i < playerUnitCount; i++) {
         int unitID = nextInt();
@@ -92,7 +92,6 @@ void IOManager::inputBody() {
         PlayerUnit unit = PlayerUnit(unitID, Position(unitPosX, unitPosY), PlayerUnitType(unitType), player);
         unit.setHitPoint(unitHP);
 
-        field->updateStatusWithAllyUnit(unit);
         field->updateWithPlayerUnit(&unit);
         player->updateUnit(unit);
     }
@@ -109,18 +108,21 @@ void IOManager::inputBody() {
         PlayerUnit unit = PlayerUnit(unitID, Position(unitPosX, unitPosY), PlayerUnitType(unitType), enemy);
         unit.setHitPoint(unitHP);
         
+        field->updateWithPlayerUnit(&unit);
         enemy->updateUnit(unit);
     }
     
-    // Input FieldUnit Information
+    // Input ResourceUnit Information
     int resourceCount; cin >> resourceCount;
     for (int i = 0; i < resourceCount; i++) {
         int resourcePosY = nextInt();
         int resourcePosX = nextInt();
 
-        FieldUnit unit = FieldUnit(Position(resourcePosX, resourcePosY), FieldUnitType::Resource);
-        field->updateStatusWithFieldUnit(unit);
+        ResourceUnit unit = ResourceUnit(Position(resourcePosX, resourcePosY));
+        field->updateWithResourceUnit(unit);
     }
+    
+    field->updateResourceStatus();
     
     finishInput();
 }

@@ -26,7 +26,7 @@ typedef pair<int, int> Position;
 namespace utl {
 //    int dist(int x1, int y1, int x2, int y2);
     int dist(Position pos1, Position pos2);
-    int getHashID(int x, int y);
+    int getHashID(Position pos);
     bool isValidUnitID(int ID);
     vector<Position> framePositions(int d, bool shuffle);
     vector<Position> areaPositions(int d, bool shuffle);

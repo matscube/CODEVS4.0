@@ -64,7 +64,7 @@ PlayerUnitActionType CreateAttackerAction(PlayerUnitType t) {
 
 // MARK: Utility
 int PlayerUnit::getHashID() {
-    return utl::getHashID(position.first, position.second);
+    return utl::getHashID(position);
 }
 
 /*------------------------------------------------*/
