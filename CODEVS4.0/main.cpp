@@ -60,29 +60,41 @@ int main(int argc, const char * argv[]) {
         Position rightBasePos = Position(99, 30);
         if (ai.calcResourceGetting() < 30) {
             ai.createVillageOnResourceCommand(INF, 100);
-            ai.getResourceCommand(INF);
             ai.searchUnkownFieldSmallCommand(INF);
+            ai.getResourceCommand(INF);
+            
+            ai.searchUnkownFieldAllCommand(INF);
+            ai.defendResourceCommand(INF);
         } else if (ai.defenderBaseCount(defendBasePos) == 0) {
-            ai.createDefenderBaseCommand(defendBasePos, 1, 100);
+            ai.createDefenderBaseCommand(defendBasePos, 70);
+            ai.createVillageOnResourceCommand(INF, 30);
             ai.searchUnkownFieldMediumCommand(INF);
+            ai.getResourceCommand(INF);
+
+            ai.searchUnkownFieldAllCommand(INF);
+            ai.defendResourceCommand(INF);
         } else if (ai.defenderBaseCount(rightBasePos) == 0) {
             ai.createCastleDefenderCommand(defendBasePos, 1, 50);
             ai.defendCastleCommand(30);
 
-            ai.createDefenderBaseCommand(rightBasePos, 1, 50);
+            ai.createDefenderBaseCommand(rightBasePos, 50);
             ai.searchUnkownFieldMediumCommand(INF);
+
+            ai.searchUnkownFieldAllCommand(INF);
+            ai.defendResourceCommand(INF);
         } else {
             ai.createCastleDefenderCommand(defendBasePos, 1, 50);
             ai.defendCastleCommand(30);
 
             ai.createCastleDefenderCommand(rightBasePos, 1, 20);
             
+            ai.defendResourceCommand(INF);
+            
             ai.createVillageOnResourceCommand(INF, 30);
             ai.searchUnkownFieldAllCommand(INF);
             ai.getResourceCommand(INF);
         }
         
-//        ai.searchUnkownFieldMediumCommand(INF);
         
 
         // Output AI Commands
