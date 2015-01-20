@@ -40,6 +40,11 @@ void Field::resetWithStage() {
     resources.clear();
 }
 
+void Field::resetWithTurn() {
+    memcpy(willBeVisited, isVisited, sizeof(isVisited));
+    memcpy(willBeViewed, isViewed, sizeof(isViewed));
+}
+
 int Field::calcVisited() {
     int cnt = 0;
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
@@ -53,8 +58,8 @@ int Field::calcVisited() {
 ResourceUnit::ResourceUnit() {}
 ResourceUnit::ResourceUnit(Position position) {
     ResourceUnit::position = position;
-    ResourceUnit::occupancy = 0;
-    ResourceUnit::hashID = getHashID(position);
+    ResourceUnit::hashID = utl::getHashID(position);
+    ResourceUnit::status = ResourceUnitStatus::Default;
 }
 
 map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
@@ -67,7 +72,7 @@ map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
             } else {
                 pos = Position(dx, dy);
             }
-            int hashID = utl::getHashID(pos.first, pos.second);
+            int hashID = utl::getHashID(pos);
             res[hashID] = pos;
         }
     }
@@ -75,34 +80,8 @@ map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
 }
 
 
-void Field::resetStatusWithTurn() {
-    memset(allyWorkers, 0, sizeof(allyWorkers));
-    memset(reservedWorkers, 0, sizeof(reservedWorkers));
-    memcpy(willBeVisited, isVisited, sizeof(isVisited));
-    memcpy(willBeViewed, isViewed, sizeof(isViewed));
-    map<int, ResourceUnit>::iterator resIte = resources.begin();
-    for (; resIte != resources.end(); resIte++) {
-        resIte->second.occupancy = 0;
-    }
-}
 
-void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
-    Position cPos = allyUnit.position;
-    
-    // Update FieldStatus
-    int viewRange = PlayerUnit::viewRange(allyUnit.type);
-    for (int x = cPos.first - viewRange; x <= cPos.first + viewRange; x++) {
-        for (int y = cPos.second - viewRange; y <= cPos.second + viewRange; y++) {
-            if (!isValidIndex(Position(x, y))) continue;
-            if (utl::dist(cPos, Position(x, y)) > viewRange) continue;
-        }
-    }
-    
-    // Update Resource Occupancy
-    allyWorkers[cPos.first][cPos.second]++;
-}
-
-void Field::updateStatusWithResourceUnit(ResourceUnit resourceUnit) {
+void Field::updateWithResourceUnit(ResourceUnit resourceUnit) {
     if (resources.find(resourceUnit.hashID) == resources.end()) {
         resources[resourceUnit.hashID] = resourceUnit;
     }
@@ -121,8 +100,4 @@ void Field::updateWithPlayerUnit(PlayerUnit *playerUnit) {
             // set value on willBeVisited by resetWithTurn
         }
     }
-}
-
-int ResourceUnit::getHashID(Position position) {
-    return position.second * MAX_FIELD_WIDTH + position.first;
 }

@@ -29,14 +29,17 @@ typedef pair<int, int> Position;
 
 bool isValidIndex(Position p);
 
+enum class ResourceUnitStatus {
+    Default,
+    Enemy,
+};
 class ResourceUnit {
 public:
     Position position;
     int hashID;
-    int occupancy;
+    ResourceUnitStatus status;
     ResourceUnit();
     ResourceUnit(Position position);
-    static int getHashID(Position position);
 };
 
 class Field {
@@ -45,9 +48,9 @@ public:
 
     Field();
     void resetWithStage();
+    void resetWithTurn();
 
-    // TODO: status unuesd?
-    // MARK: Visited Status
+    // MARK: Visited and Viewd Status
     bool isViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool willBeViewed[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     bool isVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
@@ -56,13 +59,8 @@ public:
 
     // MARK: Resource status
     map<int, ResourceUnit> resources;
-    int allyWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
-    int reservedWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     
-
-    void resetStatusWithTurn();
-    void updateStatusWithAllyUnit(PlayerUnit playerUnit);
-    void updateStatusWithResourceUnit(ResourceUnit resourceUnit);
+    void updateWithResourceUnit(ResourceUnit resourceUnit);
     void updateWithPlayerUnit(PlayerUnit *playerUnit);
     
     // MARK: count

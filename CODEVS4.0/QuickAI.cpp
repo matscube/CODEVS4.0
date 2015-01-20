@@ -807,7 +807,7 @@ void QuickAI::supplyMovableWorkerWithCastle(int need) {
     int workerCount = 0;
     for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
 //        if (uIte->second.isMovable()) workerCount++;
-        int hashID = utl::getHashID(uIte->second.position.first, uIte->second.position.second);
+        int hashID = utl::getHashID(uIte->second.position);
         if (field->resources.find(hashID) == field->resources.end()) workerCount++;
     }
     
@@ -826,7 +826,7 @@ void QuickAI::supplyWorkerForSearchCommand(int need) {
     int searchWorkerCount = 0;
     for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
         PlayerUnit *worker = &uIte->second;
-        int hashID = utl::getHashID(worker->position.first, worker->position.second);
+        int hashID = utl::getHashID(worker->position);
         if (field->resources.find(hashID) == field->resources.end()) {
             searchWorkerCount++;
         }

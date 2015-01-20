@@ -515,7 +515,7 @@ int ExtraAI::calcResourceGetting() {
     map<int, int> workerCount; // <hashID, workerCount>
     map<int, PlayerUnit>::iterator uIte;
     for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
-        int hashID = utl::getHashID(uIte->second.position.first, uIte->second.position.second);
+        int hashID = utl::getHashID(uIte->second.position);
         if (field->resources.find(hashID) != field->resources.end()) {
             if (workerCount.find(hashID) == workerCount.end()) {
                 resourceGetting++;

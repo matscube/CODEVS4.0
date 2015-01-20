@@ -875,7 +875,7 @@ vector<Position> AI::fieldCenterArea() {
     for (int x = 40; x <= 60; x++) {
         for (int y = 40; y <= 60; y++) {
             if (field->isVisited[x][y]) {
-                int hashID = utl::getHashID(x, y);
+                int hashID = utl::getHashID(Position(x, y));
                 if (field->resources.find(hashID) == field->resources.end()) {
                     positions.push_back(Position(x, y));
                 }
