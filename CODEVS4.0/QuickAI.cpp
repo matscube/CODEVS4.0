@@ -700,7 +700,7 @@ void QuickAI::createVillageOnResourceCommand() {
     }
     
     // no village resource, assign worker
-    map<int, FieldUnit>::iterator resIte;
+    map<int, ResourceUnit>::iterator resIte;
     vector<pair<int, pair<int, int> > > dToRes; // <dist, <unitID, resID>>
     for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
         if (isVillage.find(resIte->second.hashID) != isVillage.end()) continue; // resource has village
@@ -717,7 +717,7 @@ void QuickAI::createVillageOnResourceCommand() {
     map<int, bool> resWillHaveVillage; // <resID, villageOK>
     for (dIte = dToRes.begin(); dIte != dToRes.end(); dIte++) {
         PlayerUnit *pUnit = &player->workers[dIte->second.first];
-        FieldUnit *res = &field->resources[dIte->second.second];
+        ResourceUnit *res = &field->resources[dIte->second.second];
         
         if (resWillHaveVillage.find(res->hashID) != resWillHaveVillage.end()) continue;
         
@@ -763,7 +763,7 @@ void QuickAI::fixResourceCommand() {
     }
     
     // create worker on village/resource
-    map<int, FieldUnit>::iterator resIte;
+    map<int, ResourceUnit>::iterator resIte;
     for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
         int hashID = uIte->second.getHashID();
         int count = 0;

@@ -112,14 +112,14 @@ void IOManager::inputBody() {
         enemy->updateUnit(unit);
     }
     
-    // Input FieldUnit Information
+    // Input ResourceUnit Information
     int resourceCount; cin >> resourceCount;
     for (int i = 0; i < resourceCount; i++) {
         int resourcePosY = nextInt();
         int resourcePosX = nextInt();
 
-        FieldUnit unit = FieldUnit(Position(resourcePosX, resourcePosY));
-        field->updateStatusWithFieldUnit(unit);
+        ResourceUnit unit = ResourceUnit(Position(resourcePosX, resourcePosY));
+        field->updateStatusWithResourceUnit(unit);
     }
     
     finishInput();

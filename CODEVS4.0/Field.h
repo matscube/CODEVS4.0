@@ -29,13 +29,13 @@ typedef pair<int, int> Position;
 
 bool isValidIndex(Position p);
 
-class FieldUnit {
+class ResourceUnit {
 public:
     Position position;
     int hashID;
     int occupancy;
-    FieldUnit();
-    FieldUnit(Position position);
+    ResourceUnit();
+    ResourceUnit(Position position);
     static int getHashID(Position position);
 };
 
@@ -55,14 +55,14 @@ public:
     map<int, Position> enemyCastlePositions(PlayerType pType); // <hashID, position>
 
     // MARK: Resource status
-    map<int, FieldUnit> resources;
+    map<int, ResourceUnit> resources;
     int allyWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     int reservedWorkers[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
     
 
     void resetStatusWithTurn();
     void updateStatusWithAllyUnit(PlayerUnit playerUnit);
-    void updateStatusWithFieldUnit(FieldUnit fieldUnit);
+    void updateStatusWithResourceUnit(ResourceUnit resourceUnit);
     void updateWithPlayerUnit(PlayerUnit *playerUnit);
     
     // MARK: count

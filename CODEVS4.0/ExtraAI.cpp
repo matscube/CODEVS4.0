@@ -542,7 +542,7 @@ int ExtraAI::createVillageOnResourceCommand(int assign, int prob) {
     }
     
     // no village resource, assign worker
-    map<int, FieldUnit>::iterator resIte;
+    map<int, ResourceUnit>::iterator resIte;
     vector<pair<int, pair<int, int> > > dToRes; // <dist, <unitID, resID>>
     for (resIte = field->resources.begin(); resIte != field->resources.end(); resIte++) {
         if (isVillage.find(resIte->second.hashID) != isVillage.end()) continue; // resource has village
@@ -561,7 +561,7 @@ int ExtraAI::createVillageOnResourceCommand(int assign, int prob) {
     for (dIte = dToRes.begin(); dIte != dToRes.end(); dIte++) {
         if (currentAssign >= assign) break;
         PlayerUnit *pUnit = &player->workers[dIte->second.first];
-        FieldUnit *res = &field->resources[dIte->second.second];
+        ResourceUnit *res = &field->resources[dIte->second.second];
         
         if (resWillHaveVillage.find(res->hashID) != resWillHaveVillage.end()) continue;
         
@@ -607,7 +607,7 @@ int ExtraAI::getResourceCommand(int prob) {
     }
     
     // create worker on village/resource
-    map<int, FieldUnit>::iterator resIte;
+    map<int, ResourceUnit>::iterator resIte;
     for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
         int hashID = uIte->second.getHashID();
         int count = 0;
@@ -646,7 +646,7 @@ void ExtraAI::defendResourceCommand(int assign) {
     
     vector<pair<int, pair<PlayerUnit *, Position> > > attackerDists; // <d, <unit, pos> >
     map<int, PlayerUnit *>::iterator uPIte;
-    map<int, FieldUnit>::iterator fIte;
+    map<int, ResourceUnit>::iterator fIte;
     for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
         
         for (fIte = field->resources.begin(); fIte != field->resources.end(); fIte++) {

@@ -50,11 +50,11 @@ int Field::calcVisited() {
     return cnt;
 }
 
-FieldUnit::FieldUnit() {}
-FieldUnit::FieldUnit(Position position) {
-    FieldUnit::position = position;
-    FieldUnit::occupancy = 0;
-    FieldUnit::hashID = getHashID(position);
+ResourceUnit::ResourceUnit() {}
+ResourceUnit::ResourceUnit(Position position) {
+    ResourceUnit::position = position;
+    ResourceUnit::occupancy = 0;
+    ResourceUnit::hashID = getHashID(position);
 }
 
 map<int, Position> Field::enemyCastlePositions(PlayerType pType) {
@@ -80,7 +80,7 @@ void Field::resetStatusWithTurn() {
     memset(reservedWorkers, 0, sizeof(reservedWorkers));
     memcpy(willBeVisited, isVisited, sizeof(isVisited));
     memcpy(willBeViewed, isViewed, sizeof(isViewed));
-    map<int, FieldUnit>::iterator resIte = resources.begin();
+    map<int, ResourceUnit>::iterator resIte = resources.begin();
     for (; resIte != resources.end(); resIte++) {
         resIte->second.occupancy = 0;
     }
@@ -102,9 +102,9 @@ void Field::updateStatusWithAllyUnit(PlayerUnit allyUnit) {
     allyWorkers[cPos.first][cPos.second]++;
 }
 
-void Field::updateStatusWithFieldUnit(FieldUnit fieldUnit) {
-    if (resources.find(fieldUnit.hashID) == resources.end()) {
-        resources[fieldUnit.hashID] = fieldUnit;
+void Field::updateStatusWithResourceUnit(ResourceUnit resourceUnit) {
+    if (resources.find(resourceUnit.hashID) == resources.end()) {
+        resources[resourceUnit.hashID] = resourceUnit;
     }
 }
 
@@ -123,6 +123,6 @@ void Field::updateWithPlayerUnit(PlayerUnit *playerUnit) {
     }
 }
 
-int FieldUnit::getHashID(Position position) {
+int ResourceUnit::getHashID(Position position) {
     return position.second * MAX_FIELD_WIDTH + position.first;
 }
