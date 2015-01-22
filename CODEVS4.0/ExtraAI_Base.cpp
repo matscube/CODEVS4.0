@@ -89,6 +89,11 @@ map<PlayerUnitType, bool> ExtraAI::attackerTypes() {
     return res;
 }
 
+// MARK: Cost limit
+void ExtraAI::setCostLimit(int limit) {
+    player->necessaryResourceCount = limit;
+}
+
 // MARK: Debug --------------------------------------------------------
 void ExtraAI::debug() {
     

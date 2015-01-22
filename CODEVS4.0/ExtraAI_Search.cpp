@@ -19,7 +19,7 @@ vector<Position> ExtraAI::searchLineToRight1() {
 }
 vector<Position> ExtraAI::searchLineToRight2() {
     vector<Position> line;
-    for (int x = 40; x < MAX_FIELD_WIDTH; x++) {
+    for (int x = 35; x < MAX_FIELD_WIDTH; x++) {
         Position p(x, 13);
         line.push_back(p);
     }
@@ -27,7 +27,7 @@ vector<Position> ExtraAI::searchLineToRight2() {
 }
 vector<Position> ExtraAI::searchLineToRight3() {
     vector<Position> line;
-    for (int x = 40; x < MAX_FIELD_WIDTH; x++) {
+    for (int x = 30; x < MAX_FIELD_WIDTH; x++) {
         Position p(x, 22);
         line.push_back(p);
     }
@@ -35,7 +35,7 @@ vector<Position> ExtraAI::searchLineToRight3() {
 }
 vector<Position> ExtraAI::searchLineToRight4() {
     vector<Position> line;
-    for (int x = 40; x < MAX_FIELD_WIDTH; x++) {
+    for (int x = 25; x < MAX_FIELD_WIDTH; x++) {
         Position p(x, 31);
         line.push_back(p);
     }
@@ -43,7 +43,7 @@ vector<Position> ExtraAI::searchLineToRight4() {
 }
 vector<Position> ExtraAI::searchLineToRight5() {
     vector<Position> line;
-    for (int x = 40; x < MAX_FIELD_WIDTH; x++) {
+    for (int x = 20; x < MAX_FIELD_WIDTH; x++) {
         Position p(x, 40);
         line.push_back(p);
     }
@@ -99,7 +99,7 @@ vector<Position> ExtraAI::searchLineToDown1() {
 }
 vector<Position> ExtraAI::searchLineToDown2() {
     vector<Position> line;
-    for (int y = 40; y < MAX_FIELD_HEIGHT; y++) {
+    for (int y = 35; y < MAX_FIELD_HEIGHT; y++) {
         Position p(13, y);
         line.push_back(p);
     }
@@ -107,7 +107,7 @@ vector<Position> ExtraAI::searchLineToDown2() {
 }
 vector<Position> ExtraAI::searchLineToDown3() {
     vector<Position> line;
-    for (int y = 40; y < MAX_FIELD_HEIGHT; y++) {
+    for (int y = 30; y < MAX_FIELD_HEIGHT; y++) {
         Position p(22, y);
         line.push_back(p);
     }
@@ -115,7 +115,7 @@ vector<Position> ExtraAI::searchLineToDown3() {
 }
 vector<Position> ExtraAI::searchLineToDown4() {
     vector<Position> line;
-    for (int y = 40; y < MAX_FIELD_HEIGHT; y++) {
+    for (int y = 30; y < MAX_FIELD_HEIGHT; y++) {
         Position p(31, y);
         line.push_back(p);
     }
@@ -123,7 +123,7 @@ vector<Position> ExtraAI::searchLineToDown4() {
 }
 vector<Position> ExtraAI::searchLineToDown5() {
     vector<Position> line;
-    for (int y = 40; y < MAX_FIELD_HEIGHT; y++) {
+    for (int y = 30; y < MAX_FIELD_HEIGHT; y++) {
         Position p(40, y);
         line.push_back(p);
     }

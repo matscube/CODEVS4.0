@@ -43,6 +43,9 @@ public:
     void addCommandCreateAttacker(PlayerUnit *pUnit, PlayerUnitType unitType);
 //    void moveCommand(Position target, vector<PlayerUnitType> types, int assign)
     
+    // MARK: Cost limit
+    void setCostLimit(int limit);
+    
     // MARK: Defend
     int defenderBaseCount(Position position);
     int createDefenderBaseCommand(Position position, int prob);
