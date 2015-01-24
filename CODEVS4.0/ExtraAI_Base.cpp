@@ -21,6 +21,7 @@ void ExtraAI::resetWithTurn() {
     commands.clear();
 }
 void ExtraAI::resetWithStage() {
+    nearestEnemyDistance = INF;
     commands.clear();
 }
 
@@ -32,11 +33,61 @@ void ExtraAI::addCommand(Command newCommand) {
 }
 
 // MARK: Basic Command ----------------------------------------------
-void ExtraAI::addCommandMove(PlayerUnit *pUnit, Position target) {
-    PlayerUnitActionType at = pUnit->moveToTargetAction(target);
-    Command com(pUnit->ID, at);
+void ExtraAI::addCommandMove(PlayerUnit *pUnit, Position target, bool synchro, bool formed) {
+    if (synchro && formed) {
+        int x = pUnit->position.first;
+        int y = pUnit->position.second;
+        int dx = target.first - x;
+        int dy = target.second - y;
+        if (dx == 0 && dy == 0) return;
+  
+        Position next = pUnit->position;
+        PlayerUnitActionType at;
+        if (dx > 0 && field->unitCount[x + 1][y] < 10) {
+            at = PlayerUnitActionType::MoveRight;
+            field->unitCount[x + 1][y]++;
+        } else if (dx < 0 && field->unitCount[x - 1][y] < 10) {
+            at = PlayerUnitActionType::MoveLeft;
+            field->unitCount[x - 1][y]++;
+        } else if (dy > 0 && field->unitCount[x][y + 1] < 10) {
+            at = PlayerUnitActionType::MoveDown;
+            field->unitCount[x][y + 1]++;
+        } else if (dy < 0 && field->unitCount[x][y - 1] < 10) {
+            at = PlayerUnitActionType::MoveUp;
+            field->unitCount[x][y - 1]++;
+        } else {
+            // Move target is full
+            at = PlayerUnitActionType::None;
+            field->unitCount[x][y]++;
+        }
+        
+        if (at == PlayerUnitActionType::None) {
+            pUnit->fixOnlyPosition();
+        } else {
+            Command com(pUnit->ID, at);
+            addCommand(com);
+            pUnit->fix(at);
+        }
+    } else {
+        PlayerUnitActionType at = pUnit->moveToTargetAction(target, synchro);
+        Command com(pUnit->ID, at);
+        addCommand(com);
+        pUnit->fix(at);
+    }
+}
+void ExtraAI::addCommandMove(PlayerUnit *pUnit, PlayerUnitActionType moveAction) {
+    bool move = false;
+    if (moveAction == PlayerUnitActionType::MoveUp) move = true;
+    if (moveAction == PlayerUnitActionType::MoveDown) move = true;
+    if (moveAction == PlayerUnitActionType::MoveRight) move = true;
+    if (moveAction == PlayerUnitActionType::MoveLeft) move = true;
+    if (!move) {
+        cerr << "Error: addCommandMove, action type is not move type." << endl;
+    }
+    
+    Command com(pUnit->ID, moveAction);
     addCommand(com);
-    pUnit->fix(at);
+    pUnit->fix(moveAction);
 }
 
 void ExtraAI::addCommandCreateVillage(PlayerUnit *pUnit) {

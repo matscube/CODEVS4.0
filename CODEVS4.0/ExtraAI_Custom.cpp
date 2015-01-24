@@ -21,13 +21,14 @@ int ExtraAI::defenderBaseCount(Position position) {
     
 }
 
-int ExtraAI::createDefenderBaseCommand(Position position, int prob) {
+int ExtraAI::createCastleBaseCommand(int prob) {
+    PlayerUnit *castle = &player->castle;
+
     int create = 0;
     if (rand() % 100 >= prob) return create;
-    if (defenderBaseCount(position)) return create;
+    if (defenderBaseCount(castle->position)) return create;
     
     // Worker, if needed, create
-    PlayerUnit *castle = &player->castle;
     PlayerUnit *castleWorker = nullptr;
     map<int, PlayerUnit>::iterator uIte;
     for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
@@ -56,7 +57,43 @@ int ExtraAI::createDefenderBaseCommand(Position position, int prob) {
     
     return create;
 }
-int ExtraAI::createCastleDefenderCommand(Position position, int assign, int prob) {
+int ExtraAI::createBaseCommand(Position position, int prob) {
+    int create = 0;
+
+    map<int, PlayerUnit>::iterator uIte;
+    vector<pair<int, PlayerUnit *> > workerDists; // <dist, worker>
+    for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
+        PlayerUnit *worker = &uIte->second;
+        int d = utl::dist(worker->position, position);
+        
+        workerDists.push_back(make_pair(d, worker));
+    }
+    
+    sort(workerDists.begin(), workerDists.end());
+    
+    vector<pair<int, PlayerUnit *> >::iterator wIte;
+    for (wIte = workerDists.begin(); wIte != workerDists.end(); wIte++) {
+        PlayerUnit *worker = wIte->second;
+        int d = wIte->first;
+        
+        if (d == 0) {
+            if (worker->isCreatableBase()) {
+                addCommandCreateBase(worker);
+                create++;
+            } else if (worker->isMovable()) {
+                worker->fixOnlyPosition();
+            }
+        } else {
+            if (!worker->isMovable()) continue;
+            addCommandMove(worker, position);
+        }
+        break;
+    }
+    
+    return create;
+}
+
+int ExtraAI::createDefenderCommand(Position position, int assign, int prob) {
     int create = 0;
     if (rand() % 100 >= prob) return create;
     
@@ -109,6 +146,16 @@ void ExtraAI::defendCastleCommand(int assign) {
             addCommandMove(attacker, target);
             currentAssign++;
         }
+    }
+}
+
+// MARK: Enemy -----------------------------------------------------------
+void ExtraAI::updateNearestEnemy() {
+    map<int, PlayerUnit *>::iterator uPIte;
+    for (uPIte = enemy->units.begin(); uPIte != enemy->units.end(); uPIte++) {
+        Position pos = uPIte->second->position;
+        int d = utl::dist(pos, player->castle.position);
+        if (nearestEnemyDistance > d) nearestEnemyDistance = d;
     }
 }
 
@@ -281,7 +328,7 @@ void ExtraAI::defendResourceCommand(int assign) {
     sort(attackerDists.begin(), attackerDists.end());
     
     int currentAssign = 0;
-    int need = 2;
+    int need = 5;
     int willBeVisited[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {0};
     vector<pair<int, pair<PlayerUnit *, Position> > >::iterator dIte;
     for (dIte = attackerDists.begin(); dIte != attackerDists.end(); dIte++) {

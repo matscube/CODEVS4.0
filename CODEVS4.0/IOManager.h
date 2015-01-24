@@ -9,18 +9,19 @@
 #ifndef __CODEVS4_0__IOManager__
 #define __CODEVS4_0__IOManager__
 
-#include "Field.h"
-#include "Game.h"
-#include "Player.h"
 #include "Library.h"
-#include "AI.h"
 #include <stdio.h>
 #include <iostream>
 #include <vector>
 #include <fstream>
 
+class Game;
+class Field;
+class Player;
+
 using namespace std;
 
+typedef pair<int, PlayerUnitActionType> Command;
 
 class IOManager {
     Game *game;

@@ -7,7 +7,8 @@
 //
 
 #include "Field.h"
-#include "Library.h"
+#include "PlayerUnit.h"
+#include "Player.h"
 
 bool isValidIndex(Position p) {
     if (p.first < 0 || p.first >= MAX_FIELD_WIDTH) return false;
@@ -42,6 +43,7 @@ void Field::resetWithTurn() {
     memcpy(willBeViewed, isViewed, sizeof(isViewed));
     memset(enemyWorkerCount, 0, sizeof(enemyWorkerCount));
     memset(allyWorkerCount, 0, sizeof(allyWorkerCount));
+    memset(unitCount, 0, sizeof(unitCount));
 }
 
 int Field::calcVisited() {

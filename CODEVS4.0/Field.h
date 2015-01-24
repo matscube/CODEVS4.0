@@ -9,19 +9,14 @@
 #ifndef __CODEVS4_0__Field__
 #define __CODEVS4_0__Field__
 
-
 #include "Library.h"
-#include "Player.h"
 #include <stdio.h>
 #include <vector>
 #include <map>
 #include <fstream>
 
-#define MAX_FIELD_WIDTH 100
-#define MAX_FIELD_HEIGHT 100
-#define MAX_FIELD_CELL_COUNT 10000
-#define MAX_GETTING_RESOURCE 5
 
+class PlayerUnit;
 
 using namespace std;
 typedef pair<int, int> Position;
@@ -59,6 +54,7 @@ public:
     
     // MARK: ally info
     int allyWorkerCount[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    int unitCount[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
 
     // MARK: enemy info
     int enemyWorkerCount[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];

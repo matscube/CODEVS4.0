@@ -7,6 +7,9 @@
 //
 
 #include "IOManager.h"
+#include "Game.h"
+#include "Field.h"
+#include "Player.h"
 
 IOManager::IOManager(Game &game, Field &field, Player &player, Player &enemy) {
     IOManager::game = &game;
@@ -98,6 +101,7 @@ void IOManager::inputBody() {
     
     // Input EnemyUnit Information
     int enemyUnitCount = nextInt();
+    vector<PlayerUnit> enemyUnits;
     for (int i = 0; i < enemyUnitCount; i++) {
         int unitID = nextInt();
         int unitPosY = nextInt();
@@ -110,7 +114,9 @@ void IOManager::inputBody() {
         
         field->updateWithPlayerUnit(&unit);
         enemy->updateUnit(unit);
+        enemyUnits.push_back(unit);
     }
+    enemy->updateCastleMode(enemyUnits);
     
     // Input ResourceUnit Information
     int resourceCount; cin >> resourceCount;

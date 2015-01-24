@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		21149D281A72B43300C34F40 /* ExtraAI_Quick.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21149D271A72B43300C34F40 /* ExtraAI_Quick.cpp */; };
+		21149D2B1A73EABD00C34F40 /* PlayerUnit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21149D291A73EABD00C34F40 /* PlayerUnit.cpp */; };
 		213DC4381A492BFE00E5DC85 /* Library.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 213DC4361A492BFE00E5DC85 /* Library.cpp */; };
 		216121181A4890A100C7C139 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216121161A4890A100C7C139 /* Player.cpp */; };
 		2161211B1A4890AD00C7C139 /* Field.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216121191A4890AD00C7C139 /* Field.cpp */; };
@@ -33,6 +35,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		21149D271A72B43300C34F40 /* ExtraAI_Quick.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtraAI_Quick.cpp; sourceTree = "<group>"; };
+		21149D291A73EABD00C34F40 /* PlayerUnit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlayerUnit.cpp; sourceTree = "<group>"; };
+		21149D2A1A73EABD00C34F40 /* PlayerUnit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerUnit.h; sourceTree = "<group>"; };
 		213DC4361A492BFE00E5DC85 /* Library.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Library.cpp; sourceTree = "<group>"; };
 		213DC4371A492BFE00E5DC85 /* Library.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Library.h; sourceTree = "<group>"; };
 		216121161A4890A100C7C139 /* Player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = "<group>"; };
@@ -79,6 +84,8 @@
 				2161211D1A4890BD00C7C139 /* Game.h */,
 				213DC4361A492BFE00E5DC85 /* Library.cpp */,
 				213DC4371A492BFE00E5DC85 /* Library.h */,
+				21149D291A73EABD00C34F40 /* PlayerUnit.cpp */,
+				21149D2A1A73EABD00C34F40 /* PlayerUnit.h */,
 			);
 			name = Libs;
 			sourceTree = "<group>";
@@ -90,6 +97,7 @@
 				2172155A1A6A632E00E3F464 /* ExtraAI.h */,
 				218904641A6ED1BB008372A7 /* ExtraAI_Search.cpp */,
 				218904661A6ED1DB008372A7 /* ExtraAI_Custom.cpp */,
+				21149D271A72B43300C34F40 /* ExtraAI_Quick.cpp */,
 			);
 			name = ExtraAI;
 			sourceTree = "<group>";
@@ -185,9 +193,11 @@
 				219D56491A3F497F00162FEA /* IOManager.cpp in Sources */,
 				2172155B1A6A632E00E3F464 /* ExtraAI_Base.cpp in Sources */,
 				2161211B1A4890AD00C7C139 /* Field.cpp in Sources */,
+				21149D2B1A73EABD00C34F40 /* PlayerUnit.cpp in Sources */,
 				216DBDB61A5ECA62002942FF /* QuickAI.cpp in Sources */,
 				218904671A6ED1DB008372A7 /* ExtraAI_Custom.cpp in Sources */,
 				213DC4381A492BFE00E5DC85 /* Library.cpp in Sources */,
+				21149D281A72B43300C34F40 /* ExtraAI_Quick.cpp in Sources */,
 				216121181A4890A100C7C139 /* Player.cpp in Sources */,
 				2161211E1A4890BD00C7C139 /* Game.cpp in Sources */,
 				216121211A48925100C7C139 /* AI.cpp in Sources */,

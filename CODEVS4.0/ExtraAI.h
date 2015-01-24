@@ -36,7 +36,8 @@ public:
     vector<Command> getCommands();
     
     // MARK: Basic Command
-    void addCommandMove(PlayerUnit *pUnit, Position target);
+    void addCommandMove(PlayerUnit *pUnit, Position target, bool synchro = false, bool formed = false);
+    void addCommandMove(PlayerUnit *pUnit, PlayerUnitActionType moveAction);
     void addCommandCreateVillage(PlayerUnit *pUnit);
     void addCommandCreateBase(PlayerUnit *pUnit);
     void addCommandCreateWorker(PlayerUnit *pUnit);
@@ -48,8 +49,9 @@ public:
     
     // MARK: Defend
     int defenderBaseCount(Position position);
-    int createDefenderBaseCommand(Position position, int prob);
-    int createCastleDefenderCommand(Position position, int assign, int prob);
+    int createCastleBaseCommand(int prob);
+    int createBaseCommand(Position position, int prob);
+    int createDefenderCommand(Position position, int assign, int prob);
     void defendCastleCommand(int assign); // moveCommand
     
     // MARK: Utility
@@ -85,6 +87,16 @@ public:
     void searchUnkownFieldMediumCommand(int assign);
     void searchUnkownFieldAllCommand(int assign);
     
+    vector<Position> searchEnemyCastleLine1();
+    vector<Position> searchEnemyCastleLine2();
+    vector<Position> searchEnemyCastleLine3();
+    vector<Position> searchEnemyCastleLine4();
+    vector<Position> searchEnemyCastleLine5();
+    void searchEnemyCastleCommand();
+
+    // MARK: Enemy
+    int nearestEnemyDistance = INF;
+    void updateNearestEnemy();
     
     // MARK: Attacker
     vector<PlayerUnitType> attackerTypesPack(int knight, int fighter, int assasin);
@@ -97,6 +109,25 @@ public:
 
     // MARK: temp
     int supplyFreeWorkerWithVillageCommand(int need, int prob);
+    
+    // MARK: Attack
+    vector<Position> backAttackMoveLineRight();
+    vector<Position> backAttackMoveLineDown();
+    void backAttackMoveRightCommand();
+    void backAttackMoveDownCommand();
+    vector<PlayerUnit *> attackBases();
+    int calcAttackBase();
+    void createOneAttackerBase();
+    void createOneMoreAttackerBase();
+    void createAttackerCommand();
+    void attackCastleCommand();
+    
+    void poolAttackerCommand(int need);
+    
+    
+    // Worker
+    void supplyWorkerForSearchCommand(int need);
+
     
     // MARK: Debug
     void debug();

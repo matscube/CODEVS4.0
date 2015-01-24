@@ -9,6 +9,8 @@
 #ifndef __CODEVS4_0__Player__
 #define __CODEVS4_0__Player__
 
+
+#include "PlayerUnit.h"
 #include <stdio.h>
 #include <vector>
 #include <string>
@@ -17,89 +19,10 @@
 #include <cstdlib>
 #include <iostream>
 
-
-using namespace std;
-typedef pair<int, int> Position;
-
-enum class PlayerUnitType {
-    Worker,
-    Knight,
-    Fighter,
-    Assassin,
-    Castle,
-    Village,
-    Base,
-    Unknown,
-};
-
-string PlayerUnitTypeName(PlayerUnitType t);
-
-enum class PlayerUnitActionType {
-    MoveUp,
-    MoveDown,
-    MoveLeft,
-    MoveRight,
-    CreateWorker,
-    CreateKnight,
-    CreateFighter,
-    CreateAssassin,
-    CreateVillage,
-    CreateBase,
-    None,
-};
-
-PlayerUnitType UnitTypeCreated(PlayerUnitActionType at);
-
-PlayerUnitActionType CreateAttackerAction(PlayerUnitType t);
-
-enum class PlayerUnitStatus {
-    Idle,
-    FixPosition,
-    Reserved,
-};
-
-string PlayerUnitStatusName(PlayerUnitStatus s);
-
-class Player;
-class PlayerUnit {
-public:
-    int ID;
-//    int x, y;
-    Position position;
-    int hitPoint;
-    PlayerUnitType type;
-    PlayerUnitStatus status;
-    Player *player;
-
-    PlayerUnit();
-    PlayerUnit(int ID, Position position, PlayerUnitType type, Player *player);
-    void setHitPoint(int hitPoint);
-    // TODO: use Position type;
-    PlayerUnitActionType moveToTargetAction(Position target, bool synchro = false);
-    
-    int getHashID();
-    
-    static int cost(PlayerUnitActionType at);
-    static string action(PlayerUnitActionType type);
-    static int viewRange(PlayerUnitType type);
-    static int attackRange(PlayerUnitType type);
-    bool isMovable();
-    bool isCreatableWorker();
-    bool isCreatableAttacker(PlayerUnitType t);
-    bool isCreatableVillage();
-    bool isCreatableBase();
-
-    bool isAttacker();
-
-    void fix(PlayerUnitActionType at);
-    void fixOnlyPosition();
-};
+class Field;
 
 // TODO: rename
-enum class PlayerType {
-    Ally,
-    Enemy,
-};
+string castleModeString(CastleMode mode);
 
 class Player {
 public:
@@ -110,6 +33,10 @@ public:
 
     PlayerType type;
     void updateType(PlayerUnit p);
+    
+    // MARK: For enemy
+    CastleMode castleMode;
+    void updateCastleMode(vector<PlayerUnit> inputEnemyUnits);
 
     // MARK: Unit
     void clearUnits();
@@ -127,6 +54,7 @@ public:
     // MARK: Reset
     void resetWithStage();
     void resetWithTurn();
+    void resetCastle();
     
     // MARK: Calc count
     int calcWorkerCount();

@@ -259,12 +259,13 @@ void ExtraAI::searchUnkownFieldSmallCommand(int assign) {
     int currentAssign = 0;
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight1(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight2(), 1, allTypes());
-    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight3(), 1, allTypes());
     
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown1(), 1, allTypes());
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown2(), 1, allTypes());
-    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown3(), 1, allTypes());
     
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToRight3(), 1, allTypes());
+    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineToDown3(), 1, allTypes());
+
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly1(), 1, allTypes());
 }
 void ExtraAI::searchUnkownFieldMediumCommand(int assign) {
@@ -309,4 +310,55 @@ void ExtraAI::searchUnkownFieldAllCommand(int assign) {
     
     if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly1(), 1, allTypes());
     //    if (++currentAssign <= assign) searchNoVisitedAreaCommand(searchLineAlly2(), 1, allTypes());
+}
+
+
+vector<Position> ExtraAI::searchEnemyCastleLine1() {
+    vector<Position> line;
+    for (int y = 59; y < MAX_FIELD_HEIGHT; y++) {
+        Position p(95, y);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchEnemyCastleLine2() {
+    vector<Position> line;
+    for (int x = 59; x < MAX_FIELD_HEIGHT; x++) {
+        Position p(x, 95);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchEnemyCastleLine3() {
+    vector<Position> line;
+    for (int y = 69; y < MAX_FIELD_HEIGHT; y++) {
+        Position p(86, y);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchEnemyCastleLine4() {
+    vector<Position> line;
+    for (int x = 69; x < MAX_FIELD_HEIGHT; x++) {
+        Position p(x, 86);
+        line.push_back(p);
+    }
+    return line;
+}
+vector<Position> ExtraAI::searchEnemyCastleLine5() {
+    vector<Position> line;
+    Position p(81, 81);
+    line.push_back(p);
+    return line;
+}
+
+void ExtraAI::searchEnemyCastleCommand() {
+    map<PlayerUnitType, bool> assasinType;
+    assasinType[PlayerUnitType::Assassin] = true;
+    
+    searchNoVisitedAreaCommand(searchEnemyCastleLine1(), 1, assasinType);
+    searchNoVisitedAreaCommand(searchEnemyCastleLine2(), 1, assasinType);
+    searchNoVisitedAreaCommand(searchEnemyCastleLine3(), 1, assasinType);
+    searchNoVisitedAreaCommand(searchEnemyCastleLine4(), 1, assasinType);
+    searchNoVisitedAreaCommand(searchEnemyCastleLine5(), 1, assasinType);
 }

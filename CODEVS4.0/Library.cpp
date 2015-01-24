@@ -12,7 +12,9 @@
 int utl::dist(Position pos1, Position pos2) {
     return abs(pos1.first - pos2.first) + abs(pos1.second - pos2.second);
 }
-
+int utl::distSingle(Position pos1, Position pos2) {
+    return max(abs(pos1.first - pos2.first), abs(pos1.second - pos2.second));
+}
 int utl::getHashID(Position pos) {
     return pos.second * MAX_FIELD_WIDTH + pos.first;
 }
@@ -20,6 +22,11 @@ int utl::getHashID(Position pos) {
 bool utl::isValidUnitID(int ID) {
     if (ID < 0) return false;
     else return true;
+}
+bool utl::isValidPosition(Position pos) {
+    if (pos.first < 0 || pos.first >= MAX_FIELD_WIDTH) return false;
+    if (pos.second < 0 || pos.second >= MAX_FIELD_HEIGHT) return false;
+    return true;
 }
 
 vector<Position> utl::framePositions(int d, bool shuffle) {
