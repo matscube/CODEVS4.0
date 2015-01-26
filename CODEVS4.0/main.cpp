@@ -60,11 +60,10 @@ int main(int argc, const char * argv[]) {
 //        cerr << enemy.castle.position.first << " " << enemy.castle.position.second << endl;
 
         // Ready
-        ai.updateNearestEnemy();
+        ai.updateEnemy();
         
         // Defending Mode
-        /*
-        if (ai.nearestEnemyDistance < 30) {
+        if (ai.nearestEnemyDistance < 20) {
             Position castleBasePos = player.castle.position;
             
             if (ai.defenderBaseCount(castleBasePos) == 0) {
@@ -72,11 +71,18 @@ int main(int argc, const char * argv[]) {
                 if (castleBaseCount == 0) {
                     ai.setCostLimit(500);
                 }
-            } else {
+            } else if (ai.enemyCountToAllyCaslte >= 1 && ai.calcCastleDefender() < 5) {
                 ai.createDefenderCommand(castleBasePos, 1, 100);
-                ai.defendCastleCommand(30);
+//                ai.defendCastleCommand(5);
+            } else if (ai.enemyCountToAllyCaslte >= 5 && ai.calcCastleDefender() < 10) {
+                ai.createDefenderCommand(castleBasePos, 1, 100);
+//                ai.defendCastleCommand(10);
+            } else if (ai.enemyCountToAllyCaslte >= 10 && ai.calcCastleDefender() < 30) {
+                ai.createDefenderCommand(castleBasePos, 1, 100);
+//                ai.defendCastleCommand(30);
             }
-        }*/
+            ai.defendCastleCommand(INF);
+        }
         
         // Attack
         // create base

@@ -117,45 +117,104 @@ int ExtraAI::createDefenderCommand(Position position, int assign, int prob) {
     return create;
 }
 
+int ExtraAI::calcCastleDefender() {
+    int create = 0;
+    map<int, PlayerUnit *>::iterator uPIte;
+    for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
+        int d = utl::dist(player->castle.position, uPIte->second->position);
+        if (d <= PlayerUnit::viewRange(PlayerUnitType::Castle)) create++;
+    }
+    return create;
+}
 void ExtraAI::defendCastleCommand(int assign) {
-    Position target = player->castle.position;
-    map<int, PlayerUnit *>::iterator uIte;
-    vector<pair<int, PlayerUnit *> > attackerDists; // <d, attaker>
-    for (uIte = player->attackers.begin(); uIte != player->attackers.end(); uIte++) {
-        PlayerUnit *attacker = uIte->second;
-        int d = utl::dist(attacker->position, target);
-        
-        attackerDists.push_back(make_pair(d, attacker));
+    Position center = player->castle.position;
+    
+    // Select pool cell
+    vector<pair<int, Position> > poolTargetDists;
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            Position pos(center.first + dx, center.second + dy);
+            if (utl::isValidPosition(pos)) {
+                int d = utl::dist(pos, enemy->castle.position);
+                poolTargetDists.push_back(make_pair(d, pos));
+            }
+        }
+    }
+    sort(poolTargetDists.begin(), poolTargetDists.end());
+    
+    int poolTargetCount = (assign + 9) / 10;
+    int currentPoolTargetCount = 0;
+    vector<Position> poolTargets;
+    vector<pair<int, Position> >::iterator pIte;
+    for (pIte = poolTargetDists.begin(); pIte != poolTargetDists.end(); pIte++) {
+        if (currentPoolTargetCount < poolTargetCount) {
+            poolTargets.push_back(pIte->second);
+            currentPoolTargetCount++;
+        } else {
+            break;
+        }
     }
     
-    sort(attackerDists.begin(), attackerDists.end());
+    // Select Defender
+    int poolTargetRange = PlayerUnit::viewRange(PlayerUnitType::Castle);
+    map<int, PlayerUnit* >::iterator uPIte;
+    vector<PlayerUnit *> attackers;
+    for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
+        PlayerUnit *attacker = uPIte->second;
+        int d = utl::dist(attacker->position, center);
+        if (d > poolTargetRange) continue;
+        attackers.push_back(attacker);
+    }
     
-    int currentAssign = 0;
-    vector<pair<int, PlayerUnit *> >::iterator aIte;
-    for (aIte = attackerDists.begin(); aIte != attackerDists.end(); aIte++) {
-        if (currentAssign >= assign) break;
-        int d = aIte->first;
-        PlayerUnit *attacker = aIte->second;
+    // Assign defender to pool cell
+    vector<PlayerUnit *>::iterator aIte;
+    vector<Position>::iterator tIte;
+    vector<pair<int, pair<PlayerUnit *, Position> > > poolAttackers;
+    for (aIte = attackers.begin(); aIte != attackers.end(); aIte++) {
+        PlayerUnit *attacker = *aIte;
+        for (tIte = poolTargets.begin(); tIte != poolTargets.end(); tIte++) {
+            Position target = *tIte;
+            int d = utl::dist(attacker->position, target);
+            poolAttackers.push_back(make_pair(d, make_pair(attacker, target)));
+        }
+    }
+    sort(poolAttackers.begin(), poolAttackers.end());
+    
+    int poolCountField[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT] = {0};
+    vector<pair<int, pair<PlayerUnit *, Position> > >::iterator paIte;
+    for (paIte = poolAttackers.begin(); paIte != poolAttackers.end(); paIte++) {
+        PlayerUnit *attacker = paIte->second.first;
+        Position target = paIte->second.second;
+        int d = paIte->first;
         
+        if (poolCountField[target.first][target.second] >= 10) continue;
         if (d == 0) {
-            if (!attacker->isMovable()) continue;
-            attacker->fixOnlyPosition();
-            currentAssign++;
+            if (attacker->isMovable()) {
+                attacker->fixOnlyPosition();
+                poolCountField[target.first][target.second]++;
+            } else {
+                poolCountField[target.first][target.second]++;
+            }
         } else {
-            if (!attacker->isMovable()) continue;
-            addCommandMove(attacker, target);
-            currentAssign++;
+            if (attacker->isMovable()) {
+                addCommandMove(attacker, target);
+                poolCountField[target.first][target.second]++;
+            }
         }
     }
 }
 
 // MARK: Enemy -----------------------------------------------------------
-void ExtraAI::updateNearestEnemy() {
+void ExtraAI::updateEnemy() {
     map<int, PlayerUnit *>::iterator uPIte;
     for (uPIte = enemy->units.begin(); uPIte != enemy->units.end(); uPIte++) {
         Position pos = uPIte->second->position;
         int d = utl::dist(pos, player->castle.position);
         if (nearestEnemyDistance > d) nearestEnemyDistance = d;
+        
+        if (d <= PlayerUnit::viewRange(PlayerUnitType::Castle)) {
+            enemyCountToAllyCaslte++;
+        }
     }
 }
 
