@@ -18,10 +18,12 @@ ExtraAI::ExtraAI(Game &game, Field &field, Player &player, Player &enemy) {
 }
 
 void ExtraAI::resetWithTurn() {
+    enemyCountToAllyCaslte = 0;
     commands.clear();
 }
 void ExtraAI::resetWithStage() {
     nearestEnemyDistance = INF;
+    enemyCountToAllyCaslte = 0;
     commands.clear();
 }
 

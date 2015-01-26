@@ -52,6 +52,7 @@ public:
     int createCastleBaseCommand(int prob);
     int createBaseCommand(Position position, int prob);
     int createDefenderCommand(Position position, int assign, int prob);
+    int calcCastleDefender();
     void defendCastleCommand(int assign); // moveCommand
     
     // MARK: Utility
@@ -95,8 +96,9 @@ public:
     void searchEnemyCastleCommand();
 
     // MARK: Enemy
-    int nearestEnemyDistance = INF;
-    void updateNearestEnemy();
+    int nearestEnemyDistance;
+    int enemyCountToAllyCaslte;
+    void updateEnemy();
     
     // MARK: Attacker
     vector<PlayerUnitType> attackerTypesPack(int knight, int fighter, int assasin);
