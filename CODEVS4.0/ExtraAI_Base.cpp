@@ -45,15 +45,16 @@ void ExtraAI::addCommandMove(PlayerUnit *pUnit, Position target, bool synchro, b
   
         Position next = pUnit->position;
         PlayerUnitActionType at;
+        // Priority of right and down
         if (dx > 0 && field->unitCount[x + 1][y] < 10) {
             at = PlayerUnitActionType::MoveRight;
             field->unitCount[x + 1][y]++;
-        } else if (dx < 0 && field->unitCount[x - 1][y] < 10) {
-            at = PlayerUnitActionType::MoveLeft;
-            field->unitCount[x - 1][y]++;
         } else if (dy > 0 && field->unitCount[x][y + 1] < 10) {
             at = PlayerUnitActionType::MoveDown;
             field->unitCount[x][y + 1]++;
+        } else if (dx < 0 && field->unitCount[x - 1][y] < 10) {
+            at = PlayerUnitActionType::MoveLeft;
+            field->unitCount[x - 1][y]++;
         } else if (dy < 0 && field->unitCount[x][y - 1] < 10) {
             at = PlayerUnitActionType::MoveUp;
             field->unitCount[x][y - 1]++;

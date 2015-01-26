@@ -188,6 +188,9 @@ void ExtraAI::poolAttackerCommand(int need) {
     
     // Count pool count
     Position center = base->position;
+//    if (center.first == MAX_FIELD_WIDTH - 1) center.first--;
+//    if (center.second == MAX_FIELD_HEIGHT - 1) center.second--;
+
     int poolCountSingleRange = 4;
     int poolCount = 0;
     map<int, PlayerUnit *>::iterator uIte;
@@ -232,6 +235,7 @@ void ExtraAI::poolAttackerCommand(int need) {
     }
   
     // Select Attacker
+//    int poolTargetSingleRange = 2;
     int poolTargetSingleRange = 1;
     vector<PlayerUnit *> attackers;
     for (uIte = player->attackers.begin(); uIte != player->attackers.end(); uIte++) {
