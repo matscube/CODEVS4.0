@@ -35,7 +35,7 @@ vector<Position> ExtraAI::searchLineToRight3() {
 }
 vector<Position> ExtraAI::searchLineToRight4() {
     vector<Position> line;
-    for (int x = 25; x < MAX_FIELD_WIDTH; x++) {
+    for (int x = 30; x < MAX_FIELD_WIDTH; x++) {
         Position p(x, 31);
         line.push_back(p);
     }
@@ -43,7 +43,7 @@ vector<Position> ExtraAI::searchLineToRight4() {
 }
 vector<Position> ExtraAI::searchLineToRight5() {
     vector<Position> line;
-    for (int x = 20; x < MAX_FIELD_WIDTH; x++) {
+    for (int x = 30; x < MAX_FIELD_WIDTH; x++) {
         Position p(x, 40);
         line.push_back(p);
     }
@@ -176,27 +176,15 @@ vector<Position> ExtraAI::searchLineAlly1() {
         Position p(x, 4);
         line.push_back(p);
     }
-    for (int y = 9; y < 40; y++) {
-        Position p(4, y);
-        line.push_back(p);
-    }
-    return line;
-}
-vector<Position> ExtraAI::searchLineAlly2() {
-    vector<Position> line;
-    for (int x = 0; x < 40; x++) {
-        Position p(x, 4);
-        line.push_back(p);
-    }
-    for (int x = 10; x < 40; x++) {
+    for (int x = 9; x < 35; x++) {
         Position p(x, 13);
         line.push_back(p);
     }
-    for (int x = 10; x < 40; x++) {
+    for (int x = 9; x < 30; x++) {
         Position p(x, 22);
         line.push_back(p);
     }
-    for (int x = 10; x < 40; x++) {
+    for (int x = 9; x < 30; x++) {
         Position p(x, 31);
         line.push_back(p);
     }
