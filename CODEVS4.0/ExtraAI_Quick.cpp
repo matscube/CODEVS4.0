@@ -188,8 +188,8 @@ void ExtraAI::poolAttackerCommand(int need) {
     
     // Count pool count
     Position center = base->position;
-//    if (center.first == MAX_FIELD_WIDTH - 1) center.first--;
-//    if (center.second == MAX_FIELD_HEIGHT - 1) center.second--;
+    if (center.first == MAX_FIELD_WIDTH - 1) center.first--;
+    if (center.second == MAX_FIELD_HEIGHT - 1) center.second--;
 
     int poolCountSingleRange = 4;
     int poolCount = 0;
@@ -233,14 +233,15 @@ void ExtraAI::poolAttackerCommand(int need) {
             break;
         }
     }
-  
+    
+    
     // Select Attacker
 //    int poolTargetSingleRange = 2;
     int poolTargetSingleRange = 1;
     vector<PlayerUnit *> attackers;
     for (uIte = player->attackers.begin(); uIte != player->attackers.end(); uIte++) {
         PlayerUnit *attacker = uIte->second;
-        int distSToBase = utl::distSingle(attacker->position, base->position);
+        int distSToBase = utl::distSingle(attacker->position, center);
         if (distSToBase > poolTargetSingleRange) continue;
         attackers.push_back(attacker);
     }

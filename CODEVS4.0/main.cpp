@@ -101,12 +101,15 @@ int main(int argc, const char * argv[]) {
         
         if (enemy.castleMode == CastleMode::Alone) {
             // Quick Attack
+//            cerr << "alone" << endl;
             ai.attackCastleCommand();
         } else if (enemy.castleMode == CastleMode::Defending) {
             // Pool Attack
+//            cerr << "pool" << endl;
             ai.poolAttackerCommand(60);
             ai.attackCastleCommand();
         } else {
+//            cerr << "default" << endl;
             ai.poolAttackerCommand(30);
             ai.attackCastleCommand();
         }

@@ -100,6 +100,8 @@ void Player::updateCastleMode(vector<PlayerUnit> inputEnemyUnits) {
         int d = utl::dist(unit->position, target);
         if (d <= 2) castleDefenderCount++;
     }
+    maxCastleDefenderCount = max(maxCastleDefenderCount, castleDefenderCount);
+//    cerr << "DefendCount: " << maxCastleDefenderCount << endl;
     if (castleIsViewd && castleDefenderCount >= 3) castleMode = CastleMode::Defending;
     else if (castleIsViewd) castleMode = CastleMode::Alone;
 }

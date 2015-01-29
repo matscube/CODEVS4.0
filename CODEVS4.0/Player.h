@@ -36,6 +36,7 @@ public:
     
     // MARK: For enemy
     CastleMode castleMode;
+    int maxCastleDefenderCount = 0;
     void updateCastleMode(vector<PlayerUnit> inputEnemyUnits);
 
     // MARK: Unit
