@@ -112,16 +112,18 @@ int main(int argc, const char * argv[]) {
         }
         
         // Resource Getting
-        ai.createVillageOnResourceCommand(INF, 100);
-        ai.searchUnkownFieldSmallCommand(INF);
-        ai.getResourceCommand(INF);
+        if (attackBaseCount == 0) {
+            ai.createVillageOnResourceCommand(INF, 100);
+            ai.searchUnkownFieldSmallCommand(INF);
+            ai.getResourceCommand(INF);
 
-        ai.searchUnkownFieldMediumCommand(INF);
-        ai.getResourceCommand(INF);
-        
-        ai.searchUnkownFieldAllCommand(INF);
-        ai.getResourceCommand(INF);
-
+            ai.searchUnkownFieldMediumCommand(INF);
+            ai.getResourceCommand(INF);
+            
+            ai.searchUnkownFieldAllCommand(INF);
+            ai.getResourceCommand(INF);
+        }
+            
         // End AI Commands **********************************************************
 
         // Output AI Commands

@@ -24,6 +24,7 @@ void ExtraAI::resetWithTurn() {
 void ExtraAI::resetWithStage() {
     nearestEnemyDistance = INF;
     enemyCountToAllyCaslte = 0;
+    memset(workerCreationCount, 0, sizeof(workerCreationCount));
     commands.clear();
 }
 

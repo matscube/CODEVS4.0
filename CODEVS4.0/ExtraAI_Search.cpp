@@ -353,12 +353,14 @@ vector<Position> ExtraAI::searchEnemyCastleLine5() {
 }
 
 void ExtraAI::searchEnemyCastleCommand() {
-    map<PlayerUnitType, bool> assasinType;
-    assasinType[PlayerUnitType::Assassin] = true;
+    map<PlayerUnitType, bool> types;
+//    types[PlayerUnitType::Knight] = true;
+//    types[PlayerUnitType::Assassin] = true;
+    types[PlayerUnitType::Assassin] = true;
     
-    searchNoVisitedAreaCommand(searchEnemyCastleLine1(), 1, assasinType);
-    searchNoVisitedAreaCommand(searchEnemyCastleLine2(), 1, assasinType);
-    searchNoVisitedAreaCommand(searchEnemyCastleLine3(), 1, assasinType);
-    searchNoVisitedAreaCommand(searchEnemyCastleLine4(), 1, assasinType);
-    searchNoVisitedAreaCommand(searchEnemyCastleLine5(), 1, assasinType);
+    searchNoVisitedAreaCommand(searchEnemyCastleLine1(), 1, types);
+    searchNoVisitedAreaCommand(searchEnemyCastleLine2(), 1, types);
+    searchNoVisitedAreaCommand(searchEnemyCastleLine3(), 1, types);
+    searchNoVisitedAreaCommand(searchEnemyCastleLine4(), 1, types);
+    searchNoVisitedAreaCommand(searchEnemyCastleLine5(), 1, types);
 }

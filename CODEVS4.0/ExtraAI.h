@@ -108,6 +108,8 @@ public:
     int createVillageOnResourceCommand(int assign, int prob);
     int getResourceCommand(int prob);
     void defendResourceCommand(int assign);
+    int workerCreationCount[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    
 
     // MARK: temp
     int supplyFreeWorkerWithVillageCommand(int need, int prob);
