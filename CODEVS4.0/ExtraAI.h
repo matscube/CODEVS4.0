@@ -123,6 +123,8 @@ public:
     int calcAttackBase();
     void createOneAttackerBase();
     void createOneMoreAttackerBase();
+    vector<PlayerUnitType> defaultAttackerPack();
+    vector<PlayerUnitType> assassinAttackerPack();
     void createAttackerCommand();
     void attackCastleCommand();
     bool poolReleased;

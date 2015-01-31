@@ -149,11 +149,24 @@ void ExtraAI::createOneMoreAttackerBase() {
     }
 }
 
-void ExtraAI::createAttackerCommand() {
+vector<PlayerUnitType> ExtraAI::defaultAttackerPack() {
     vector<PlayerUnitType> types;
     for (int i = 0; i < 10; i++) types.push_back(PlayerUnitType::Knight);
     for (int i = 0; i < 50; i++) types.push_back(PlayerUnitType::Fighter);
     for (int i = 0; i < 40; i++) types.push_back(PlayerUnitType::Assassin);
+    return types;
+}
+vector<PlayerUnitType> ExtraAI::assassinAttackerPack() {
+    vector<PlayerUnitType> types;
+    for (int i = 0; i < 0; i++) types.push_back(PlayerUnitType::Knight);
+    for (int i = 0; i < 0; i++) types.push_back(PlayerUnitType::Fighter);
+    for (int i = 0; i < 100; i++) types.push_back(PlayerUnitType::Assassin);
+    return types;
+}
+void ExtraAI::createAttackerCommand() {
+    vector<PlayerUnitType> types;
+    if (enemy->defenderType == CastleDefenderType::Default) types = defaultAttackerPack();
+    if (enemy->defenderType == CastleDefenderType::Assassin) types = assassinAttackerPack();
     
     vector<PlayerUnit *> bases = attackBases();
     vector<PlayerUnit *>::iterator uPIte;

@@ -92,6 +92,7 @@ void Player::updateCastleMode(vector<PlayerUnit> inputEnemyUnits) {
     Position target = castle.position;
     int castleDefenderCount = 0;
     bool castleIsViewd = false;
+    int assassinCount = 0;
     vector<PlayerUnit>::iterator uIte;
     for (uIte = inputEnemyUnits.begin(); uIte != inputEnemyUnits.end(); uIte++) {
         PlayerUnit *unit = &*uIte;
@@ -99,11 +100,17 @@ void Player::updateCastleMode(vector<PlayerUnit> inputEnemyUnits) {
         if (!unit->isAttacker()) continue;
         int d = utl::dist(unit->position, target);
         if (d <= 2) castleDefenderCount++;
+        if (unit->type == PlayerUnitType::Assassin) assassinCount++;
     }
+
     maxCastleDefenderCount = max(maxCastleDefenderCount, castleDefenderCount);
 //    cerr << "DefendCount: " << maxCastleDefenderCount << endl;
-    if (castleIsViewd && castleDefenderCount >= 3) castleMode = CastleMode::Defending;
-    else if (castleIsViewd) castleMode = CastleMode::Alone;
+    if (castleIsViewd && castleDefenderCount >= 3) {
+        castleMode = CastleMode::Defending;
+        if (assassinCount > castleDefenderCount * 60 / 100) defenderType = CastleDefenderType::Assassin;
+        else defenderType = CastleDefenderType::Default;
+    } else if (castleIsViewd) castleMode = CastleMode::Alone;
+
 }
 
 
@@ -113,7 +120,9 @@ void Player::resetWithStage() {
     isViewdCastle = false;
     resourceCount = 0;
     necessaryResourceCount = 0;
+    maxCastleDefenderCount = 0;
     castleMode = CastleMode::Unknown;
+    defenderType = CastleDefenderType::Default;
     
     clearUnits();
     resetCastle();
