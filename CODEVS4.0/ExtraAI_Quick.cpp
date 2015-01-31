@@ -178,11 +178,11 @@ void ExtraAI::attackCastleCommand() {
     }
 }
 
-void ExtraAI::poolAttackerCommand(int need) {
+bool ExtraAI::poolAttackerCommand(int need) {
     vector<PlayerUnit *> bases = attackBases();
     if (bases.size() == 0) {
 //        cerr << "Base Size : 0" << endl;
-        return;
+        return false;
     }
     PlayerUnit *base = bases[0];
     
@@ -202,7 +202,7 @@ void ExtraAI::poolAttackerCommand(int need) {
     cerr << "PoolCount: " << poolCount << endl;
     if (poolCount >= need) {
         cerr << "Release" << endl;
-        return;
+        return true;
     } else {
         cerr << "Pooling" << endl;
     }
@@ -282,7 +282,7 @@ void ExtraAI::poolAttackerCommand(int need) {
             }
         }
     }
-    
+    return false;
 }
 
 // MARK: Worker

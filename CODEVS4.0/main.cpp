@@ -106,7 +106,11 @@ int main(int argc, const char * argv[]) {
         } else if (enemy.castleMode == CastleMode::Defending) {
             // Pool Attack
 //            cerr << "pool" << endl;
-            ai.poolAttackerCommand(60);
+            if (!ai.poolReleased) {
+                if (ai.poolAttackerCommand(70)) {
+                    ai.poolReleased = true;
+                }
+            }
             ai.attackCastleCommand();
         } else {
 //            cerr << "default" << endl;

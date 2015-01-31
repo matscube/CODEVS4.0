@@ -26,6 +26,7 @@ void ExtraAI::resetWithStage() {
     enemyCountToAllyCaslte = 0;
     memset(workerCreationCount, 0, sizeof(workerCreationCount));
     commands.clear();
+    poolReleased = false;
 }
 
 vector<Command> ExtraAI::getCommands() {

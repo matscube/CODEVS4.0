@@ -125,8 +125,8 @@ public:
     void createOneMoreAttackerBase();
     void createAttackerCommand();
     void attackCastleCommand();
-    
-    void poolAttackerCommand(int need);
+    bool poolReleased;
+    bool poolAttackerCommand(int need);
     
     
     // Worker
