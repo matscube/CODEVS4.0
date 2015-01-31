@@ -149,11 +149,24 @@ void ExtraAI::createOneMoreAttackerBase() {
     }
 }
 
-void ExtraAI::createAttackerCommand() {
+vector<PlayerUnitType> ExtraAI::defaultAttackerPack() {
     vector<PlayerUnitType> types;
     for (int i = 0; i < 10; i++) types.push_back(PlayerUnitType::Knight);
     for (int i = 0; i < 50; i++) types.push_back(PlayerUnitType::Fighter);
     for (int i = 0; i < 40; i++) types.push_back(PlayerUnitType::Assassin);
+    return types;
+}
+vector<PlayerUnitType> ExtraAI::assassinAttackerPack() {
+    vector<PlayerUnitType> types;
+    for (int i = 0; i < 0; i++) types.push_back(PlayerUnitType::Knight);
+    for (int i = 0; i < 0; i++) types.push_back(PlayerUnitType::Fighter);
+    for (int i = 0; i < 100; i++) types.push_back(PlayerUnitType::Assassin);
+    return types;
+}
+void ExtraAI::createAttackerCommand() {
+    vector<PlayerUnitType> types;
+    if (enemy->defenderType == CastleDefenderType::Default) types = defaultAttackerPack();
+    if (enemy->defenderType == CastleDefenderType::Assassin) types = assassinAttackerPack();
     
     vector<PlayerUnit *> bases = attackBases();
     vector<PlayerUnit *>::iterator uPIte;
@@ -178,16 +191,19 @@ void ExtraAI::attackCastleCommand() {
     }
 }
 
-void ExtraAI::poolAttackerCommand(int need) {
+bool ExtraAI::poolAttackerCommand(int need) {
     vector<PlayerUnit *> bases = attackBases();
     if (bases.size() == 0) {
 //        cerr << "Base Size : 0" << endl;
-        return;
+        return false;
     }
     PlayerUnit *base = bases[0];
     
     // Count pool count
     Position center = base->position;
+    if (center.first == MAX_FIELD_WIDTH - 1) center.first--;
+    if (center.second == MAX_FIELD_HEIGHT - 1) center.second--;
+
     int poolCountSingleRange = 4;
     int poolCount = 0;
     map<int, PlayerUnit *>::iterator uIte;
@@ -199,7 +215,7 @@ void ExtraAI::poolAttackerCommand(int need) {
     cerr << "PoolCount: " << poolCount << endl;
     if (poolCount >= need) {
         cerr << "Release" << endl;
-        return;
+        return true;
     } else {
         cerr << "Pooling" << endl;
     }
@@ -230,13 +246,15 @@ void ExtraAI::poolAttackerCommand(int need) {
             break;
         }
     }
-  
+    
+    
     // Select Attacker
+//    int poolTargetSingleRange = 2;
     int poolTargetSingleRange = 1;
     vector<PlayerUnit *> attackers;
     for (uIte = player->attackers.begin(); uIte != player->attackers.end(); uIte++) {
         PlayerUnit *attacker = uIte->second;
-        int distSToBase = utl::distSingle(attacker->position, base->position);
+        int distSToBase = utl::distSingle(attacker->position, center);
         if (distSToBase > poolTargetSingleRange) continue;
         attackers.push_back(attacker);
     }
@@ -277,7 +295,29 @@ void ExtraAI::poolAttackerCommand(int need) {
             }
         }
     }
+    return false;
+}
+
+void ExtraAI::reunionAttackerCommand() {
+    vector<PlayerUnit *> bases = attackBases();
+    if (bases.size() == 0) {
+        return;
+    }
+    PlayerUnit *base = bases[0];
+    Position center = base->position;
+    if (center.first == MAX_FIELD_WIDTH - 1) center.first--;
+    if (center.second == MAX_FIELD_HEIGHT - 1) center.second--;
     
+    int poolTargetSingleRange = 1;
+    map<int, PlayerUnit *>::iterator uPIte;
+    for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
+        PlayerUnit *aUnit = uPIte->second;
+        int distSToBase = utl::distSingle(center, aUnit->position);
+        if (distSToBase <= poolTargetSingleRange) continue;
+        if (!aUnit->isMovable()) continue;
+        
+        addCommandMove(aUnit, center);
+    }
 }
 
 // MARK: Worker

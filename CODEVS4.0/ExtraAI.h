@@ -108,6 +108,8 @@ public:
     int createVillageOnResourceCommand(int assign, int prob);
     int getResourceCommand(int prob);
     void defendResourceCommand(int assign);
+    int workerCreationCount[MAX_FIELD_WIDTH][MAX_FIELD_HEIGHT];
+    
 
     // MARK: temp
     int supplyFreeWorkerWithVillageCommand(int need, int prob);
@@ -121,10 +123,13 @@ public:
     int calcAttackBase();
     void createOneAttackerBase();
     void createOneMoreAttackerBase();
+    vector<PlayerUnitType> defaultAttackerPack();
+    vector<PlayerUnitType> assassinAttackerPack();
     void createAttackerCommand();
     void attackCastleCommand();
-    
-    void poolAttackerCommand(int need);
+    bool poolReleased;
+    bool poolAttackerCommand(int need);
+    void reunionAttackerCommand();
     
     
     // Worker

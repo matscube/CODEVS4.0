@@ -101,27 +101,37 @@ int main(int argc, const char * argv[]) {
         
         if (enemy.castleMode == CastleMode::Alone) {
             // Quick Attack
+//            cerr << "alone" << endl;
             ai.attackCastleCommand();
         } else if (enemy.castleMode == CastleMode::Defending) {
             // Pool Attack
-            ai.poolAttackerCommand(60);
+//            cerr << "pool" << endl;
+            if (!ai.poolReleased) {
+                ai.reunionAttackerCommand();
+                if (ai.poolAttackerCommand(70)) {
+                    ai.poolReleased = true;
+                }
+            }
             ai.attackCastleCommand();
         } else {
+//            cerr << "default" << endl;
             ai.poolAttackerCommand(30);
             ai.attackCastleCommand();
         }
         
         // Resource Getting
-        ai.createVillageOnResourceCommand(INF, 100);
-        ai.searchUnkownFieldSmallCommand(INF);
-        ai.getResourceCommand(INF);
+        if (attackBaseCount == 0) {
+            ai.createVillageOnResourceCommand(INF, 100);
+            ai.searchUnkownFieldSmallCommand(INF);
+            ai.getResourceCommand(INF);
 
-        ai.searchUnkownFieldMediumCommand(INF);
-        ai.getResourceCommand(INF);
-        
-        ai.searchUnkownFieldAllCommand(INF);
-        ai.getResourceCommand(INF);
-
+            ai.searchUnkownFieldMediumCommand(INF);
+            ai.getResourceCommand(INF);
+            
+            ai.searchUnkownFieldAllCommand(INF);
+            ai.getResourceCommand(INF);
+        }
+            
         // End AI Commands **********************************************************
 
         // Output AI Commands

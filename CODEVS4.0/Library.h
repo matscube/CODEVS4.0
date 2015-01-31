@@ -49,7 +49,10 @@ enum class CastleMode {
     Alone,
     Defending,
 };
-
+enum class CastleDefenderType {
+    Default,
+    Assassin,
+};
 
 class Player;
 enum class PlayerUnitActionType {

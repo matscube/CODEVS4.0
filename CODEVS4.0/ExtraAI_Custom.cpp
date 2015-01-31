@@ -329,16 +329,21 @@ int ExtraAI::getResourceCommand(int prob) {
     // create worker on village/resource
     map<int, ResourceUnit>::iterator resIte;
     for (uIte = player->villages.begin(); uIte != player->villages.end(); uIte++) {
-        int hashID = uIte->second.getHashID();
+        PlayerUnit *village = &uIte->second;
+        int hashID = village->getHashID();
         int count = 0;
         if (workerCount.find(hashID) != workerCount.end()) {
             count = workerCount[hashID];
         }
         
+        if (workerCreationCount[village->position.first][village->position.second] > 9) continue;
+        
         if (count < MAX_GETTING_RESOURCE) {
-            if (!uIte->second.isCreatableWorker()) continue;
-            addCommandCreateWorker(&uIte->second);
+            if (!village->isCreatableWorker()) continue;
+            addCommandCreateWorker(village);
             create++;
+            
+            workerCreationCount[village->position.first][village->position.second]++;
         }
     }
     
