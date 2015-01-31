@@ -127,6 +127,7 @@ public:
     void attackCastleCommand();
     bool poolReleased;
     bool poolAttackerCommand(int need);
+    void reunionAttackerCommand();
     
     
     // Worker

@@ -107,6 +107,7 @@ int main(int argc, const char * argv[]) {
             // Pool Attack
 //            cerr << "pool" << endl;
             if (!ai.poolReleased) {
+                ai.reunionAttackerCommand();
                 if (ai.poolAttackerCommand(70)) {
                     ai.poolReleased = true;
                 }

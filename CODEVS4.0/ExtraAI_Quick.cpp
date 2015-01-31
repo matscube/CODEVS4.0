@@ -285,6 +285,28 @@ bool ExtraAI::poolAttackerCommand(int need) {
     return false;
 }
 
+void ExtraAI::reunionAttackerCommand() {
+    vector<PlayerUnit *> bases = attackBases();
+    if (bases.size() == 0) {
+        return;
+    }
+    PlayerUnit *base = bases[0];
+    Position center = base->position;
+    if (center.first == MAX_FIELD_WIDTH - 1) center.first--;
+    if (center.second == MAX_FIELD_HEIGHT - 1) center.second--;
+    
+    int poolTargetSingleRange = 1;
+    map<int, PlayerUnit *>::iterator uPIte;
+    for (uPIte = player->attackers.begin(); uPIte != player->attackers.end(); uPIte++) {
+        PlayerUnit *aUnit = uPIte->second;
+        int distSToBase = utl::distSingle(center, aUnit->position);
+        if (distSToBase <= poolTargetSingleRange) continue;
+        if (!aUnit->isMovable()) continue;
+        
+        addCommandMove(aUnit, center);
+    }
+}
+
 // MARK: Worker
 void ExtraAI::supplyWorkerForSearchCommand(int need) {
     map<int, PlayerUnit>::iterator uIte;
