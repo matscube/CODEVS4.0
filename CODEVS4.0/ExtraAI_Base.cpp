@@ -6,6 +6,8 @@
 //  Copyright (c) 2015年 TakanoriMatsumoto. All rights reserved.
 //
 
+#include <stdio.h>
+#include <string.h>
 #include "ExtraAI.h"
 
 ExtraAI::ExtraAI(Game &game, Field &field, Player &player, Player &enemy) {

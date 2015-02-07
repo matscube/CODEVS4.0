@@ -29,18 +29,21 @@ int ExtraAI::createCastleBaseCommand(int prob) {
     if (defenderBaseCount(castle->position)) return create;
     
     // Worker, if needed, create
-    PlayerUnit *castleWorker = nullptr;
+    PlayerUnit *castleWorker; // = nullptr;
+    bool flg = false;
     map<int, PlayerUnit>::iterator uIte;
     for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
         PlayerUnit *worker = &uIte->second;
         if (worker->isMovable() && utl::dist(worker->position, castle->position) == 0) {
             castleWorker = worker;
+            flg = true;
             break;
         }
     }
 
     // create worker
-    if (castleWorker == nullptr) {
+    if (flg) {
+//    if (castleWorker == nullptr) {
         if (castle->isCreatableWorker()) {
             addCommandCreateWorker(castle);
         }

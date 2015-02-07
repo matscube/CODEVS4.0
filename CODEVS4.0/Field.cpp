@@ -6,6 +6,8 @@
 //  Copyright (c) 2014年 TakanoriMatsumoto. All rights reserved.
 //
 
+#include <stdio.h>
+#include <string.h>
 #include "Field.h"
 #include "PlayerUnit.h"
 #include "Player.h"

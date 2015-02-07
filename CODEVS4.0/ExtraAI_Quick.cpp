@@ -106,20 +106,24 @@ void ExtraAI::createOneAttackerBase() {
 }
 void ExtraAI::createOneMoreAttackerBase() {
     map<int, PlayerUnit>::iterator uIte;
-    PlayerUnit *targetBase = nullptr;
+    PlayerUnit *targetBase; // = nullptr;
+    bool flg = false;
     for (uIte = player->bases.begin(); uIte != player->bases.end(); uIte++) {
         PlayerUnit *base = &uIte->second;
         if (base->position.first == MAX_FIELD_WIDTH - 1 || base->position.second == MAX_FIELD_HEIGHT - 1) {
             targetBase= base;
+            flg = true;
         }
     }
     
-    if (targetBase == nullptr) {
+    if (flg) {
+//    if (targetBase == nullptr) {
         cerr << "Error base is nowhere." << endl;
         return;
     }
     
-    PlayerUnit *targetWorker = nullptr;
+    PlayerUnit *targetWorker; // = nullptr;
+    flg = false;
     int dToBase = INF;
     for (uIte = player->workers.begin(); uIte != player->workers.end(); uIte++) {
         PlayerUnit *worker = &uIte->second;
@@ -130,10 +134,12 @@ void ExtraAI::createOneMoreAttackerBase() {
         if (d < dToBase) {
             dToBase = d;
             targetWorker = worker;
+            flg = true;
         }
     }
     
-    if (targetWorker == nullptr) {
+    if (flg) {
+//    if (targetWorker == nullptr) {
         cerr << "Warning: missing commandable worker." << endl;
         return;
     }
