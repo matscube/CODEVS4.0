@@ -13,8 +13,6 @@
 		216121181A4890A100C7C139 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216121161A4890A100C7C139 /* Player.cpp */; };
 		2161211B1A4890AD00C7C139 /* Field.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216121191A4890AD00C7C139 /* Field.cpp */; };
 		2161211E1A4890BD00C7C139 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2161211C1A4890BD00C7C139 /* Game.cpp */; };
-		216121211A48925100C7C139 /* AI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2161211F1A48925100C7C139 /* AI.cpp */; };
-		216DBDB61A5ECA62002942FF /* QuickAI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 216DBDB41A5ECA62002942FF /* QuickAI.cpp */; };
 		2172155B1A6A632E00E3F464 /* ExtraAI_Base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 217215591A6A632E00E3F464 /* ExtraAI_Base.cpp */; };
 		218904651A6ED1BB008372A7 /* ExtraAI_Search.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 218904641A6ED1BB008372A7 /* ExtraAI_Search.cpp */; };
 		218904671A6ED1DB008372A7 /* ExtraAI_Custom.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 218904661A6ED1DB008372A7 /* ExtraAI_Custom.cpp */; };
@@ -46,10 +44,6 @@
 		2161211A1A4890AD00C7C139 /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Field.h; sourceTree = "<group>"; };
 		2161211C1A4890BD00C7C139 /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Game.cpp; sourceTree = "<group>"; };
 		2161211D1A4890BD00C7C139 /* Game.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
-		2161211F1A48925100C7C139 /* AI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AI.cpp; sourceTree = "<group>"; };
-		216121201A48925100C7C139 /* AI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AI.h; sourceTree = "<group>"; };
-		216DBDB41A5ECA62002942FF /* QuickAI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = QuickAI.cpp; sourceTree = "<group>"; };
-		216DBDB51A5ECA62002942FF /* QuickAI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuickAI.h; sourceTree = "<group>"; };
 		217215591A6A632E00E3F464 /* ExtraAI_Base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtraAI_Base.cpp; sourceTree = "<group>"; };
 		2172155A1A6A632E00E3F464 /* ExtraAI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtraAI.h; sourceTree = "<group>"; };
 		218904641A6ED1BB008372A7 /* ExtraAI_Search.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtraAI_Search.cpp; sourceTree = "<group>"; };
@@ -124,10 +118,6 @@
 				218904631A6ED194008372A7 /* ExtraAI */,
 				213DC4351A49241800E5DC85 /* Libs */,
 				219D56401A3F47BE00162FEA /* main.cpp */,
-				2161211F1A48925100C7C139 /* AI.cpp */,
-				216121201A48925100C7C139 /* AI.h */,
-				216DBDB41A5ECA62002942FF /* QuickAI.cpp */,
-				216DBDB51A5ECA62002942FF /* QuickAI.h */,
 			);
 			path = CODEVS4.0;
 			sourceTree = "<group>";
@@ -194,13 +184,11 @@
 				2172155B1A6A632E00E3F464 /* ExtraAI_Base.cpp in Sources */,
 				2161211B1A4890AD00C7C139 /* Field.cpp in Sources */,
 				21149D2B1A73EABD00C34F40 /* PlayerUnit.cpp in Sources */,
-				216DBDB61A5ECA62002942FF /* QuickAI.cpp in Sources */,
 				218904671A6ED1DB008372A7 /* ExtraAI_Custom.cpp in Sources */,
 				213DC4381A492BFE00E5DC85 /* Library.cpp in Sources */,
 				21149D281A72B43300C34F40 /* ExtraAI_Quick.cpp in Sources */,
 				216121181A4890A100C7C139 /* Player.cpp in Sources */,
 				2161211E1A4890BD00C7C139 /* Game.cpp in Sources */,
-				216121211A48925100C7C139 /* AI.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

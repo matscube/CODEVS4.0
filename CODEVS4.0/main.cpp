@@ -13,8 +13,6 @@
 #include "Field.h"
 #include "Player.h"
 #include "Game.h"
-#include "AI.h"
-#include "QuickAI.h"
 #include "ExtraAI.h"
 #include "Library.h"
 
