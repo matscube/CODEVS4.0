@@ -39,7 +39,7 @@ public:
 };
 
 class Field {
-    ofstream ofs;
+//    ofstream ofs;
 public:
 
     Field();

@@ -29,7 +29,7 @@ class IOManager {
     Player *player;
     Player *enemy;
     void finishInput();
-    ofstream ofs;
+//    ofstream ofs;
 public:
     IOManager(Game &game, Field &field, Player &player, Player &enemy);
     void resetWithStage(Game &game, Field &field, Player &player, Player &enemy);

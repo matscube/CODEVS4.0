@@ -16,7 +16,7 @@ IOManager::IOManager(Game &game, Field &field, Player &player, Player &enemy) {
     IOManager::field = &field;
     IOManager::player = &player;
     IOManager::enemy = &enemy;
-    ofs = ofstream("/Users/matscube/iomanager.txt");
+//    ofs = ofstream("/Users/matscube/iomanager.txt");
 }
 
 void IOManager::resetWithStage(Game &game, Field &field, Player &player, Player &enemy) {
@@ -24,7 +24,7 @@ void IOManager::resetWithStage(Game &game, Field &field, Player &player, Player 
     IOManager::field = &field;
     IOManager::player = &player;
     IOManager::enemy = &enemy;
-    ofs = ofstream("/Users/matscube/iomanager.txt");
+//    ofs = ofstream("/Users/matscube/iomanager.txt");
 }
 
 int IOManager::nextInt() {
@@ -158,14 +158,14 @@ void IOManager::output(vector<Command> commands) {
         }
     }
     
-    ofs << "Turn: " << game->currentTurn << endl;
-    ofs << "Resource: " << player->resourceCount << endl;
+//    ofs << "Turn: " << game->currentTurn << endl;
+//    ofs << "Resource: " << player->resourceCount << endl;
     
-    ofs << "Input: " << endl;
+//    ofs << "Input: " << endl;
     
     int sz = (int)resCommands.size();
     cout << sz << endl; cout.flush();
-    ofs << sz << endl;
+//    ofs << sz << endl;
     
     for (ite = resCommands.begin(); ite != resCommands.end(); ite++) {
         if (ite->second == PlayerUnitActionType::None) {
@@ -174,9 +174,9 @@ void IOManager::output(vector<Command> commands) {
         }
         cout << ite->first << " " << PlayerUnit::action(ite->second) << endl; cout.flush();
         
-        ofs << ite->first << " " << PlayerUnit::action(ite->second) << endl; ofs.flush();
+//        ofs << ite->first << " " << PlayerUnit::action(ite->second) << endl; ofs.flush();
     }
-    ofs << endl;
+//    ofs << endl;
 }
 
 void IOManager::testOutput() {

@@ -29,7 +29,7 @@ void Field::resetWithStage() {
             isVisited[x][y] = false;
         }
     }
-    ofs = ofstream("/Users/matscube/Desktop/field_debug.txt");
+//    ofs = ofstream("/Users/matscube/Desktop/field_debug.txt");
     for (int x = 0; x < MAX_FIELD_WIDTH; x++) {
         for (int y = 0; y < MAX_FIELD_HEIGHT; y++) {
             isViewed[x][y] = false;
